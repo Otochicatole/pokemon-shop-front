@@ -6,7 +6,6 @@ import { ShoppingBag, UserRound, Menu, X, Search } from 'lucide-react';
 import { type FormEvent, useState } from 'react';
 import { useCartStore } from '@/features/cart/infrastructure/store';
 import { SessionMenu } from '@/features/auth/ui/session-menu';
-import { PromoBar } from './pixel-primitives';
 
 export function Header() {
   const [open, setOpen] = useState(false);
@@ -19,9 +18,7 @@ export function Header() {
     router.push(value ? `/catalog?q=${encodeURIComponent(value)}` : '/catalog');
     setOpen(false);
   };
-  return <>
-    <PromoBar />
-    <header className="site-header">
+  return <header className="site-header">
       <div className="header-inner">
         <Link href="/" className="brand" onClick={() => setOpen(false)}><span className="brand-mark">✦</span><span>Card Shop<small>objetos para coleccionar</small></span></Link>
         <nav className={`main-nav ${open ? 'is-open' : ''}`}>
@@ -38,6 +35,5 @@ export function Header() {
           <button className="menu-toggle" aria-label={open ? 'Cerrar menú' : 'Abrir menú'} onClick={() => setOpen(!open)}>{open ? <X size={19} /> : <Menu size={19} />}</button>
         </div>
       </div>
-    </header>
-  </>;
+    </header>;
 }

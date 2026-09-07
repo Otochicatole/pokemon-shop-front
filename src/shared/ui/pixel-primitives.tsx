@@ -21,10 +21,6 @@ export function SectionHeading({ eyebrow, title, description, action, level = 'h
   return <div className="section-heading heading-row"><div>{eyebrow && <p className="eyebrow">{eyebrow}</p>}<Heading>{title}</Heading>{description && <p>{description}</p>}</div>{action}</div>;
 }
 
-export function PromoBar() {
-  return <div className="promo-bar" aria-label="Promociones"><span>✦ Envío gratis desde $60</span><span>✦ Stock real · compra protegida</span><span>▣ Nueva expansión: ruta celeste</span></div>;
-}
-
 export function ProductTile({ children, className = '' }: { children: ReactNode; className?: string }) {
   return <article className={`product-card product-tile ${className}`}>{children}</article>;
 }
