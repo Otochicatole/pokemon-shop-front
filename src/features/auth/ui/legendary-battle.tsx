@@ -2,7 +2,14 @@
 
 import Image from 'next/image';
 import { useState } from 'react';
+import { PokemonStage } from '@/components/pokemon-stage';
 import { legendaryCompanions, type LegendaryCompanion } from '../domain/legendary-companion';
+
+const groundOffsets: Record<LegendaryCompanion['id'], string> = {
+  mewtwo: '0%',
+  moltres: '17.2%',
+  raikou: '0%',
+};
 
 export function LegendaryBattle() {
   const [selectedId, setSelectedId] = useState<LegendaryCompanion['id']>('mewtwo');
@@ -19,10 +26,14 @@ export function LegendaryBattle() {
         <small>HP {selected.hp} / {selected.maxHp}</small>
       </div>
 
-      <div className="legendary-sprite" key={selected.id}>
-        <Image src={selected.spriteUrl} alt={`${selected.name[0]}${selected.name.slice(1).toLowerCase()} pixelado`} width={430} height={430} unoptimized priority />
-      </div>
-      <div className="legendary-platform" aria-hidden="true" />
+      <PokemonStage
+        key={selected.id}
+        variant="legendary"
+        spriteUrl={selected.spriteUrl}
+        alt={`${selected.name[0]}${selected.name.slice(1).toLowerCase()} pixelado`}
+        groundOffset={groundOffsets[selected.id]}
+        priority
+      />
 
       <div className="legendary-dialogue" aria-live="polite" aria-atomic="true">
         <span aria-hidden="true">▶</span>

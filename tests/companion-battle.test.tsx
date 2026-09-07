@@ -37,4 +37,12 @@ describe('CompanionBattle', () => {
 
     expect(screen.getByRole('button', { name: 'FUEGO' })).toHaveAttribute('aria-pressed', 'true');
   });
+
+  it('renders the active sprite and platform in one shared stage', () => {
+    const { container } = render(<CompanionBattle />);
+    const stage = container.querySelector('[data-pokemon-stage="route"]');
+
+    expect(stage).toContainElement(container.querySelector('[data-pokemon-sprite]'));
+    expect(stage).toContainElement(container.querySelector('[data-pokemon-platform]'));
+  });
 });

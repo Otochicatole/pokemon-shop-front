@@ -2,7 +2,14 @@
 
 import Image from 'next/image';
 import { useState } from 'react';
+import { PokemonStage } from '@/components/pokemon-stage';
 import { companions, type Companion } from '../domain/companion';
+
+const groundOffsets: Record<Companion['id'], string> = {
+  pikachu: '0%',
+  charmander: '0%',
+  squirtle: '0%',
+};
 
 export function CompanionBattle() {
   const [selectedId, setSelectedId] = useState<Companion['id']>('pikachu');
@@ -19,10 +26,14 @@ export function CompanionBattle() {
         <small>HP {selected.hp} / {selected.maxHp}</small>
       </div>
 
-      <div className="hero-sprite" key={selected.id}>
-        <Image src={selected.spriteUrl} alt={`${selected.name[0]}${selected.name.slice(1).toLowerCase()} pixelado`} width={430} height={430} unoptimized priority />
-      </div>
-      <div className="battle-platform" aria-hidden="true" />
+      <PokemonStage
+        key={selected.id}
+        variant="route"
+        spriteUrl={selected.spriteUrl}
+        alt={`${selected.name[0]}${selected.name.slice(1).toLowerCase()} pixelado`}
+        groundOffset={groundOffsets[selected.id]}
+        priority
+      />
 
       <div className="dialogue" aria-live="polite" aria-atomic="true">
         <span aria-hidden="true">▶</span>
