@@ -1,7 +1,7 @@
-export type LegendaryCompanionType = 'psychic' | 'fire' | 'ice';
+export type LegendaryCompanionType = 'psychic' | 'fire' | 'electric';
 
 export interface LegendaryCompanion {
-  id: 'mewtwo' | 'moltres' | 'articuno';
+  id: 'mewtwo' | 'moltres' | 'raikou';
   name: string;
   type: LegendaryCompanionType;
   typeLabel: string;
@@ -25,8 +25,8 @@ export const legendaryCompanions: readonly LegendaryCompanion[] = [
     message: 'enciende el horizonte.', detail: 'Sus llamas dibujan un nuevo camino para tu colección.',
   },
   {
-    id: 'articuno', name: 'ARTICUNO', type: 'ice', typeLabel: 'HIELO', level: 65, hp: 195, maxHp: 195,
-    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/144.gif',
-    message: 'desciende entre cristales.', detail: 'El aire se vuelve frío cuando sus alas aparecen.',
+    id: 'raikou', name: 'RAIKOU', type: 'electric', typeLabel: 'ELÉCTRICO', level: 65, hp: 195, maxHp: 195,
+    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/243.gif',
+    message: 'despierta la tormenta.', detail: 'Un rugido eléctrico recorre la cámara celestial.',
   },
 ] as const;
