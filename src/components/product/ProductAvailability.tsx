@@ -1,0 +1,1 @@
+export function ProductAvailability({ available, className = '' }: { available: number; className?: string }) { if (available === 0) return <p className={`stock-muted ${className}`}>Agotado</p>; if (available <= 2) return <p className={`stock-warn ${className}`}>Últimas {available} unidades</p>; return <p className={`stock-available ${className}`}>En stock</p>; }

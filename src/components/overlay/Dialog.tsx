@@ -1,0 +1,3 @@
+'use client';
+import type { ReactNode } from 'react';
+export function Dialog({ open, title, onClose, children, className = '' }: { open: boolean; title: string; onClose: () => void; children: ReactNode; className?: string }) { if (!open) return null; return <div className="dialog-backdrop" role="presentation" onMouseDown={onClose}><section className={`dialog ${className}`} role="dialog" aria-modal="true" aria-labelledby="dialog-title" onMouseDown={(event) => event.stopPropagation()}><button type="button" className="dialog-close" onClick={onClose} aria-label="Cerrar">×</button><h2 id="dialog-title">{title}</h2>{children}</section></div>; }

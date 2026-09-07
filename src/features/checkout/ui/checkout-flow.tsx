@@ -7,7 +7,7 @@ import { toast } from 'sonner';
 import { useCartStore } from '@/features/cart/infrastructure/store';
 import { cartTotal } from '@/features/cart/domain/cart';
 import { formatMoney } from '@/shared/lib/format';
-import { Button } from '@/shared/ui/button';
+import { Button } from '@/components/button';
 import { getCheckoutOptions, previewCheckout, createOrder } from '../infrastructure/api';
 import { getMe } from '@/features/auth/infrastructure/api';
 import type { OrderInput } from '@/shared/api/contracts';

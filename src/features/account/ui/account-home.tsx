@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { getMe, logout } from '@/features/auth/infrastructure/api';
-import { Button } from '@/shared/ui/button';
+import { Button } from '@/components/button';
 
 export function AccountHome() {
   const router = useRouter(); const queryClient = useQueryClient();
