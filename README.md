@@ -1,5 +1,7 @@
 # front-card-shop
 
+El cliente consume la API modular `/api/v2` del backend mediante el proxy same-origin de Next.js. Las respuestas se validan con Zod y se normalizan desde el envelope `{ data, meta }`.
+
 Frontend ecommerce modular para `back-card-shop`, construido con Next.js 16, React 19, TypeScript, Tailwind 4 y Bun.
 
 ## Desarrollo local
@@ -8,7 +10,7 @@ Frontend ecommerce modular para `back-card-shop`, construido con Next.js 16, Rea
 2. Asegurate de que el backend escuche en `http://localhost:3000` y tenga `FRONTEND_ORIGINS=http://localhost:3001`.
 3. Ejecutá `bun install` y `bun run dev`.
 
-La tienda queda disponible en `http://localhost:3001`. El proxy same-origin de Next reenvía `/api/v1/*` y `/media/*` al backend; no se guardan tokens de sesión en el navegador.
+La tienda queda disponible en `http://localhost:3001`. El proxy same-origin de Next reenvía `/api/v2/*` y `/media/*` al backend; no se guardan tokens de sesión en el navegador.
 
 ## Comandos
 

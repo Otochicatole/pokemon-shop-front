@@ -12,7 +12,7 @@ export const productSchema = z.object({
   updatedAt: z.string().or(z.date()).optional(),
 });
 export type Product = z.infer<typeof productSchema>;
-export const productListSchema = z.object({ data: z.array(productSchema), nextCursor: z.string().nullable() });
+export const productListSchema = z.object({ data: z.array(productSchema), meta: z.object({ nextCursor: z.string().nullable() }) });
 
 export const optionsSchema = z.object({
   fulfillment: z.object({
