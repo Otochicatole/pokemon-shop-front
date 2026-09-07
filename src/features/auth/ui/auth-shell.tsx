@@ -1,0 +1,2 @@
+import Link from 'next/link';
+export function AuthShell({ title, eyebrow, children }: { title: string; eyebrow?: string; children: React.ReactNode }) { return <main className="auth-page"><div className="auth-aside"><Link href="/" className="brand light"><span className="brand-mark">✦</span><span>Card Shop<small>objetos para coleccionar</small></span></Link><p>Encontrá piezas que merecen un lugar especial.</p></div><div className="auth-panel"><div className="auth-card"><p className="eyebrow">{eyebrow ?? 'Tu cuenta'}</p><h1>{title}</h1>{children}</div></div></main>; }

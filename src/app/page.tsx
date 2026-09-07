@@ -1,69 +1,29 @@
-import Image from "next/image";
+import Link from 'next/link';
+import Image from 'next/image';
+import { ArrowUpRight, ShieldCheck, Sparkles, Truck, Package, Layers3, Gem } from 'lucide-react';
+import { listProducts } from '@/features/catalog/infrastructure/api';
+import { ProductCard } from '@/shared/ui/product-card';
+import { SectionHeading, TexturePanel } from '@/shared/ui/pixel-primitives';
 
-export default function Home() {
-  return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
-  );
+const collections = [
+  { href: '/catalog?kind=SINGLE_CARD', label: 'Cartas sueltas', eyebrow: 'Completá tu pokédex', icon: Layers3, tone: 'yellow' },
+  { href: '/catalog?kind=SEALED_PRODUCT', label: 'Sobres y cajas', eyebrow: 'Tentá a la suerte', icon: Package, tone: 'red' },
+  { href: '/catalog', label: 'Accesorios', eyebrow: 'Protegé tu equipo', icon: Gem, tone: 'cyan' },
+] as const;
+
+export default async function Home() {
+  const products = await listProducts(new URLSearchParams({ limit: '8' })).catch(() => ({ data: [], nextCursor: null }));
+  return <>
+    <section className="hero">
+      <div className="hero-copy"><p className="eyebrow">Ruta 10 // central de coleccionistas</p><h1>Viví la aventura.<br /><em>Coleccioná.</em></h1><p className="hero-text">Cartas Pokémon, productos sellados y equipo para entrenadores. Explorá el catálogo y encontrá tu próxima pieza favorita.</p><div className="hero-actions"><Link className="button button-primary" href="/catalog">Entrar a la tienda <ArrowUpRight size={16} /></Link><Link className="text-button" href="/catalog?kind=SINGLE_CARD">Atacar <Sparkles size={14} /></Link></div></div>
+      <div className="hero-art battle-scene" aria-label="Escena pixelada de aventura" role="img"><div className="route-label">RUTA 10 <span /> CENTRAL POKÉMON DE ENTRENADORES</div><div className="battle-hud"><span>PIKACHU</span><b>Lv. 18</b><div><i /><i /><i /><i /></div><small>HP 48 / 48</small></div><div className="hero-sprite"><Image src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/25.gif" alt="Pokémon pixelado" width={430} height={430} unoptimized priority /></div><div className="battle-platform" /><div className="dialogue"><span>▶</span><div><b>PIKACHU</b><span>quiere acompañarte.</span><small>Listo para tu próxima aventura.</small></div></div><div className="companion-selector"><button className="active"><span className="type-dot electric" /><span>ELÉCTRICO</span></button><button><span className="type-dot fire" /><span>FUEGO</span></button><button><span className="type-dot water" /><span>AGUA</span></button></div></div>
+    </section>
+    <section className="trust-strip"><span><ShieldCheck size={16} /> Compra protegida</span><span><Sparkles size={16} /> Piezas verificadas</span><span><Truck size={16} /> Envíos a todo el país</span></section>
+    <section className="collection-links">{collections.map(({ href, label, eyebrow, icon: Icon, tone }) => <Link className={`collection-link collection-link-${tone}`} href={href} key={label}><span className="collection-icon"><Icon size={22} /></span><span><small>{eyebrow}</small><strong>{label}</strong></span><ArrowUpRight size={17} /></Link>)}</section>
+    <section className="home-section"><SectionHeading eyebrow="Inventario en vivo" title="Cartas destacadas" description="Stock real, precios claros y piezas listas para tu próxima colección." action={<Link className="text-button" href="/catalog">Catálogo completo <ArrowUpRight size={15} /></Link>} />{products.data.length ? <div className="product-grid">{products.data.map((product) => <ProductCard key={product.id} product={product} />)}</div> : <div className="empty-home"><p>El catálogo se está preparando.</p><Link href="/catalog" className="text-button">Explorar la tienda <ArrowUpRight size={16} /></Link></div>}</section>
+    <section className="explore-section"><TexturePanel className="explore-panel"><div><p className="eyebrow">Mapa de la aventura // Card Shop</p><h2>Explorá por categoría</h2><p>Cada zona esconde una colección diferente.</p></div><Link className="button button-secondary" href="/catalog">Ver todas las piezas <ArrowUpRight size={15} /></Link></TexturePanel></section>
+    <section className="drop-banner"><div className="booster-stack" aria-hidden="true"><span>RUTA<br /><b>CELESTE</b><small>EXPANSIÓN 02</small></span><span>RUTA<br /><b>CELESTE</b><small>EXPANSIÓN 02</small></span><span>RUTA<br /><b>CELESTE</b><small>EXPANSIÓN 02</small></span></div><div className="drop-copy"><p className="eyebrow">Próxima expansión</p><h2>Ruta<br />Celeste</h2><span>12 CARTAS NUEVAS · 4 ULTRA RARAS · 1 SECRETA</span><div className="countdown"><strong>04<small>DÍAS</small></strong><i>:</i><strong>18<small>HORAS</small></strong><i>:</i><strong>26<small>MIN</small></strong></div><Link className="button button-primary" href="/catalog">Explorar novedades <ArrowUpRight size={15} /></Link></div></section>
+    <section className="trainer-club"><div className="club-card"><span className="club-level">CLUB DE ENTRENADORES · NIVEL 01</span><h2>Sumá puntos.<br />Desbloqueá recompensas.</h2><p>Cada compra suma experiencia. Subí de nivel y conseguí envíos gratis, preventas y cartas exclusivas.</p><Link className="button button-primary" href="/auth/register">Unirme gratis <ArrowUpRight size={15} /></Link></div><div className="xp-box"><div className="xp-top"><span>TU PRÓXIMA RECOMPENSA</span><b>650 / 1000 XP</b></div><div className="xp-track"><i /></div><div className="reward-row"><span>◉<small>100 XP<br />STICKER</small></span><span>▣<small>500 XP<br />ENVÍO</small></span><span className="locked">◆<small>1000 XP<br />CARTA RARA</small></span></div></div></section>
+    <section className="manifesto"><p className="eyebrow">La experiencia Card Shop</p><h2>Comprar también puede ser una forma de <em>descubrir.</em></h2><p>Información clara, stock real y una experiencia pensada para disfrutar cada elección.</p></section>
+  </>;
 }
