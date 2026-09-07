@@ -66,7 +66,7 @@ button:disabled { cursor: not-allowed; opacity: .5; }
 @media (max-width: 760px) { .footer-main { grid-template-columns: 1fr 1fr; padding: 44px 18px; gap: 25px; }.footer-newsletter { grid-column: 1 / -1; }.footer-bottom { flex-direction: column; padding: 18px; line-height: 1.6; } }
 .hero-art.battle-scene { min-height: 610px; display: grid; place-items: center; background: linear-gradient(rgba(8,13,18,.05), rgba(8,13,18,.18)), url('https://pocket-pixel-design-system.t3rry327.chatgpt.site/world/kanto-route.png') center / cover; }
 .hero-art.battle-scene::before { content: ''; position: absolute; inset: 0; opacity: .22; background-image: linear-gradient(rgba(255,255,255,.12) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.12) 1px, transparent 1px); background-size: 16px 16px; }
-.hero-art.battle-scene::after { content: ''; }
+.hero-art.battle-scene::after { content: none; display: none; }
 .battle-scene .route-label { position: absolute; top: 18px; left: 22px; z-index: 5; display: flex; align-items: center; gap: 10px; color: #fff; font: 7px var(--pixel-font); text-transform: uppercase; }.battle-scene .route-label span { width: 36px; height: 2px; background: var(--accent); }.battle-hud { position: absolute; top: 25px; right: 22px; z-index: 5; width: 215px; padding: 12px; display: grid; grid-template-columns: 1fr auto; border: 3px solid var(--ink); background: rgba(7,10,15,.86); box-shadow: 5px 5px 0 #05070a; }.battle-hud span, .battle-hud b { font: 8px var(--pixel-font); }.battle-hud div { grid-column: 1 / -1; display: flex; gap: 2px; height: 10px; margin: 8px 0 4px; padding: 2px; background: #05070a; }.battle-hud div i { flex: 1; background: var(--green); }.battle-hud small { grid-column: 1 / -1; text-align: right; font: 6px var(--pixel-font); }.hero-sprite { position: relative; z-index: 3; width: min(430px, 65%); height: min(430px, 65%); filter: drop-shadow(12px 13px rgba(0,0,0,.4)); animation: hero-float 1.3s steps(2,end) infinite; }.hero-sprite img { width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; }.battle-platform { position: absolute; bottom: 115px; z-index: 2; width: 64%; height: 64px; border: 3px solid var(--line-strong); border-radius: 50%; background: repeating-linear-gradient(90deg, rgba(255,255,255,.25) 0 14px, transparent 14px 27px); transform: skew(-10deg); }.dialogue { position: absolute; left: 5%; bottom: 25px; z-index: 6; width: 62%; min-height: 88px; display: flex; gap: 12px; padding: 16px 18px; border: 3px solid var(--ink); background: rgba(7,10,15,.9); box-shadow: inset 0 0 0 4px #05070a, inset 0 0 0 7px var(--ink); }.dialogue > span { color: var(--accent); font: 10px var(--pixel-font); }.dialogue b, .dialogue span, .dialogue small { display: block; }.dialogue b { margin-bottom: 8px; font: 8px var(--pixel-font); }.dialogue > div > span { margin-bottom: 4px; font: 15px 'Nunito', sans-serif; }.dialogue small { color: #c9d3da; font-size: 10px; font-weight: 700; }.companion-selector { position: absolute; right: 3%; bottom: 25px; z-index: 7; display: flex; flex-direction: column; gap: 7px; }.companion-selector button { width: 135px; height: 51px; display: flex; align-items: center; gap: 9px; border: 2px solid var(--ink); background: rgba(7,10,15,.82); color: var(--ink); font: 6px var(--pixel-font); text-align: left; }.companion-selector button.active { background: var(--accent); color: #080b10; transform: translateX(-7px); }.type-dot { width: 12px; height: 12px; margin-left: 7px; border-radius: 50%; background: var(--accent); }.type-dot.fire { background: var(--warm); }.type-dot.water { background: var(--cyan); }.companion-selector button:not(.active) { opacity: .9; }.companion-selector button:hover { border-color: var(--accent); }.hero-art.battle-scene .orb, .hero-art.battle-scene .hero-card { display: none; }
 @keyframes hero-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
 @media (max-width: 760px) { .hero-art.battle-scene { min-height: 520px; }.battle-scene .route-label { font-size: 6px; left: 13px; }.battle-hud { top: 20px; right: 12px; width: 172px; padding: 8px; }.hero-sprite { width: 70%; height: 70%; }.battle-platform { bottom: 130px; width: 78%; }.dialogue { left: 4%; bottom: 18px; width: 72%; padding: 12px; }.dialogue small { display: none; }.companion-selector { right: 2%; bottom: 18px; }.companion-selector button { width: 94px; height: 42px; font-size: 5px; }.type-dot { width: 8px; height: 8px; } }
@@ -106,7 +106,7 @@ button:disabled { cursor: not-allowed; opacity: .5; }
 /* Interactive companion battle */
 .hero-sprite { animation: companion-enter .18s steps(2, end), hero-float 1.3s steps(2, end) .18s infinite; }
 .dialogue { min-height: 105px; padding: 19px 20px; gap: 13px; border: 4px solid #dbe4ea; background: rgba(11,14,18,.94); box-shadow: inset 0 0 0 4px #0b0e12, inset 0 0 0 7px #e6edf2, 5px 5px 0 rgba(5,6,9,.65); }
-.dialogue > span { padding-top: 1px; color: #aab5bf; }
+.dialogue > span { padding-top: 1px; color: #aab5bf; animation: dialogue-caret-blink 1s steps(1, end) infinite; }
 .dialogue b { margin-bottom: 9px; font-size: 9px; }
 .dialogue > div > span { margin-bottom: 3px; color: #fff; font-size: 15px; font-weight: 800; line-height: 1.25; }
 .dialogue small { color: #fff; font-size: 12px; line-height: 1.35; }
@@ -122,6 +122,11 @@ button:disabled { cursor: not-allowed; opacity: .5; }
 @keyframes companion-enter {
   from { opacity: .15; transform: translateY(12px) scale(.96); }
   to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes dialogue-caret-blink {
+  0%, 45% { opacity: 1; }
+  46%, 100% { opacity: 0; }
 }
 
 @media (max-width: 760px) {
