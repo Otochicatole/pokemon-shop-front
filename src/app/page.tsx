@@ -1,9 +1,9 @@
 import Link from 'next/link';
-import Image from 'next/image';
 import { ArrowUpRight, ShieldCheck, Sparkles, Truck, Package, Layers3, Gem } from 'lucide-react';
 import { listProducts } from '@/features/catalog/infrastructure/api';
 import { SectionHeading, TexturePanel } from '@/components';
 import { CatalogProductCard } from '@/features/catalog/ui/catalog-product-card';
+import { CompanionBattle } from '@/features/home';
 
 const collections = [
   { href: '/catalog?kind=SINGLE_CARD', label: 'Cartas sueltas', eyebrow: 'Completá tu pokédex', icon: Layers3, tone: 'yellow' },
@@ -16,7 +16,7 @@ export default async function Home() {
   return <>
     <section className="hero">
       <div className="hero-copy"><p className="eyebrow">Ruta 10 // central de coleccionistas</p><h1>Viví la aventura.<br /><em>Coleccioná.</em></h1><p className="hero-text">Cartas Pokémon, productos sellados y equipo para entrenadores. Explorá el catálogo y encontrá tu próxima pieza favorita.</p><div className="hero-actions"><Link className="button button-primary" href="/catalog">Entrar a la tienda <ArrowUpRight size={16} /></Link><Link className="text-button" href="/catalog?kind=SINGLE_CARD">Atacar <Sparkles size={14} /></Link></div></div>
-      <div className="hero-art battle-scene" aria-label="Escena pixelada de aventura" role="img"><div className="route-label">RUTA 10 <span /> CENTRAL POKÉMON DE ENTRENADORES</div><div className="battle-hud"><span>PIKACHU</span><b>Lv. 18</b><div><i /><i /><i /><i /></div><small>HP 48 / 48</small></div><div className="hero-sprite"><Image src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/25.gif" alt="Pokémon pixelado" width={430} height={430} unoptimized priority /></div><div className="battle-platform" /><div className="dialogue"><span>▶</span><div><b>PIKACHU</b><span>quiere acompañarte.</span><small>Listo para tu próxima aventura.</small></div></div><div className="companion-selector"><button className="active"><span className="type-dot electric" /><span>ELÉCTRICO</span></button><button><span className="type-dot fire" /><span>FUEGO</span></button><button><span className="type-dot water" /><span>AGUA</span></button></div></div>
+      <CompanionBattle />
     </section>
     <section className="trust-strip"><span><ShieldCheck size={16} /> Compra protegida</span><span><Sparkles size={16} /> Piezas verificadas</span><span><Truck size={16} /> Envíos a todo el país</span></section>
     <section className="collection-links">{collections.map(({ href, label, eyebrow, icon: Icon, tone }) => <Link className={`collection-link collection-link-${tone}`} href={href} key={label}><span className="collection-icon"><Icon size={22} /></span><span><small>{eyebrow}</small><strong>{label}</strong></span><ArrowUpRight size={17} /></Link>)}</section>
