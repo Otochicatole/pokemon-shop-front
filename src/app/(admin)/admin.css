@@ -14,6 +14,15 @@
   color: var(--ink);
 }
 
+/* Keep admin selectors intentionally minimal: the native chevron is hidden
+   while the control remains keyboard and screen-reader accessible. */
+.admin-root select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: none;
+  cursor: pointer;
+}
+
 .admin-root input:focus,
 .admin-root select:focus,
 .admin-root textarea:focus {
@@ -106,6 +115,20 @@
 .admin-toolbar .component-field { min-width: 180px; flex: 1; }
 .admin-toolbar .admin-search-field { min-width: min(100%, 300px); flex: 2; }
 .admin-toolbar-actions { display: flex; gap: 8px; }
+
+/* Order filters stay on one compact control row at desktop sizes. The
+   explicit grid prevents the search field and date controls from collapsing
+   into uneven flex widths while retaining a clean reflow below. */
+.admin-order-toolbar { display: grid; grid-template-columns: minmax(260px, 2.1fr) repeat(4, minmax(145px, 1fr)) repeat(2, minmax(132px, 1fr)); align-items: end; gap: 12px; }
+.admin-order-toolbar .component-field,
+.admin-order-toolbar .admin-search-field { width: 100%; min-width: 0; flex: initial; }
+.admin-order-toolbar input,
+.admin-order-toolbar select { width: 100%; min-width: 0; }
+
+@media (max-width: 1320px) {
+  .admin-order-toolbar { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .admin-order-toolbar .admin-search-field { grid-column: span 2; }
+}
 
 .admin-table-wrap { width: 100%; overflow-x: auto; border: 2px solid var(--line); background: rgba(12, 18, 25, .97); box-shadow: 5px 5px 0 #05070a; }
 .admin-data-table { width: 100%; border-collapse: collapse; }
@@ -288,6 +311,8 @@
   .admin-health-strip > div { border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
   .admin-health-strip > div:nth-child(2n) { border-right: 0; }
   .admin-health-strip > div:nth-last-child(-n+2) { border-bottom: 0; }
+  .admin-order-toolbar { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .admin-order-toolbar .admin-search-field { grid-column: span 2; }
 }
 
 @media (max-width: 900px) {
@@ -304,6 +329,8 @@
   .admin-login-intro { min-height: 320px; padding: 34px 24px; border-right: 0; border-bottom: 2px solid var(--line-strong); }
   .admin-login-intro h1 { margin: 50px 0 16px; font-size: clamp(30px, 8vw, 48px); }
   .admin-login-panel { min-height: 620px; }
+  .admin-order-toolbar { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .admin-order-toolbar .admin-search-field { grid-column: 1 / -1; }
 }
 
 @media (max-width: 680px) {
@@ -316,6 +343,8 @@
   .admin-form-grid { grid-template-columns: 1fr; }
   .admin-form-span { grid-column: auto; }
   .admin-toolbar { align-items: stretch; flex-direction: column; }
+  .admin-order-toolbar { grid-template-columns: 1fr; }
+  .admin-order-toolbar .admin-search-field { grid-column: auto; }
   .admin-toolbar .component-field { width: 100%; min-width: 0; }
   .admin-toolbar-actions { width: 100%; }
   .admin-toolbar-actions .button { flex: 1; }
