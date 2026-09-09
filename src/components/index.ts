@@ -9,3 +9,4 @@ export * from './navigation';
 export * from './overlay';
 export * from './layout';
 export * from './pokemon-stage';
+export * from './admin';

@@ -1,14 +1,13 @@
 import Link from 'next/link';
 import { ArrowUpRight, ShieldCheck, Sparkles, Truck, Package, Layers3, Gem } from 'lucide-react';
-import { listProducts } from '@/features/catalog/infrastructure/api';
+import { CatalogProductCard, listProducts } from '@/features/catalog';
 import { SectionHeading, TexturePanel } from '@/components';
-import { CatalogProductCard } from '@/features/catalog/ui/catalog-product-card';
 import { CompanionBattle } from '@/features/home';
 
 const collections = [
   { href: '/catalog?kind=SINGLE_CARD', label: 'Cartas sueltas', eyebrow: 'Completá tu pokédex', icon: Layers3, tone: 'yellow' },
   { href: '/catalog?kind=SEALED_PRODUCT', label: 'Sobres y cajas', eyebrow: 'Tentá a la suerte', icon: Package, tone: 'red' },
-  { href: '/catalog', label: 'Accesorios', eyebrow: 'Protegé tu equipo', icon: Gem, tone: 'cyan' },
+  { href: '/catalog?kind=ACCESSORY', label: 'Accesorios', eyebrow: 'Protegé tu equipo', icon: Gem, tone: 'cyan' },
 ] as const;
 
 export default async function Home() {

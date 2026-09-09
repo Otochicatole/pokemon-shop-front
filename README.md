@@ -12,6 +12,18 @@ Frontend ecommerce modular para `back-card-shop`, construido con Next.js 16, Rea
 
 La tienda queda disponible en `http://localhost:3001`. El proxy same-origin de Next reenvía `/api/v2/*` y `/media/*` al backend; no se guardan tokens de sesión en el navegador.
 
+## CMS administrativo
+
+El CMS vive en `http://localhost:3001/admin/login` y usa un layout, una cookie opaca, CSRF y cliente HTTP independientes de la tienda. Incluye dashboard, productos e imágenes, inventario, órdenes, pagos, fulfillment, clientes en consulta y auditoría.
+
+Después de aplicar las migraciones y el seed del backend podés usar:
+
+- Admin: `admin@cardshop.test` / `Admin123!seed-card-shop`
+
+Las cuentas administrativas se crean solamente con la CLI del backend. Estas credenciales son exclusivamente locales y deben cambiarse antes de compartir el entorno.
+
+La organización principal usa route groups: `(store)` compone Header/Footer de la tienda y `(admin)` compone el shell operativo. Las features administrativas exponen su API pública desde `index.ts`; sus componentes no acceden directamente a Prisma ni a la sesión del storefront.
+
 ## Comandos
 
 ```bash

@@ -3,16 +3,56 @@ import { z } from 'zod';
 export const moneySchema = z.object({ amountMinor: z.string(), currency: z.literal('ARS') });
 export type Money = z.infer<typeof moneySchema>;
 
+export const productKindSchema = z.enum(['SINGLE_CARD', 'SEALED_PRODUCT', 'ACCESSORY']);
+export const pokemonTypeSchema = z.enum(['COLORLESS', 'DARKNESS', 'DRAGON', 'FAIRY', 'FIGHTING', 'FIRE', 'GRASS', 'LIGHTNING', 'METAL', 'PSYCHIC', 'WATER']);
+export const productConditionSchema = z.enum(['NM', 'EXCELLENT', 'GOOD', 'PLAYED', 'DAMAGED']);
+export type ProductKind = z.infer<typeof productKindSchema>;
+export type PokemonType = z.infer<typeof pokemonTypeSchema>;
+export type ProductCondition = z.infer<typeof productConditionSchema>;
+
+export const pokemonCardSchema = z.object({
+  setName: z.string(),
+  setCode: z.string().nullable(),
+  cardNumber: z.string(),
+  rarity: z.string(),
+  language: z.string(),
+  condition: productConditionSchema,
+  pokemonType: pokemonTypeSchema.nullish().transform((value) => value ?? null),
+  finish: z.string().nullable(),
+  edition: z.string().nullable(),
+  gradingCompany: z.string().nullable(),
+  grade: z.string().nullable(),
+  certificationNumber: z.string().nullable(),
+});
+
 export const productSchema = z.object({
   id: z.string(), sku: z.string(), slug: z.string(), name: z.string(), description: z.string(),
-  kind: z.enum(['SINGLE_CARD', 'SEALED_PRODUCT']), stockMode: z.enum(['UNIQUE', 'QUANTITY']),
+  kind: productKindSchema, stockMode: z.enum(['UNIQUE', 'QUANTITY']),
   price: moneySchema, available: z.number().int().nonnegative(), productVersion: z.number().int(),
-  pokemonCard: z.object({ setName: z.string(), setCode: z.string().nullable(), cardNumber: z.string(), rarity: z.string(), language: z.string(), condition: z.string(), finish: z.string().nullable(), edition: z.string().nullable(), gradingCompany: z.string().nullable(), grade: z.string().nullable() }).nullable().optional(),
+  pokemonCard: pokemonCardSchema.nullable().optional(),
   images: z.array(z.object({ id: z.string(), url: z.string(), altText: z.string().nullable(), sortOrder: z.number() })).default([]),
   updatedAt: z.string().or(z.date()).optional(),
 });
 export type Product = z.infer<typeof productSchema>;
 export const productListSchema = z.object({ data: z.array(productSchema), meta: z.object({ nextCursor: z.string().nullable() }) });
+
+export const catalogFacetOptionSchema = z.object({ value: z.string(), count: z.number().int().nonnegative() });
+export const catalogFiltersSchema = z.object({
+  totalProducts: z.number().int().nonnegative(),
+  kinds: z.array(catalogFacetOptionSchema),
+  pokemonTypes: z.array(catalogFacetOptionSchema),
+  sets: z.array(catalogFacetOptionSchema),
+  rarities: z.array(catalogFacetOptionSchema),
+  conditions: z.array(catalogFacetOptionSchema),
+  languages: z.array(catalogFacetOptionSchema),
+  finishes: z.array(catalogFacetOptionSchema),
+  editions: z.array(catalogFacetOptionSchema),
+  gradingCompanies: z.array(catalogFacetOptionSchema),
+  priceRange: z.object({ minMinor: z.string().nullable(), maxMinor: z.string().nullable() }),
+});
+export const catalogFiltersEnvelopeSchema = z.object({ data: catalogFiltersSchema, meta: z.record(z.string(), z.unknown()).optional() });
+export type CatalogFacetOption = z.infer<typeof catalogFacetOptionSchema>;
+export type CatalogFilters = z.infer<typeof catalogFiltersSchema>;
 
 export const optionsSchema = z.object({
   fulfillment: z.object({
