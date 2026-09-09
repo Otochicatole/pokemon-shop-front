@@ -14,7 +14,9 @@ La tienda queda disponible en `http://localhost:3001`. El proxy same-origin de N
 
 ## CMS administrativo
 
-El CMS vive en `http://localhost:3001/admin/login` y usa un layout, una cookie opaca, CSRF y cliente HTTP independientes de la tienda. Incluye dashboard, productos e imágenes, inventario, órdenes, pagos, fulfillment, clientes en consulta y auditoría.
+El CMS vive en `http://localhost:3001/admin/login` y usa un layout, una cookie opaca, CSRF y cliente HTTP independientes de la tienda. Incluye dashboard, productos e imágenes, inventario, proveedores, órdenes, pagos, fulfillment, clientes en consulta y auditoría.
+
+La agenda de proveedores está en `http://localhost:3001/admin/suppliers`. Permite alta, edición, desactivación y reactivación; quitar un proveedor es una baja lógica y conserva su información.
 
 Después de aplicar las migraciones y el seed del backend podés usar:
 

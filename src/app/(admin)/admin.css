@@ -115,6 +115,7 @@
 .admin-toolbar .component-field { min-width: 180px; flex: 1; }
 .admin-toolbar .admin-search-field { min-width: min(100%, 300px); flex: 2; }
 .admin-toolbar-actions { display: flex; gap: 8px; }
+.admin-toolbar > .admin-filter-submit { align-self: end; min-width: 142px; }
 
 /* Order filters stay on one compact control row at desktop sizes. The
    explicit grid prevents the search field and date controls from collapsing
@@ -124,6 +125,15 @@
 .admin-order-toolbar .admin-search-field { width: 100%; min-width: 0; flex: initial; }
 .admin-order-toolbar input,
 .admin-order-toolbar select { width: 100%; min-width: 0; }
+
+.supplier-toolbar { display: grid; grid-template-columns: minmax(260px, 2fr) minmax(180px, .75fr); align-items: end; }
+.supplier-toolbar .component-field,
+.supplier-toolbar .admin-search-field { width: 100%; min-width: 0; flex: initial; }
+.supplier-toolbar select { width: 100%; min-width: 0; }
+.supplier-contact { display: inline-flex; align-items: center; gap: 6px; }
+.supplier-toggle.is-active { color: var(--warm); }
+.supplier-toggle.is-inactive { color: var(--green); }
+.supplier-toggle:hover { border-color: currentColor; }
 
 @media (max-width: 1320px) {
   .admin-order-toolbar { grid-template-columns: repeat(4, minmax(0, 1fr)); }
@@ -345,7 +355,9 @@
   .admin-toolbar { align-items: stretch; flex-direction: column; }
   .admin-order-toolbar { grid-template-columns: 1fr; }
   .admin-order-toolbar .admin-search-field { grid-column: auto; }
+  .supplier-toolbar { grid-template-columns: 1fr; }
   .admin-toolbar .component-field { width: 100%; min-width: 0; }
+  .admin-toolbar > .admin-filter-submit { width: 100%; min-width: 0; }
   .admin-toolbar-actions { width: 100%; }
   .admin-toolbar-actions .button { flex: 1; }
   .admin-table-wrap { overflow: visible; border: 0; background: transparent; box-shadow: none; }
