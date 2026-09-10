@@ -4,7 +4,7 @@ import { useId, useState } from 'react';
 import { RotateCcw } from 'lucide-react';
 import { Button } from '@/components/button';
 import type { CatalogFacetOption, CatalogFilters } from '@/shared/api/contracts';
-import { minorToArs, validateCatalogPriceRange } from '../application/catalog-filter-codec';
+import { minorToUsd, validateCatalogPriceRange } from '../application/catalog-filter-codec';
 import {
   conditionLabels,
   pokemonTypeLabels,
@@ -95,14 +95,14 @@ export function CatalogFilterPanel({ filters, facets, onToggle, onChange, onClea
       </details>
 
       <details className="catalog-filter-group" open={filters.minPrice !== '' || filters.maxPrice !== ''}>
-        <summary>Precio ARS<span>{filters.minPrice || filters.maxPrice ? '●' : ''}</span></summary>
+        <summary>Precio USD<span>{filters.minPrice || filters.maxPrice ? '●' : ''}</span></summary>
         <PriceRangeFields
           key={`${filters.minPrice}-${filters.maxPrice}`}
           id={id}
           min={filters.minPrice}
           max={filters.maxPrice}
-          minPlaceholder={minorToArs(facets?.priceRange.minMinor ?? null)}
-          maxPlaceholder={minorToArs(facets?.priceRange.maxMinor ?? null)}
+          minPlaceholder={minorToUsd(facets?.priceRange.minMinor ?? null)}
+          maxPlaceholder={minorToUsd(facets?.priceRange.maxMinor ?? null)}
           onApply={(minPrice, maxPrice) => onChange({ ...filters, minPrice, maxPrice })}
         />
       </details>
@@ -193,7 +193,7 @@ function PriceRangeFields({ id, min, max, minPlaceholder, maxPlaceholder, onAppl
   };
   return (
     <fieldset className="catalog-price-fields">
-      <legend className="sr-only">Rango de precio en pesos argentinos</legend>
+      <legend className="sr-only">Rango de precio en USD</legend>
       <label htmlFor={`${id}-min-price`}><span>Mínimo</span><input id={`${id}-min-price`} inputMode="decimal" value={minPrice} placeholder={minPlaceholder || '0'} aria-invalid={Boolean(error)} aria-describedby={error ? `${id}-price-error` : undefined} onChange={(event) => setMinPrice(event.target.value)} /></label>
       <label htmlFor={`${id}-max-price`}><span>Máximo</span><input id={`${id}-max-price`} inputMode="decimal" value={maxPrice} placeholder={maxPlaceholder || 'Sin límite'} aria-invalid={Boolean(error)} aria-describedby={error ? `${id}-price-error` : undefined} onChange={(event) => setMaxPrice(event.target.value)} /></label>
       {error && <p className="catalog-price-error" id={`${id}-price-error`} role="alert">{error}</p>}

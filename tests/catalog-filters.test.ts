@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { activeCatalogFilterCount, arsToMinor, buildCatalogApiParams, catalogFiltersToSearchParams, parseCatalogFilters, toggleCatalogFilter, validateCatalogPriceRange } from '@/features/catalog/application/catalog-filter-codec';
+import { activeCatalogFilterCount, usdToMinor, buildCatalogApiParams, catalogFiltersToSearchParams, parseCatalogFilters, toggleCatalogFilter, validateCatalogPriceRange } from '@/features/catalog/application/catalog-filter-codec';
 
 describe('catalog filter codec', () => {
   it('parses repeated and comma-separated facets while discarding invalid enum values', () => {
@@ -12,7 +12,7 @@ describe('catalog filter codec', () => {
     expect(filters.sort).toBe('PRICE_ASC');
   });
 
-  it('keeps a canonical shareable URL and converts displayed ARS to minor units for the API', () => {
+  it('keeps a canonical shareable URL and converts displayed USD to minor units for the API', () => {
     const filters = parseCatalogFilters(new URLSearchParams('q=dragon&rarity=Ultra+Rare&inStock=true&minPrice=1250.50&maxPrice=3000'));
     const browserParams = catalogFiltersToSearchParams(filters);
     const apiParams = buildCatalogApiParams(filters, '11111111-1111-4111-8111-111111111111');
@@ -35,10 +35,10 @@ describe('catalog filter codec', () => {
     expect(activeCatalogFilterCount(withoutCard)).toBe(2);
   });
 
-  it('handles decimal ARS precisely without floating-point arithmetic', () => {
-    expect(arsToMinor('0.01')).toBe('1');
-    expect(arsToMinor('999999999999.99')).toBe('99999999999999');
-    expect(arsToMinor('precio')).toBeNull();
+  it('handles decimal USD precisely without floating-point arithmetic', () => {
+    expect(usdToMinor('0.01')).toBe('1');
+    expect(usdToMinor('999999999999.99')).toBe('99999999999999');
+    expect(usdToMinor('precio')).toBeNull();
   });
 
   it('preserves explicit negative stock and grading filters', () => {

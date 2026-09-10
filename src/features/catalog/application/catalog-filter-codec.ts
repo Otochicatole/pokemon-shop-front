@@ -35,7 +35,7 @@ function readOptionalBoolean(value: string | null): boolean | null {
   return null;
 }
 
-export function arsToMinor(value: string): string | null {
+export function usdToMinor(value: string): string | null {
   const normalized = readDecimal(value);
   if (!normalized) return null;
   const [whole = '0', decimals = ''] = normalized.split('.');
@@ -43,7 +43,7 @@ export function arsToMinor(value: string): string | null {
   return minor <= maxPriceMinor ? minor.toString() : null;
 }
 
-export function minorToArs(value: string | null): string {
+export function minorToUsd(value: string | null): string {
   if (value === null || !/^\d+$/.test(value)) return '';
   const minor = BigInt(value);
   const decimals = (minor % 100n).toString().padStart(2, '0');
@@ -59,8 +59,8 @@ export function validateCatalogPriceRange(minInput: string, maxInput: string): C
   const maxPrice = readDecimal(maxInput);
   if (minInput.trim() && !minPrice) return { success: false, error: 'Ingresá un precio mínimo válido, con hasta dos decimales.' };
   if (maxInput.trim() && !maxPrice) return { success: false, error: 'Ingresá un precio máximo válido, con hasta dos decimales.' };
-  const minMinor = minPrice ? arsToMinor(minPrice) : null;
-  const maxMinor = maxPrice ? arsToMinor(maxPrice) : null;
+  const minMinor = minPrice ? usdToMinor(minPrice) : null;
+  const maxMinor = maxPrice ? usdToMinor(maxPrice) : null;
   if ((minPrice && minMinor === null) || (maxPrice && maxMinor === null)) return { success: false, error: 'El precio supera el máximo permitido.' };
   if (minMinor !== null && maxMinor !== null && BigInt(minMinor) > BigInt(maxMinor)) {
     return { success: false, error: 'El precio mínimo no puede superar al máximo.' };
@@ -121,8 +121,8 @@ export function catalogFiltersToSearchParams(filters: CatalogFilterState): URLSe
 
 export function buildCatalogApiParams(filters: CatalogFilterState, cursor?: string | null): URLSearchParams {
   const params = catalogFiltersToSearchParams(filters);
-  const minPriceMinor = arsToMinor(filters.minPrice);
-  const maxPriceMinor = arsToMinor(filters.maxPrice);
+  const minPriceMinor = usdToMinor(filters.minPrice);
+  const maxPriceMinor = usdToMinor(filters.maxPrice);
   params.delete('minPrice');
   params.delete('maxPrice');
   if (minPriceMinor !== null) params.set('minPriceMinor', minPriceMinor);

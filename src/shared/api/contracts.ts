@@ -1,6 +1,7 @@
 import { z } from 'zod';
+import { BASE_CURRENCY } from '@/shared/lib/currency';
 
-export const moneySchema = z.object({ amountMinor: z.string(), currency: z.literal('ARS') });
+export const moneySchema = z.object({ amountMinor: z.string(), currency: z.literal(BASE_CURRENCY) });
 export type Money = z.infer<typeof moneySchema>;
 
 export const productKindSchema = z.enum(['SINGLE_CARD', 'SEALED_PRODUCT', 'ACCESSORY']);
@@ -67,7 +68,7 @@ export const userSchema = z.object({ id: z.string(), email: z.string().email(), 
 export type User = z.infer<typeof userSchema>;
 export const loyaltyProgramSchema = z.object({
   enabled: z.boolean(),
-  currency: z.literal('ARS'),
+  currency: z.literal(BASE_CURRENCY),
   spendPerPoint: moneySchema,
   pointsPerStep: z.number().int().positive(),
   pointValue: moneySchema,

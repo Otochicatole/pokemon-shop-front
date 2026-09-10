@@ -6,7 +6,7 @@ import { auditListEnvelopeSchema } from '@/features/audit-log/domain/contracts';
 import { adminLoginSchema } from '@/features/admin-auth/domain/contracts';
 import { adminOrderSchema } from '@/features/order-management/domain/contracts';
 
-const money = { amountMinor: '125000', currency: 'ARS' as const };
+const money = { amountMinor: '125000', currency: 'USD' as const };
 const product = {
   id: 'product-1', sku: 'PKM-001', slug: 'carta-demo', name: 'Carta demo', description: 'Demo', kind: 'SINGLE_CARD' as const,
   stockMode: 'UNIQUE' as const, status: 'DRAFT' as const, version: 1, price: money,
@@ -41,7 +41,7 @@ describe('admin API contracts', () => {
   });
 
   it('requires the discount and loyalty snapshot returned with administrative orders', () => {
-    const discount = { amountMinor: '1500', currency: 'ARS' as const };
+    const discount = { amountMinor: '1500', currency: 'USD' as const };
     const order = adminOrderSchema.parse({
       id: 'order-1', number: 'CS-0001', version: 2, status: 'PAID',
       paymentMethod: 'BANK_TRANSFER', fulfillmentType: 'PICKUP',
