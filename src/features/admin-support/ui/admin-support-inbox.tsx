@@ -123,7 +123,7 @@ export function AdminSupportInboxView() {
     </div>
     {query.isLoading ? <div className="admin-loading">Cargando conversaciones</div> : query.isError ? <div className="admin-error-panel"><div><h2>No pudimos cargar soporte</h2><p>{adminErrorMessage(query.error)}</p><Button variant="secondary" onClick={() => void query.refetch()}>Reintentar</Button></div></div> : <>
       <AdminDataTable rows={conversations} rowKey={(row) => row.id} caption="Conversaciones de soporte" empty={attention === 'unread' ? 'No hay mensajes nuevos en esta página.' : 'Todavía no hay conversaciones de soporte.'} columns={[
-        { key: 'subject', header: 'Conversación', render: (row) => <div className="admin-support-subject"><Link className="admin-table-link" href={`/admin/support/${row.id}`}>{row.subject}</Link><small className="admin-block-muted">{row.lastMessagePreview}</small></div> },
+        { key: 'subject', header: 'Conversación', render: (row) => <div className="admin-support-subject"><Link className="admin-table-link" href={`/admin/support/${row.id}`}>{row.subject}</Link><small className="admin-block-muted">{row.lastMessagePreview ?? 'Sin mensajes todavía'}</small></div> },
         { key: 'customer', header: 'Cliente', render: (row) => <div><strong>{row.user.name?.trim() || 'Sin nombre'}</strong><small className="admin-block-muted">{row.user.email}</small></div> },
         { key: 'status', header: 'Estado', render: (row) => <SupportStatusBadge status={row.status} /> },
         { key: 'unread', header: 'Nuevos', align: 'center', render: (row) => row.unreadCount > 0 ? <span className="admin-support-unread" aria-label={`${row.unreadCount} mensajes sin leer`}>{row.unreadCount}</span> : <span className="admin-muted">—</span> },

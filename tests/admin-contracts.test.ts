@@ -5,6 +5,7 @@ import { fulfillmentEnvelopeSchema } from '@/features/fulfillment-management/dom
 import { auditListEnvelopeSchema } from '@/features/audit-log/domain/contracts';
 import { adminLoginSchema } from '@/features/admin-auth/domain/contracts';
 import { adminOrderSchema } from '@/features/order-management/domain/contracts';
+import { adminTransferSettingsEnvelopeSchema } from '@/features/transfer-settings/domain/contracts';
 
 const money = { amountMinor: '125000', currency: 'USD' as const };
 const product = {
@@ -31,6 +32,15 @@ describe('admin API contracts', () => {
   it('accepts backend dashboard range codes and integer money', () => {
     const parsed = adminDashboardEnvelopeSchema.parse({ data: { range: '7D', since: '2026-09-01T00:00:00.000Z', revenue: { gross: money, refunded: { ...money, amountMinor: '0' }, net: money, paidPayments: 2, refunds: 0 }, orders: { total: 2, byStatus: { PAID: 2 } }, products: { draft: 1, published: 2, archived: 0, outOfStock: 0, lowStock: 1 }, attention: { transferReviews: 1, mercadoPagoReviews: 0 }, integrations: { bankTransfer: true, mercadoPago: false, smtp: true }, recentOrders: [], recentActivity: [] }, meta: {} });
     expect(parsed.data.range).toBe('7D');
+  });
+
+  it('parses transfer settings with an optional CBU and alias', () => {
+    const settings = adminTransferSettingsEnvelopeSchema.parse({ data: {
+      enabled: true, bankName: 'Banco Demo', accountHolder: 'Card Shop', cbu: '1234567890123456789012', alias: null,
+      version: 2, updatedAt: '2026-09-10T12:00:00.000Z', currency: 'USD',
+    }, meta: {} });
+    expect(settings.data.bankName).toBe('Banco Demo');
+    expect(settings.data.alias).toBeNull();
   });
 
   it('parses fulfillment and redacted audit payloads', () => {

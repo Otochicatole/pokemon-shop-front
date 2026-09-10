@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { act, render, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import type { ReactElement } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { SupportRealtimeProvider } from '@/features/support-realtime/ui/support-realtime-provider';
 import { getSessionSyncGeneration, publishSessionSync } from '@/shared/auth/session-sync';
@@ -14,6 +15,8 @@ const mocks = vi.hoisted(() => ({
   playSound: vi.fn(),
   unlockSound: vi.fn(),
   toast: vi.fn(),
+  toastCustom: vi.fn(),
+  toastDismiss: vi.fn(),
   push: vi.fn(),
   replace: vi.fn(),
   refresh: vi.fn(),
@@ -23,7 +26,7 @@ vi.mock('next/navigation', () => {
   const router = { push: mocks.push, replace: mocks.replace, refresh: mocks.refresh };
   return { usePathname: () => '/account/support', useRouter: () => router };
 });
-vi.mock('sonner', () => ({ toast: mocks.toast }));
+vi.mock('sonner', () => ({ toast: Object.assign(mocks.toast, { custom: mocks.toastCustom, dismiss: mocks.toastDismiss }) }));
 vi.mock('@/features/auth/infrastructure/api', () => ({ getMe: mocks.getMe }));
 vi.mock('@/features/admin-auth/infrastructure/api', () => ({ getAdminMe: mocks.getAdminMe }));
 vi.mock('@/shared/api/client', () => ({ apiFetch: mocks.apiFetch, resetCsrf: mocks.resetCsrf }));
@@ -113,6 +116,38 @@ describe('support realtime socket isolation', () => {
     expect(client.getQueryData(['orders'])).toBeUndefined();
     await waitFor(() => expect(client.getQueryData(['me'])).toEqual(userB));
     expect(mocks.resetCsrf).toHaveBeenCalled();
+    view.unmount();
+  });
+
+  it('opens a realtime notification when clicking the notification itself', async () => {
+    const user = { id: 'user-a', email: 'a@example.test', name: 'A', emailVerified: true };
+    mocks.getMe.mockResolvedValue(user);
+    const client = new QueryClient({ defaultOptions: { queries: { retry: false, staleTime: Infinity } } });
+    const view = render(<QueryClientProvider client={client}><SupportRealtimeProvider><div>Contenido</div></SupportRealtimeProvider></QueryClientProvider>);
+    await waitFor(() => expect(FakeWebSocket.instances).toHaveLength(1));
+
+    act(() => {
+      FakeWebSocket.instances[0].emit('message', { data: JSON.stringify({
+        type: 'notification.created',
+        payload: {
+          notification: {
+            title: 'Actualización de tu orden',
+            message: 'Tu orden está en preparación.',
+            reference: { kind: 'ORDER', orderNumber: 'BCS-123' },
+          },
+          unreadCount: 1,
+        },
+        sentAt: '2026-09-10T00:00:00.000Z',
+      }) });
+    });
+
+    await waitFor(() => expect(mocks.toastCustom).toHaveBeenCalledWith(expect.any(Function)));
+    const renderToast = mocks.toastCustom.mock.calls[0]?.[0] as ((id: string) => ReactElement);
+    render(renderToast('toast-1'));
+    fireEvent.click(screen.getByRole('button', { name: 'Abrir notificación: Actualización de tu orden' }));
+
+    expect(mocks.toastDismiss).toHaveBeenCalledWith('toast-1');
+    expect(mocks.push).toHaveBeenCalledWith('/account/orders/BCS-123');
     view.unmount();
   });
 

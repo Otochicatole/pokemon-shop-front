@@ -206,10 +206,17 @@ export function SupportRealtimeProvider({ children }: { children: ReactNode }) {
             void queryClient.invalidateQueries({ queryKey: ['order', orderNumber] });
           }
           playSupportNotificationSound();
-          toast(String(payload?.title ?? 'Nueva notificación'), {
-            description: typeof payload?.message === 'string' ? payload.message : 'Tenés una novedad para revisar.',
-            action: { label: 'Abrir', onClick: () => router.push(href) },
-          });
+          const title = String(payload?.title ?? 'Nueva notificación');
+          const message = typeof payload?.message === 'string' ? payload.message : 'Tenés una novedad para revisar.';
+          toast.custom((id) => <button
+            type="button"
+            className="realtime-notification-toast"
+            aria-label={`Abrir notificación: ${title}`}
+            onClick={() => { toast.dismiss(id); router.push(href); }}
+          >
+            <strong>{title}</strong>
+            <span>{message}</span>
+          </button>);
           return;
         }
 

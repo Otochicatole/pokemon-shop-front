@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Bell, Boxes, ClipboardList, Coins, CreditCard, Gauge, Handshake, History, MessagesSquare, PackageSearch, Truck, UsersRound } from 'lucide-react';
+import { Bell, Boxes, ClipboardList, CreditCard, Gauge, Handshake, MessagesSquare, PackageSearch, Settings, Truck, UsersRound } from 'lucide-react';
 import { toast } from 'sonner';
 import { AdminShell, type AdminNavigationItem } from '@/components/admin';
 import { adminErrorMessage } from '@/shared/admin/client';
@@ -22,8 +22,7 @@ const navigation: AdminNavigationItem[] = [
   { href: '/admin/customers', label: 'Clientes', icon: <UsersRound size={18} /> },
   { href: '/admin/support', label: 'Soporte', icon: <MessagesSquare size={18} /> },
   { href: '/admin/notifications', label: 'Notificaciones', icon: <Bell size={18} /> },
-  { href: '/admin/loyalty', label: 'Fidelidad', icon: <Coins size={18} /> },
-  { href: '/admin/audit', label: 'Auditoría', icon: <History size={18} /> },
+  { href: '/admin/config', label: 'Configuración', icon: <Settings size={18} /> },
 ];
 
 export function AdminAppShell({ initialAdmin, children }: { initialAdmin: AdminIdentity; children: React.ReactNode }) {

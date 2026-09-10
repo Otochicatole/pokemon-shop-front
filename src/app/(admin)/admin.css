@@ -305,6 +305,25 @@
 .admin-tabs-content { padding-top: 18px; }
 .admin-card-section { padding-top: 18px; }
 .admin-section-actions { display: flex; justify-content: flex-end; margin-bottom: 14px; }
+.admin-config-directory { border: 2px solid var(--line); background: rgba(16, 22, 29, .97); box-shadow: 5px 5px 0 #05070a; }
+.admin-config-directory-header { display: flex; align-items: end; justify-content: space-between; gap: 18px; padding: 20px 22px; border-bottom: 2px solid var(--line); }
+.admin-config-directory-kicker { color: var(--cyan); font: 8px/1.6 var(--pixel-font); letter-spacing: .05em; text-transform: uppercase; }
+.admin-config-directory-header h2 { margin: 7px 0 0; font: 13px/1.5 var(--pixel-font); text-transform: uppercase; }
+.admin-config-directory-count { padding: 6px 8px; border: 1px solid var(--line-strong); color: var(--muted); font: 7px var(--pixel-font); text-transform: uppercase; white-space: nowrap; }
+.admin-config-directory-list { margin: 0; padding: 0; list-style: none; }
+.admin-config-directory-list li { border-bottom: 1px solid var(--line); }
+.admin-config-directory-list li:last-child { border-bottom: 0; }
+.admin-config-directory-link { display: grid; grid-template-columns: 54px minmax(0, 1fr) auto; align-items: center; gap: 18px; min-height: 116px; padding: 18px 22px; color: var(--ink); transition: background .15s ease, padding .15s ease; }
+.admin-config-directory-link:hover { padding-left: 26px; background: rgba(83, 190, 229, .08); color: var(--ink); }
+.admin-config-directory-link:focus-visible { outline: 2px solid var(--accent); outline-offset: -4px; }
+.admin-config-directory-icon { width: 54px; height: 54px; display: grid; place-items: center; border: 2px solid var(--cyan); background: rgba(83, 190, 229, .08); color: var(--cyan); }
+.admin-config-directory-copy { min-width: 0; display: grid; gap: 4px; }
+.admin-config-directory-category { color: var(--cyan); font: 7px var(--pixel-font); letter-spacing: .04em; text-transform: uppercase; }
+.admin-config-directory-copy strong { font-size: 16px; }
+.admin-config-directory-copy > span:last-child { color: var(--muted); font-size: 13px; line-height: 1.45; }
+.admin-config-directory-action { display: inline-flex; align-items: center; gap: 8px; color: var(--accent); font: 8px var(--pixel-font); text-transform: uppercase; white-space: nowrap; }
+.admin-config-directory-action svg { transition: transform .15s ease; }
+.admin-config-directory-link:hover .admin-config-directory-action svg { transform: translateX(3px); }
 .admin-config-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
 .admin-config-card { display: grid; gap: 16px; padding: 18px; border: 2px solid var(--line); background: rgba(16, 22, 29, .97); box-shadow: 5px 5px 0 #05070a; }
 .admin-config-card header { display: flex; align-items: center; gap: 12px; }
@@ -524,6 +543,11 @@
   .admin-login-card { padding: 24px 18px; }
   .admin-login-card h2 { font-size: 21px; }
   .admin-range-picker { width: 100%; }.admin-range-picker button { flex: 1; }
+  .admin-config-directory-header { align-items: flex-start; flex-direction: column; }
+  .admin-config-directory-link { grid-template-columns: 44px minmax(0, 1fr); gap: 14px; min-height: 0; padding: 16px; }
+  .admin-config-directory-link:hover { padding-left: 20px; }
+  .admin-config-directory-icon { width: 44px; height: 44px; }
+  .admin-config-directory-action { grid-column: 2; justify-self: start; }
   .admin-health-strip, .admin-config-grid, .admin-stats-compact { grid-template-columns: 1fr; }
   .admin-health-strip > div { border-right: 0; border-bottom: 1px solid var(--line); }
   .admin-health-strip > div:last-child { border-bottom: 0; }

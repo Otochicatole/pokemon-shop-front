@@ -37,7 +37,7 @@ export const adminSupportConversationSchema = z.object({
   }),
   createdByType: supportSenderTypeSchema,
   lastMessageAt: z.string(),
-  lastMessagePreview: z.string(),
+  lastMessagePreview: z.string().nullable(),
   createdAt: z.string(),
   updatedAt: z.string(),
   unreadCount: z.number().int().nonnegative(),

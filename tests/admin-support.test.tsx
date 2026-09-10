@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { AnchorHTMLAttributes } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
+  adminSupportConversationSchema,
   adminSupportConversationDetailEnvelopeSchema,
   adminSupportConversationListEnvelopeSchema,
 } from '@/features/admin-support/domain/contracts';
@@ -77,6 +78,11 @@ describe('administrative support', () => {
     const detail = adminSupportConversationDetailEnvelopeSchema.parse({ data: { conversation, messages: [customerMessage] }, meta: { nextCursor: null } });
     expect(list.data[0]?.status).toBe('IN_PROGRESS');
     expect(detail.data.messages[0]).toMatchObject({ senderType: 'USER', content: 'Necesito ayuda con la entrega' });
+  });
+
+  it('accepts conversations without a last message preview', () => {
+    const parsed = adminSupportConversationSchema.parse({ ...conversation, lastMessagePreview: null });
+    expect(parsed.lastMessagePreview).toBeNull();
   });
 
   it('renders the inbox with unread indicators and a link to the conversation', async () => {
