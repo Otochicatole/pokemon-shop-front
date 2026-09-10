@@ -261,14 +261,19 @@
 .admin-wide-dialog { width: min(100%, 880px); max-height: min(88vh, 900px); overflow-y: auto; }
 .admin-dialog-form { display: grid; gap: 16px; margin-top: 20px; }
 .admin-tcgdex-search { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 12px; margin-top: 18px; }
-.admin-tcgdex-results { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 20px; }
-.admin-tcgdex-result { display: grid; grid-template-columns: 52px minmax(0, 1fr) auto; align-items: center; gap: 11px; min-height: 72px; padding: 9px; border: 2px solid var(--line); background: #0a0f15; color: var(--ink); text-align: left; cursor: pointer; }
+.admin-tcgdex-results { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+.admin-tcgdex-result { display: grid; grid-template-columns: 64px minmax(0, 1fr) auto; align-items: center; gap: 14px; min-height: 98px; padding: 11px 14px; border: 2px solid var(--line); background: #0a0f15; color: var(--ink); text-align: left; cursor: pointer; }
 .admin-tcgdex-result:hover:not(:disabled) { border-color: var(--accent); background: rgba(255, 213, 47, .06); }
 .admin-tcgdex-result:disabled { cursor: wait; opacity: .7; }
-.admin-tcgdex-result-image { width: 48px; height: 62px; display: grid; place-items: center; overflow: hidden; border: 1px solid var(--line); background: #05070a; color: var(--muted); }
+.admin-tcgdex-result-image { width: 58px; height: 76px; display: grid; place-items: center; overflow: hidden; border: 1px solid var(--line); background: #05070a; color: var(--muted); }
 .admin-tcgdex-result-image img { width: 100%; height: 100%; object-fit: contain; }
+.admin-tcgdex-result-info { min-width: 0; display: grid; gap: 6px; }
 .admin-tcgdex-result strong, .admin-tcgdex-result small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.admin-tcgdex-result small { margin-top: 5px; color: var(--muted); font-size: 12px; }
+.admin-tcgdex-result strong { font-size: 14px; }
+.admin-tcgdex-result-meta { display: flex; flex-wrap: wrap; gap: 5px 15px; min-width: 0; }
+.admin-tcgdex-result-meta small { margin: 0; color: var(--muted); font-size: 12px; }
+.admin-tcgdex-result-meta-muted { gap: 5px 12px; }
+.admin-tcgdex-result-meta-muted small { color: #8fa1ad; font-size: 10px; }
 .admin-tcgdex-result-action { color: var(--cyan); }
 .admin-spin { animation: admin-spin .8s linear infinite; }
 @keyframes admin-spin { to { transform: rotate(360deg); } }
@@ -477,7 +482,6 @@
   .admin-form-section-heading .button { width: 100%; }
   .admin-tcgdex-search { grid-template-columns: 1fr; }
   .admin-tcgdex-search .button { width: 100%; }
-  .admin-tcgdex-results { grid-template-columns: 1fr; }
   .admin-toolbar { align-items: stretch; flex-direction: column; }
   .audit-toolbar { display: grid; grid-template-columns: 1fr; }
   .admin-order-toolbar { grid-template-columns: 1fr; }
