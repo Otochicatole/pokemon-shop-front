@@ -6,6 +6,7 @@ export function clearAdminPrivateCache(queryClient: QueryClient) {
       && !(query.queryKey.length === 2 && query.queryKey[1] === 'session'),
   });
   queryClient.removeQueries({ queryKey: ['support-realtime', 'admin'] });
+  queryClient.removeQueries({ queryKey: ['notifications', 'admin'] });
 }
 
 export function clearAdminSessionCache(queryClient: QueryClient) {

@@ -27,9 +27,23 @@ export function supportEventUnreadCount(event: SupportRealtimeEvent): number | n
   const raw = event.type === 'support.unread_count'
     ? event.payload.count
     : event.type === 'connection.ready'
-      ? event.payload.unreadCount
+      ? event.payload.supportUnreadCount ?? event.payload.unreadCount
       : null;
   return typeof raw === 'number' && Number.isSafeInteger(raw) && raw >= 0 ? raw : null;
+}
+
+export function notificationEventUnreadCount(event: SupportRealtimeEvent): number | null {
+  const raw = event.type === 'notifications.unread_count' || event.type === 'notification.created'
+    ? event.payload.count ?? event.payload.unreadCount
+    : event.type === 'connection.ready'
+      ? event.payload.notificationUnreadCount
+      : null;
+  return typeof raw === 'number' && Number.isSafeInteger(raw) && raw >= 0 ? raw : null;
+}
+
+export function notificationEventPayload(event: SupportRealtimeEvent) {
+  const notification = event.payload.notification;
+  return notification && typeof notification === 'object' ? notification as Record<string, unknown> : null;
 }
 
 export function supportEventConversationId(event: SupportRealtimeEvent): string | null {

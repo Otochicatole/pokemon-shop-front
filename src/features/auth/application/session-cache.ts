@@ -10,6 +10,7 @@ export function clearUserPrivateCache(queryClient: QueryClient) {
   queryClient.removeQueries({ queryKey: ['loyalty-account'] });
   queryClient.removeQueries({ queryKey: ['orders'] });
   queryClient.removeQueries({ queryKey: ['order'] });
+  queryClient.removeQueries({ queryKey: ['notifications'] });
 }
 
 export function clearUserSessionCache(queryClient: QueryClient) {

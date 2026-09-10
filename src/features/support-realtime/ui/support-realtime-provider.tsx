@@ -13,21 +13,21 @@ import { adminFetch, resetAdminCsrf } from '@/shared/admin/client';
 import { advanceSessionGeneration, getSessionSyncGeneration, isCurrentSessionRequest, subscribeSessionSync } from '@/shared/auth/session-sync';
 import {
   parseSupportRealtimeEvent,
-  supportEventAuthorType,
-  supportEventConversationCreatorType,
-  supportEventConversationId,
-  supportEventMessagePreview,
   supportEventUnreadCount,
+  notificationEventUnreadCount,
+  notificationEventPayload,
   supportSocketCloseAction,
   type SupportConnectionState,
   type SupportRealtimeRole,
 } from '../domain/events';
 import { playSupportNotificationSound, unlockSupportNotificationSound } from '../infrastructure/notification-sound';
+import { getNotificationUnreadCount, getAdminNotificationUnreadCount } from '@/features/notifications/infrastructure/api';
 
 interface SupportRealtimeContextValue {
   role: SupportRealtimeRole;
   authenticated: boolean;
   unreadCount: number;
+  notificationUnreadCount: number;
   connectionState: SupportConnectionState;
 }
 
@@ -35,11 +35,12 @@ const SupportRealtimeContext = createContext<SupportRealtimeContextValue>({
   role: 'user',
   authenticated: false,
   unreadCount: 0,
+  notificationUnreadCount: 0,
   connectionState: 'idle',
 });
 
 function websocketUrl(role: SupportRealtimeRole) {
-  const url = new URL('/api/v2/support/ws', window.location.origin);
+  const url = new URL('/api/v2/notifications/ws', window.location.origin);
   url.protocol = url.protocol === 'https:' ? 'wss:' : 'ws:';
   url.searchParams.set('role', role);
   return url.toString();
@@ -50,11 +51,6 @@ async function unreadCount(role: SupportRealtimeRole) {
     ? await adminFetch<{ data: { count: number } }>('/admin/support/unread-count')
     : await apiFetch<{ data: { count: number } }>('/support/unread-count');
   return response.data.count;
-}
-
-function isIncomingMessage(role: SupportRealtimeRole, authorType: string | null, previousCount: number, nextCount: number | null) {
-  if (authorType) return authorType !== (role === 'admin' ? 'ADMIN' : 'USER');
-  return nextCount !== null && nextCount > previousCount;
 }
 
 function sessionActorId(value: unknown) {
@@ -71,6 +67,7 @@ export function SupportRealtimeProvider({ children }: { children: ReactNode }) {
   const [connectionState, setConnectionState] = useState<SupportConnectionState>('idle');
   const unreadKey = useMemo(() => ['support-realtime', role, 'unread-count'] as const, [role]);
   const unreadRef = useRef(0);
+  const notificationUnreadRef = useRef(0);
 
   const session = useQuery<unknown>({
     queryKey: role === 'admin' ? ['admin', 'session'] : ['me'],
@@ -88,8 +85,17 @@ export function SupportRealtimeProvider({ children }: { children: ReactNode }) {
     refetchInterval: 45_000,
   });
   const currentUnreadCount = authenticated ? (unread.data ?? 0) : 0;
+  const notificationUnread = useQuery({
+    queryKey: ['notifications', role, 'unread-count'],
+    queryFn: () => role === 'admin' ? getAdminNotificationUnreadCount() : getNotificationUnreadCount(),
+    enabled: authenticated,
+    retry: false,
+    refetchInterval: 45_000,
+  });
+  const currentNotificationUnreadCount = authenticated ? (notificationUnread.data ?? 0) : 0;
 
   useEffect(() => { unreadRef.current = currentUnreadCount; }, [currentUnreadCount]);
+  useEffect(() => { notificationUnreadRef.current = currentNotificationUnreadCount; }, [currentNotificationUnreadCount]);
 
   useEffect(() => {
     const userUnauthorized = (event: Event) => {
@@ -165,36 +171,48 @@ export function SupportRealtimeProvider({ children }: { children: ReactNode }) {
         if (!event) return;
 
         const nextUnreadCount = supportEventUnreadCount(event);
-        const previousUnreadCount = unreadRef.current;
         if (nextUnreadCount !== null) {
           unreadRef.current = nextUnreadCount;
           queryClient.setQueryData(unreadKey, nextUnreadCount);
         }
+        const nextNotificationUnreadCount = notificationEventUnreadCount(event);
+        if (nextNotificationUnreadCount !== null) {
+          notificationUnreadRef.current = nextNotificationUnreadCount;
+          queryClient.setQueryData(['notifications', role, 'unread-count'], nextNotificationUnreadCount);
+        }
         if (event.type === 'connection.ready') {
           void queryClient.invalidateQueries({ queryKey: unreadKey, exact: true });
+          void queryClient.invalidateQueries({ queryKey: ['notifications', role, 'unread-count'], exact: true });
         }
 
         if (event.type === 'connection.ready' || (event.type.startsWith('support.') && event.type !== 'support.unread_count')) {
           void queryClient.invalidateQueries({ queryKey: role === 'admin' ? ['admin', 'support'] : ['support'] });
         }
 
-        const ownActorType = role === 'admin' ? 'ADMIN' : 'USER';
-        const creatorType = supportEventConversationCreatorType(event);
-        const incomingConversation = event.type === 'support.conversation.created'
-          && (creatorType ? creatorType !== ownActorType : role === 'admin');
-        const incomingMessage = event.type === 'support.message.created'
-          && isIncomingMessage(role, supportEventAuthorType(event), previousUnreadCount, nextUnreadCount);
-        if (!incomingConversation && !incomingMessage) return;
+        if (event.type === 'notification.created') {
+          void queryClient.invalidateQueries({ queryKey: ['notifications'] });
+          const payload = notificationEventPayload(event);
+          const reference = payload?.reference;
+          const href = reference && typeof reference === 'object'
+            ? (reference as Record<string, unknown>).kind === 'ORDER' && typeof (reference as Record<string, unknown>).orderNumber === 'string'
+              ? `${role === 'admin' ? '/admin/orders' : '/account/orders'}/${encodeURIComponent(String((reference as Record<string, unknown>).orderNumber))}`
+              : (reference as Record<string, unknown>).kind === 'SUPPORT_CONVERSATION' && typeof (reference as Record<string, unknown>).conversationId === 'string'
+                ? `${role === 'admin' ? '/admin/support' : '/account/support'}/${encodeURIComponent(String((reference as Record<string, unknown>).conversationId))}`
+                : (role === 'admin' ? '/admin/notifications' : '/account/notifications')
+            : (role === 'admin' ? '/admin/notifications' : '/account/notifications');
+          const orderNumber = reference && typeof reference === 'object' && (reference as Record<string, unknown>).kind === 'ORDER' ? (reference as Record<string, unknown>).orderNumber : null;
+          if (typeof orderNumber === 'string') {
+            void queryClient.invalidateQueries({ queryKey: ['orders'] });
+            void queryClient.invalidateQueries({ queryKey: ['order', orderNumber] });
+          }
+          playSupportNotificationSound();
+          toast(String(payload?.title ?? 'Nueva notificación'), {
+            description: typeof payload?.message === 'string' ? payload.message : 'Tenés una novedad para revisar.',
+            action: { label: 'Abrir', onClick: () => router.push(href) },
+          });
+          return;
+        }
 
-        playSupportNotificationSound();
-        const conversationId = supportEventConversationId(event);
-        const href = role === 'admin'
-          ? (conversationId ? `/admin/support/${conversationId}` : '/admin/support')
-          : (conversationId ? `/account/support/${conversationId}` : '/account/support');
-        toast(incomingConversation ? (role === 'admin' ? 'Nueva consulta de soporte' : 'Soporte abrió una conversación') : 'Nuevo mensaje de soporte', {
-          description: supportEventMessagePreview(event) ?? (role === 'admin' ? 'Un cliente necesita ayuda.' : 'El equipo de soporte te respondió.'),
-          action: { label: 'Abrir', onClick: () => router.push(href) },
-        });
       });
       activeSocket.addEventListener('close', (event) => {
         if (stopped || socket !== activeSocket || getSessionSyncGeneration(role) !== socketGeneration) return;
@@ -240,8 +258,9 @@ export function SupportRealtimeProvider({ children }: { children: ReactNode }) {
     role,
     authenticated,
     unreadCount: currentUnreadCount,
+    notificationUnreadCount: currentNotificationUnreadCount,
     connectionState: authenticated ? connectionState : 'idle',
-  }), [authenticated, connectionState, currentUnreadCount, role]);
+  }), [authenticated, connectionState, currentUnreadCount, currentNotificationUnreadCount, role]);
 
   return <SupportRealtimeContext.Provider value={value}>{children}</SupportRealtimeContext.Provider>;
 }
