@@ -9,11 +9,13 @@ import { getOrder, cancelOrder } from '../infrastructure/api';
 import { uploadReceipt } from '@/features/checkout/infrastructure/api';
 import { formatDate, formatMoney, statusLabel } from '@/shared/lib/format';
 import { Button } from '@/components/button';
+import { Dialog } from '@/components/overlay';
 
 export function OrderDetail({ number }: { number: string }) {
   const queryClient = useQueryClient();
   const query = useQuery({ queryKey: ['order', number], queryFn: () => getOrder(number) });
   const [busy, setBusy] = useState(false);
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
   if (query.isLoading) return <div className="page-loading">Cargando orden…</div>;
   if (query.isError || !query.data) return <div className="empty-state"><h1>Orden no encontrada</h1><Link href="/account/orders" className="button button-secondary">Volver a mis órdenes</Link></div>;
   const order = query.data;
@@ -25,6 +27,18 @@ export function OrderDetail({ number }: { number: string }) {
     try { await uploadReceipt(order.number, file); await query.refetch(); toast.success('Comprobante recibido'); }
     catch (error) { toast.error(error instanceof Error ? error.message : 'No pudimos subir el comprobante'); }
     finally { setBusy(false); }
+  };
+  const confirmCancel = async () => {
+    setBusy(true);
+    try {
+      await cancelOrder(order.number);
+      await Promise.all([query.refetch(), queryClient.invalidateQueries({ queryKey: ['loyalty-account'] })]);
+      setCancelDialogOpen(false);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'No se pudo cancelar');
+    } finally {
+      setBusy(false);
+    }
   };
   return <div className="order-page">
     <Link href="/account/orders" className="back-link"><ArrowLeft size={15} aria-hidden="true" />Volver a mis órdenes</Link>
@@ -51,12 +65,18 @@ export function OrderDetail({ number }: { number: string }) {
         {payment?.bankInstructions && <div className="bank-details"><strong>Datos para transferir</strong><span>{payment.bankInstructions.bankName}</span><span>{payment.bankInstructions.accountHolder}</span>{payment.bankInstructions.cbu && <span>CBU: {payment.bankInstructions.cbu}</span>}{payment.bankInstructions.alias && <span>Alias: {payment.bankInstructions.alias}</span>}</div>}
         {payment?.method === 'BANK_TRANSFER' && !payment.receipt && canCancel && <label className="upload-box">Subir comprobante<input type="file" accept="image/jpeg,image/png,image/webp" disabled={busy} onChange={(event) => { const file = event.target.files?.[0]; if (file) void onReceipt(file); }} /></label>}
         {payment?.receipt && <p className="form-hint">Comprobante: {payment.receipt.review === 'APPROVED' ? 'aprobado' : payment.receipt.review === 'REJECTED' ? 'rechazado' : 'en revisión'}</p>}
-        {canCancel && <Button variant="ghost" className="cancel-button" disabled={busy} onClick={async () => { if (!confirm('¿Cancelar esta orden?')) return; setBusy(true); try { await cancelOrder(order.number); await Promise.all([query.refetch(), queryClient.invalidateQueries({ queryKey: ['loyalty-account'] })]); } catch (error) { toast.error(error instanceof Error ? error.message : 'No se pudo cancelar'); } finally { setBusy(false); } }}>Cancelar orden</Button>}
+        {canCancel && <Button variant="ghost" className="cancel-button" disabled={busy} onClick={() => setCancelDialogOpen(true)}>Cancelar orden</Button>}
       </section>
       <section className="order-card order-timeline-card">
         <h2>Seguimiento de la orden</h2>
         {order.timeline.length > 0 ? <ol className="order-timeline">{order.timeline.map((event, index) => <li className={index === order.timeline.length - 1 ? 'is-current' : ''} key={event.id}><span className="order-timeline-marker" aria-hidden="true" /><div><strong>{statusLabel(event.toStatus)}</strong><span>{formatDate(event.createdAt)}{index === order.timeline.length - 1 ? ' · Estado actual' : ''}</span></div></li>)}</ol> : <p className="form-hint">Todavía no hay eventos de seguimiento para esta orden.</p>}
       </section>
     </div>
+    <Dialog open={cancelDialogOpen} title="Cancelar orden" description="Esta acción cancelará la orden y liberará las reservas asociadas. ¿Querés continuar?" onClose={() => !busy && setCancelDialogOpen(false)} className="order-cancel-dialog">
+      <div className="order-dialog-actions">
+        <Button type="button" variant="secondary" onClick={() => setCancelDialogOpen(false)} disabled={busy}>Volver</Button>
+        <Button type="button" variant="danger" onClick={() => void confirmCancel()} disabled={busy}>{busy ? 'Cancelando…' : 'Confirmar cancelación'}</Button>
+      </div>
+    </Dialog>
   </div>;
 }
