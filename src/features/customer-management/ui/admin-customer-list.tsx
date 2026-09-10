@@ -18,9 +18,9 @@ export function AdminCustomerListView() {
     { key: 'verified', header: 'Verificación', render: (row) => <AdminBadge value={row.emailVerifiedAt ? 'VERIFIED' : 'UNVERIFIED'} /> },
     { key: 'status', header: 'Estado', render: (row) => <AdminBadge value={row.status} /> },
     { key: 'orders', header: 'Órdenes', align: 'center', render: (row) => row.ordersCount ?? 0 },
+    { key: 'points', header: 'Puntos', align: 'center', render: (row) => row.loyalty.available },
     { key: 'paid', header: 'Compras', align: 'right', render: (row) => <span className="admin-money">{adminMoney(row.paidTotal)}</span> },
     { key: 'joined', header: 'Alta', render: (row) => adminDate(row.createdAt) },
     { key: 'action', header: 'Detalle', align: 'right', render: (row) => <Link className="admin-icon-button" href={`/admin/customers/${row.id}`} aria-label={`Abrir cliente ${row.email}`}><Eye size={17} /></Link> },
   ]} /><CursorPagination canPrevious={history.length > 0} canNext={Boolean(query.data?.nextCursor)} loading={query.isFetching} onPrevious={() => { const copy = [...history]; setCursor(copy.pop()); setHistory(copy); }} onNext={() => { if (!query.data?.nextCursor) return; setHistory((current) => [...current, cursor]); setCursor(query.data.nextCursor ?? undefined); }} /></>}</>;
 }
-

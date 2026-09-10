@@ -16,7 +16,7 @@ export function AdminShell({ adminName, adminEmail, navigation, onLogout, childr
   const [menuOpen, setMenuOpen] = useState(false);
   const sidebarRef = useRef<HTMLElement>(null);
   const closeMenu = () => setMenuOpen(false);
-  const labels: Record<string, string> = { products: 'Productos', new: 'Nuevo', inventory: 'Inventario', suppliers: 'Proveedores', orders: 'Órdenes', payments: 'Pagos', fulfillment: 'Envíos', customers: 'Clientes', audit: 'Auditoría' };
+  const labels: Record<string, string> = { products: 'Productos', new: 'Nuevo', inventory: 'Inventario', suppliers: 'Proveedores', orders: 'Órdenes', payments: 'Pagos', fulfillment: 'Envíos', customers: 'Clientes', loyalty: 'Fidelidad', audit: 'Auditoría' };
   const pathSegments = pathname.split('/').filter(Boolean).slice(1);
   const crumbs = pathSegments.map((segment, index) => ({ href: `/admin/${pathSegments.slice(0, index + 1).join('/')}`, label: labels[segment] ?? 'Detalle' }));
   useEffect(() => {

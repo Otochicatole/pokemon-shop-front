@@ -310,6 +310,12 @@
 .admin-sidebar-backdrop { display: none; }
 .sr-only { width: 1px; height: 1px; position: absolute; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
 
+.admin-loyalty-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.admin-loyalty-preview { padding: 20px; border: 2px dashed var(--line-strong); background: rgba(83, 190, 229, .06); }
+.admin-loyalty-preview > span { color: var(--cyan); font: 8px/1.5 var(--pixel-font); text-transform: uppercase; }
+.admin-loyalty-preview > p { max-width: 900px; margin: 12px 0 0; color: #cad3da; font-size: 14px; line-height: 1.7; }
+.admin-form-footer > span { margin-right: auto; color: var(--muted); font-size: 13px; }
+
 @keyframes admin-blink { 50% { opacity: .25; } }
 
 @media (max-width: 1180px) {
@@ -385,7 +391,7 @@
   .admin-receipt-review { align-items: stretch; flex-direction: column; }
   .admin-receipt-review > div { width: 100%; }.admin-receipt-review .button { flex: 1; }
   .admin-rate-row { grid-template-columns: 1fr; align-items: stretch; }
-  .admin-form-footer { flex-wrap: wrap; }.admin-form-footer .button { flex: 1; }
+  .admin-form-footer { flex-wrap: wrap; }.admin-form-footer > span { width: 100%; }.admin-form-footer .button { flex: 1; }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Boxes, ClipboardList, CreditCard, Gauge, Handshake, History, PackageSearch, Truck, UsersRound } from 'lucide-react';
+import { Boxes, ClipboardList, Coins, CreditCard, Gauge, Handshake, History, PackageSearch, Truck, UsersRound } from 'lucide-react';
 import { toast } from 'sonner';
 import { AdminShell, type AdminNavigationItem } from '@/components/admin';
 import { adminErrorMessage } from '@/shared/admin/client';
@@ -19,6 +19,7 @@ const navigation: AdminNavigationItem[] = [
   { href: '/admin/payments', label: 'Pagos', icon: <CreditCard size={18} /> },
   { href: '/admin/fulfillment', label: 'Envíos y retiro', icon: <Truck size={18} /> },
   { href: '/admin/customers', label: 'Clientes', icon: <UsersRound size={18} /> },
+  { href: '/admin/loyalty', label: 'Fidelidad', icon: <Coins size={18} /> },
   { href: '/admin/audit', label: 'Auditoría', icon: <History size={18} /> },
 ];
 

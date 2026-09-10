@@ -4,6 +4,7 @@ import { adminProductDetailEnvelopeSchema, adminProductListEnvelopeSchema } from
 import { fulfillmentEnvelopeSchema } from '@/features/fulfillment-management/domain/contracts';
 import { auditListEnvelopeSchema } from '@/features/audit-log/domain/contracts';
 import { adminLoginSchema } from '@/features/admin-auth/domain/contracts';
+import { adminOrderSchema } from '@/features/order-management/domain/contracts';
 
 const money = { amountMinor: '125000', currency: 'ARS' as const };
 const product = {
@@ -37,5 +38,31 @@ describe('admin API contracts', () => {
     const audit = auditListEnvelopeSchema.parse({ data: [{ id: 'a1', actorType: 'ADMIN', actorId: 'admin-1', action: 'PRODUCT_UPDATED', entityType: 'Product', entityId: 'product-1', metadata: { email: '[REDACTED]' }, requestId: 'req-1', createdAt: '2026-09-08T12:00:00.000Z' }], meta: { nextCursor: null } });
     expect(fulfillment.data.shippingZones[0]?.rates[0]?.price.amountMinor).toBe('125000');
     expect(audit.data[0]?.metadata).toEqual({ email: '[REDACTED]' });
+  });
+
+  it('requires the discount and loyalty snapshot returned with administrative orders', () => {
+    const discount = { amountMinor: '1500', currency: 'ARS' as const };
+    const order = adminOrderSchema.parse({
+      id: 'order-1', number: 'CS-0001', version: 2, status: 'PAID',
+      paymentMethod: 'BANK_TRANSFER', fulfillmentType: 'PICKUP',
+      totals: { subtotal: money, discount, shipping: { ...money, amountMinor: '0' }, total: { ...money, amountMinor: '123500' } },
+      loyalty: {
+        programVersion: 3,
+        pointsRedeemed: 1,
+        pointsDiscount: discount,
+        pointsEarned: 4,
+        redemptionStatus: 'REDEEMED',
+        spendPerPoint: { ...money, amountMinor: '30000' },
+        pointValue: discount,
+      },
+      customer: { id: '11111111-1111-4111-8111-111111111111', email: 'trainer@example.com', name: 'Trainer', status: 'ACTIVE', emailVerifiedAt: '2026-09-08T11:00:00.000Z', createdAt: '2026-09-01T12:00:00.000Z' },
+      fulfillment: { type: 'PICKUP', pickupPointId: 'pickup-1', name: 'Local', address: 'Ruta 10' },
+      items: [], reservations: [], payment: null, receipts: [], timeline: [], allowedActions: [],
+      expiresAt: null, createdAt: '2026-09-08T12:00:00.000Z', updatedAt: '2026-09-08T12:05:00.000Z',
+    });
+
+    expect(order.totals.discount.amountMinor).toBe('1500');
+    expect(order.loyalty).toMatchObject({ pointsRedeemed: 1, pointsEarned: 4, redemptionStatus: 'REDEEMED' });
+    expect(order.loyalty.pointsDiscount).toEqual(order.totals.discount);
   });
 });

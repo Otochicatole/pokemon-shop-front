@@ -65,6 +65,36 @@ export type CheckoutOptions = z.infer<typeof optionsSchema>;
 
 export const userSchema = z.object({ id: z.string(), email: z.string().email(), name: z.string().nullable(), emailVerified: z.boolean() });
 export type User = z.infer<typeof userSchema>;
+export const loyaltyProgramSchema = z.object({
+  enabled: z.boolean(),
+  currency: z.literal('ARS'),
+  spendPerPoint: moneySchema,
+  pointsPerStep: z.number().int().positive(),
+  pointValue: moneySchema,
+  minimumRedemptionPoints: z.number().int().positive(),
+  maximumRedemptionPercent: z.number().int().min(1).max(90),
+  version: z.number().int().positive(),
+  updatedAt: z.string().or(z.date()),
+});
+export const loyaltyAccountSchema = z.object({
+  balance: z.number().int(),
+  reserved: z.number().int().nonnegative(),
+  available: z.number().int().nonnegative(),
+  lifetimeEarned: z.number().int().nonnegative(),
+  lifetimeRedeemed: z.number().int().nonnegative(),
+});
+export const loyaltyTransactionSchema = z.object({
+  id: z.string(),
+  type: z.enum(['EARN', 'REDEEM', 'EARN_REVERSAL', 'REDEEM_REVERSAL', 'ADJUSTMENT']),
+  points: z.number().int(),
+  balanceAfter: z.number().int(),
+  description: z.string().nullable(),
+  orderNumber: z.string().nullable(),
+  createdAt: z.string().or(z.date()),
+});
+export type LoyaltyProgram = z.infer<typeof loyaltyProgramSchema>;
+export type LoyaltyAccount = z.infer<typeof loyaltyAccountSchema>;
+export type LoyaltyTransaction = z.infer<typeof loyaltyTransactionSchema>;
 export const orderInputSchema = z.object({
   items: z.array(z.object({ productId: z.string(), quantity: z.number().int().min(1), productVersion: z.number().int().min(1) })).min(1),
   fulfillment: z.discriminatedUnion('type', [
@@ -72,9 +102,32 @@ export const orderInputSchema = z.object({
     z.object({ type: z.literal('SHIPMENT'), shippingRateId: z.string(), recipientName: z.string().min(1), recipientPhone: z.string().min(6), addressLine1: z.string().min(1), addressLine2: z.string().optional(), city: z.string().min(1), province: z.string().min(1), postalCode: z.string().min(3) }),
   ]),
   paymentMethod: z.enum(['BANK_TRANSFER', 'MERCADO_PAGO']),
+  pointsToRedeem: z.number().int().min(0).max(2_000_000_000),
 });
 export type OrderInput = z.infer<typeof orderInputSchema>;
-export const orderSchema = z.object({ id: z.string(), number: z.string(), status: z.string(), paymentMethod: z.string(), fulfillmentType: z.string(), totals: z.object({ subtotal: moneySchema, shipping: moneySchema, total: moneySchema }), expiresAt: z.string().nullable().optional(), items: z.array(z.object({ productId: z.string(), sku: z.string(), name: z.string(), quantity: z.number(), unitPrice: moneySchema, lineTotal: moneySchema })), fulfillment: z.record(z.string(), z.unknown()).optional(), payment: z.record(z.string(), z.unknown()).nullable().optional(), createdAt: z.string().or(z.date()) });
+export const checkoutPreviewSchema = z.object({
+  subtotal: moneySchema,
+  discount: moneySchema,
+  shipping: moneySchema,
+  total: moneySchema,
+  loyalty: z.object({
+    enabled: z.boolean(), balance: z.number().int(), reserved: z.number().int().nonnegative(), available: z.number().int().nonnegative(),
+    pointsRedeemed: z.number().int().nonnegative(), maximumRedeemablePoints: z.number().int().nonnegative(),
+    minimumRedemptionPoints: z.number().int().positive(), pointsToEarn: z.number().int().nonnegative(), pointValue: moneySchema,
+  }),
+  expiresAt: z.string().or(z.date()),
+});
+export type CheckoutPreview = z.infer<typeof checkoutPreviewSchema>;
+export const orderLoyaltySchema = z.object({
+  programVersion: z.number().int().nullable(),
+  pointsRedeemed: z.number().int().nonnegative(),
+  pointsDiscount: moneySchema,
+  pointsEarned: z.number().int().nonnegative(),
+  redemptionStatus: z.enum(['NONE', 'RESERVED', 'REDEEMED', 'RELEASED', 'RESTORED']),
+  spendPerPoint: moneySchema.nullable(),
+  pointValue: moneySchema.nullable(),
+});
+export const orderSchema = z.object({ id: z.string(), number: z.string(), status: z.string(), paymentMethod: z.string(), fulfillmentType: z.string(), totals: z.object({ subtotal: moneySchema, discount: moneySchema, shipping: moneySchema, total: moneySchema }), loyalty: orderLoyaltySchema, expiresAt: z.string().nullable().optional(), items: z.array(z.object({ productId: z.string(), sku: z.string(), name: z.string(), quantity: z.number(), unitPrice: moneySchema, lineTotal: moneySchema })), fulfillment: z.record(z.string(), z.unknown()).optional(), payment: z.record(z.string(), z.unknown()).nullable().optional(), createdAt: z.string().or(z.date()) });
 export type Order = z.infer<typeof orderSchema>;
 export const problemSchema = z.object({ code: z.string(), status: z.number(), title: z.string(), requestId: z.string().optional(), details: z.unknown().optional() });
 export type Problem = z.infer<typeof problemSchema>;

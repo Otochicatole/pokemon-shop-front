@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { moneySchema } from '@/shared/api/contracts';
+import { moneySchema, orderLoyaltySchema } from '@/shared/api/contracts';
 
 export const adminOrderStatusSchema = z.enum(['PENDING_PAYMENT', 'PAYMENT_REVIEW', 'PAID', 'PREPARING', 'READY_FOR_PICKUP', 'SHIPPED', 'COMPLETED', 'CANCELLED', 'EXPIRED', 'REFUND_RECORDED', 'PAYMENT_REQUIRES_REVIEW']);
 export const adminPaymentStatusSchema = z.enum(['PENDING', 'UNDER_REVIEW', 'APPROVED', 'REJECTED', 'FAILED', 'REFUNDED', 'DISPUTED', 'REQUIRES_REVIEW']);
@@ -28,7 +28,9 @@ const pickupSchema = z.object({ type: z.literal('PICKUP'), pickupPointId: z.stri
 export const adminOrderSchema = z.object({
   id: z.string(), number: z.string(), version: z.number().int(), status: adminOrderStatusSchema,
   paymentMethod: z.enum(['BANK_TRANSFER', 'MERCADO_PAGO']), fulfillmentType: z.enum(['SHIPMENT', 'PICKUP']),
-  totals: z.object({ subtotal: moneySchema, shipping: moneySchema, total: moneySchema }), customer: customerSchema,
+  totals: z.object({ subtotal: moneySchema, discount: moneySchema, shipping: moneySchema, total: moneySchema }),
+  loyalty: orderLoyaltySchema,
+  customer: customerSchema,
   fulfillment: z.discriminatedUnion('type', [shipmentSchema, pickupSchema]), items: z.array(itemSchema), reservations: z.array(reservationSchema),
   payment: paymentSchema.nullable(), receipts: z.array(receiptSchema), timeline: z.array(timelineSchema), allowedActions: z.array(adminOrderActionSchema),
   expiresAt: z.string().nullable(), createdAt: z.string(), updatedAt: z.string(),

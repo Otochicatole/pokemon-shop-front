@@ -1,10 +1,11 @@
 import { z } from 'zod';
 import { adminOrderSchema } from '@/features/order-management';
-import { moneySchema } from '@/shared/api/contracts';
+import { loyaltyAccountSchema, moneySchema } from '@/shared/api/contracts';
 
 export const adminCustomerSchema = z.object({
   id: z.string(), email: z.string(), name: z.string().nullable(), status: z.enum(['ACTIVE', 'SUSPENDED']),
   emailVerifiedAt: z.string().nullable(), createdAt: z.string(), ordersCount: z.number().int().optional(), paidTotal: moneySchema.optional(),
+  loyalty: loyaltyAccountSchema,
 });
 export type AdminCustomer = z.infer<typeof adminCustomerSchema>;
 export const customerListEnvelopeSchema = z.object({ data: z.array(adminCustomerSchema), meta: z.object({ nextCursor: z.string().nullable() }) });
