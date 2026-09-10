@@ -111,7 +111,7 @@ export function AdminSupportConversationView({ conversationId }: { conversationI
   if (query.isLoading) return <div className="admin-loading">Cargando conversación</div>;
   if (query.isError || !conversation) return <div className="admin-error-panel"><div><h1>No pudimos cargar la conversación</h1><p>{adminErrorMessage(query.error)}</p><Link className="button button-secondary" href="/admin/support">Volver a soporte</Link></div></div>;
 
-  return <>
+  return <div className="admin-support-fullscreen">
     <Link href="/admin/support" className="admin-support-back"><ArrowLeft size={16} />Volver a soporte</Link>
     <AdminPageHeader eyebrow="Conversación de soporte" title={conversation.subject} description={`Caso de ${conversation.user.name?.trim() || conversation.user.email}`} actions={<><Button variant="secondary" onClick={() => void query.refetch()} disabled={query.isFetching}><RefreshCw size={16} />Actualizar</Button><SupportStatusBadge status={conversation.status} /></>} />
     <div className="admin-support-detail-grid">
@@ -136,5 +136,5 @@ export function AdminSupportConversationView({ conversationId }: { conversationI
         <div className="admin-support-time-note"><Clock3 size={17} aria-hidden="true" />Los mensajes nuevos actualizan esta vista automáticamente.</div>
       </aside>
     </div>
-  </>;
+  </div>;
 }

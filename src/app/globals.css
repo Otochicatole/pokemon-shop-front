@@ -30,6 +30,8 @@ button:disabled { cursor: not-allowed; opacity: .5; }
 .pixel-badge { display: inline-block; padding: 6px 8px; border: 2px solid currentColor; font: 7px var(--pixel-font); text-transform: uppercase; }
 .pixel-badge-yellow { color: var(--accent); background: rgba(255,213,47,.1); }.pixel-badge-red { color: var(--warm); background: rgba(255,91,85,.1); }.pixel-badge-cyan { color: var(--cyan); background: rgba(83,190,229,.1); }.pixel-badge-green { color: var(--green); background: rgba(121,201,107,.1); }.pixel-badge-purple { color: var(--purple); background: rgba(183,123,225,.1); }
 .site-main { min-height: calc(100vh - 118px); }
+.support-page-container { min-height: calc(100dvh - 90px); padding: 0 4vw 24px; }
+.site-main:has(.support-page-container) + .site-footer { display: none; }
 .site-header { height: 90px; position: sticky; top: 0; z-index: 10; border-bottom: 2px solid var(--line); background: rgba(7,10,15,.96); box-shadow: 0 6px 0 rgba(0,0,0,.35); }
 .header-inner { max-width: 1320px; height: 100%; margin: auto; padding: 0 28px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
 .brand { display: inline-flex; align-items: center; gap: 10px; font: 11px/1.2 var(--pixel-font); text-transform: uppercase; }.brand small { display: block; margin-top: 6px; color: var(--muted); font: 7px var(--font-geist), Arial, sans-serif; letter-spacing: .1em; text-transform: uppercase; }
@@ -230,6 +232,7 @@ button:disabled { cursor: not-allowed; opacity: .5; }
 .header-inner, .footer-main, .footer-bottom { max-width: none; }
 .header-inner { padding-inline: 4vw; }
 .page-container { max-width: none; margin-inline: 0; padding-inline: 4vw; }
+.support-page-container { padding-inline: 4vw; }
 .hero { max-width: none; margin-inline: 0; padding: 0; gap: 0; }
 .home-section { max-width: none; margin-inline: 0; padding-inline: 4vw; }
 .collection-links { max-width: none; margin-inline: 0; }
@@ -237,6 +240,10 @@ button:disabled { cursor: not-allowed; opacity: .5; }
 .drop-banner, .trainer-club { max-width: none; margin-inline: 0; }
 .footer-main, .footer-bottom { padding-inline: 4vw; }
 @media (max-width: 760px) { .hero { padding: 35px 4vw 30px; } .page-container { padding-inline: 4vw; } .home-section { padding-inline: 4vw; } .explore-section { padding-inline: 4vw; } .footer-main, .footer-bottom { padding-inline: 4vw; } }
+
+@media (max-width: 760px) {
+  .support-page-container { min-height: calc(100dvh - 70px); padding-bottom: 12px; }
+}
 .technical-panel { border: 2px solid var(--line-strong); background: var(--surface-2); box-shadow: 5px 5px 0 #05070a; }
 .stock-available { margin: 10px 0 0; color: var(--green); font: 9px var(--pixel-font); }
 .component-field { display: grid; gap: 7px; color: var(--muted); font: 9px var(--pixel-font); text-transform: uppercase; }

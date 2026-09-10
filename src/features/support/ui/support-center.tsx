@@ -3,11 +3,12 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Clock3, Headphones, MessageCircleMore, Plus, RefreshCw } from 'lucide-react';
+import { ArrowLeft, Clock3, Headphones, MessageCircleMore, Plus, RefreshCw } from 'lucide-react';
 import { type FormEvent, useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/button';
 import { ErrorState } from '@/components/feedback';
+import { Dialog } from '@/components/overlay';
 import { getMe } from '@/features/auth/infrastructure/api';
 import { useSupportRealtime } from '@/features/support-realtime';
 import { ApiError } from '@/shared/api/client';
@@ -42,6 +43,7 @@ export function SupportCenter() {
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
   const [formError, setFormError] = useState<string | null>(null);
+  const [newCaseOpen, setNewCaseOpen] = useState(false);
   const [pendingCreateId] = useState(() => new PendingClientMessageId());
   const session = useQuery({ queryKey: ['me'], queryFn: getMe, retry: false });
   const conversations = useInfiniteQuery({
@@ -87,6 +89,12 @@ export function SupportCenter() {
     });
   };
 
+  const closeNewCase = () => {
+    if (createConversation.isPending) return;
+    setNewCaseOpen(false);
+    setFormError(null);
+  };
+
   if (session.isLoading) return <div className="page-loading">Cargando soporte…</div>;
   if (!session.data) {
     return <div className="empty-state">
@@ -100,37 +108,19 @@ export function SupportCenter() {
   const items = conversations.data?.pages.flatMap((page) => page.conversations) ?? [];
 
   return <div className={styles.center}>
+    <Link href="/account" className={`${styles.supportBack} back-link`}><ArrowLeft size={15} aria-hidden="true" />Volver a mi cuenta</Link>
     <header className={styles.heading}>
       <div>
         <p className="eyebrow">Ayuda personalizada</p>
         <h1>Centro de soporte</h1>
         <p>Escribinos por cualquier problema. El equipo responde en esta misma conversación.</p>
       </div>
-      <Link href="/account" className="button button-ghost">Volver a mi cuenta</Link>
+      <div className={styles.headingActions}>
+        <Button type="button" onClick={() => { setFormError(null); setNewCaseOpen(true); }}><Plus size={17} aria-hidden="true" />Nueva consulta</Button>
+      </div>
     </header>
 
     <div className={styles.layout}>
-      <section className={styles.newCase} aria-labelledby="new-support-case">
-        <div className={styles.panelHeading}>
-          <span className={styles.iconBox}><Plus size={18} aria-hidden="true" /></span>
-          <div><h2 id="new-support-case">Nueva consulta</h2><p>Creá un chat con nuestro equipo.</p></div>
-        </div>
-        <form className={styles.form} onSubmit={submit} noValidate>
-          <label htmlFor="support-subject">
-            <span>Asunto</span>
-            <input id="support-subject" value={subject} minLength={3} maxLength={120} autoComplete="off" placeholder="Ej.: problema con mi pedido" onChange={(event) => { pendingCreateId.invalidate(); setSubject(event.target.value); }} disabled={createConversation.isPending} aria-invalid={Boolean(formError && subject.trim().length < 3)} />
-            <small aria-hidden="true">{subject.length}/120</small>
-          </label>
-          <label htmlFor="support-message">
-            <span>Mensaje</span>
-            <textarea id="support-message" value={message} maxLength={4000} rows={7} placeholder="Incluí los datos que nos ayuden a resolverlo." onChange={(event) => { pendingCreateId.invalidate(); setMessage(event.target.value); }} disabled={createConversation.isPending} aria-invalid={Boolean(formError && !message.trim())} />
-            <small aria-hidden="true">{message.length}/4000</small>
-          </label>
-          {formError && <p className={styles.formError} role="alert">{formError}</p>}
-          <Button type="submit" disabled={createConversation.isPending}>{createConversation.isPending ? 'Creando…' : 'Iniciar conversación'}</Button>
-        </form>
-      </section>
-
       <section className={styles.history} aria-labelledby="support-history">
         <div className={styles.historyHeading}>
           <div><MessageCircleMore size={20} aria-hidden="true" /><h2 id="support-history">Mis consultas</h2></div>
@@ -152,5 +142,25 @@ export function SupportCenter() {
         </div> : <div className={styles.emptyHistory}><MessageCircleMore size={30} aria-hidden="true" /><h3>{status === 'ALL' ? 'Todavía no iniciaste consultas' : `No hay casos ${filterLabels[status].toLowerCase()}`}</h3><p>Cuando escribas al equipo, el historial y las respuestas aparecerán acá.</p></div>}
       </section>
     </div>
+
+    <Dialog open={newCaseOpen} onClose={closeNewCase} title="Nueva consulta" description="Creá un chat con nuestro equipo y contanos qué problema tuviste." className={styles.newCaseDialog}>
+      <form className={styles.form} onSubmit={submit} noValidate>
+        <label htmlFor="support-subject">
+          <span>Asunto</span>
+          <input id="support-subject" value={subject} minLength={3} maxLength={120} autoComplete="off" placeholder="Ej.: problema con mi pedido" onChange={(event) => { pendingCreateId.invalidate(); setSubject(event.target.value); }} disabled={createConversation.isPending} aria-invalid={Boolean(formError && subject.trim().length < 3)} />
+          <small aria-hidden="true">{subject.length}/120</small>
+        </label>
+        <label htmlFor="support-message">
+          <span>Mensaje</span>
+          <textarea id="support-message" value={message} maxLength={4000} rows={7} placeholder="Incluí los datos que nos ayuden a resolverlo." onChange={(event) => { pendingCreateId.invalidate(); setMessage(event.target.value); }} disabled={createConversation.isPending} aria-invalid={Boolean(formError && !message.trim())} />
+          <small aria-hidden="true">{message.length}/4000</small>
+        </label>
+        {formError && <p className={styles.formError} role="alert">{formError}</p>}
+        <div className={styles.modalActions}>
+          <Button type="button" variant="ghost" onClick={closeNewCase} disabled={createConversation.isPending}>Cancelar</Button>
+          <Button type="submit" disabled={createConversation.isPending}>{createConversation.isPending ? 'Creando…' : 'Iniciar conversación'}</Button>
+        </div>
+      </form>
+    </Dialog>
   </div>;
 }

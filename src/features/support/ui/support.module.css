@@ -1,6 +1,23 @@
-.center,
+.center {
+  width: 100%;
+  max-width: none;
+}
+
+.supportBack {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 18px;
+}
+
 .conversationPage {
-  width: min(100%, 1120px);
+  width: 100%;
+}
+
+.conversationPage {
+  min-height: calc(100dvh - 90px - 24px);
+  display: flex;
+  flex-direction: column;
 }
 
 .heading {
@@ -9,6 +26,14 @@
   justify-content: space-between;
   gap: 28px;
   margin-bottom: 34px;
+}
+
+.headingActions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .heading h1,
@@ -28,7 +53,7 @@
 
 .layout {
   display: grid;
-  grid-template-columns: minmax(300px, .72fr) minmax(0, 1.28fr);
+  grid-template-columns: minmax(0, 1fr);
   align-items: start;
   gap: 22px;
 }
@@ -45,6 +70,23 @@
   position: sticky;
   top: 112px;
   padding: 24px;
+}
+
+.newCaseDialog {
+  width: min(100%, 650px);
+  max-height: min(90dvh, 760px);
+  overflow-y: auto;
+}
+
+.newCaseDialog .form {
+  padding-top: 20px;
+}
+
+.modalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 3px;
 }
 
 .panelHeading,
@@ -314,7 +356,8 @@
 }
 
 .conversationHeading {
-  margin-bottom: 25px;
+  padding: 22px 0 18px;
+  margin-bottom: 0;
 }
 
 .conversationHeading > a {
@@ -344,6 +387,10 @@
 }
 
 .chatPanel {
+  min-height: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
 }
 
@@ -359,8 +406,9 @@
 }
 
 .messageLog {
-  min-height: 330px;
-  max-height: 590px;
+  min-height: 0;
+  flex: 1;
+  max-height: none;
   padding: 25px;
   display: flex;
   flex-direction: column;
@@ -417,6 +465,7 @@
 }
 
 .composer {
+  flex: 0 0 auto;
   padding: 20px;
   border-top: 2px solid var(--line);
   background: var(--surface);
@@ -501,6 +550,16 @@
     flex-direction: column;
   }
 
+  .headingActions {
+    width: 100%;
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .headingActions > * {
+    width: 100%;
+  }
+
   .heading > a,
   .closedNotice > a {
     width: 100%;
@@ -517,7 +576,7 @@
   }
 
   .messageLog {
-    min-height: 300px;
+    min-height: 0;
     padding: 16px;
   }
 
@@ -536,5 +595,19 @@
   .composerMeta {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .newCaseDialog {
+    max-height: calc(100dvh - 28px);
+    padding: 22px 18px;
+  }
+
+  .modalActions {
+    align-items: stretch;
+    flex-direction: column-reverse;
+  }
+
+  .modalActions > * {
+    width: 100%;
   }
 }

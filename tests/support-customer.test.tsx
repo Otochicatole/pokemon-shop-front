@@ -70,6 +70,8 @@ describe('customer support', () => {
     renderWithQueryClient(<SupportCenter />);
 
     expect(await screen.findByRole('link', { name: /Mi pedido no llegó/i })).toHaveAttribute('href', '/account/support/case-1');
+    expect(screen.queryByRole('textbox', { name: /Asunto/i })).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Nueva consulta' }));
     await user.type(screen.getByRole('textbox', { name: /Asunto/i }), 'Cobro duplicado');
     await user.type(screen.getByRole('textbox', { name: /Mensaje/i }), 'Veo dos cargos para la misma compra.');
     await user.click(screen.getByRole('button', { name: 'Iniciar conversación' }));
@@ -99,6 +101,7 @@ describe('customer support', () => {
     const user = userEvent.setup();
     renderWithQueryClient(<SupportCenter />);
 
+    await user.click(await screen.findByRole('button', { name: 'Nueva consulta' }));
     await user.type(await screen.findByRole('textbox', { name: /Asunto/i }), 'Cobro duplicado');
     await user.type(screen.getByRole('textbox', { name: /Mensaje/i }), 'Veo dos cargos.');
     const submit = screen.getByRole('button', { name: 'Iniciar conversación' });
