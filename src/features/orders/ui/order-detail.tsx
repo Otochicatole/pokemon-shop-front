@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Coins } from 'lucide-react';
+import { ArrowLeft, Coins } from 'lucide-react';
 import { toast } from 'sonner';
 import { getOrder, cancelOrder } from '../infrastructure/api';
 import { uploadReceipt } from '@/features/checkout/infrastructure/api';
@@ -26,5 +26,33 @@ export function OrderDetail({ number }: { number: string }) {
     catch (error) { toast.error(error instanceof Error ? error.message : 'No pudimos subir el comprobante'); }
     finally { setBusy(false); }
   };
-  return <div className="order-page"><div className="section-heading"><p className="eyebrow">Orden {order.number}</p><div className="heading-row"><h1>{statusLabel(order.status)}</h1><span className="status-pill">{statusLabel(order.status)}</span></div><p>Creada el {formatDate(order.createdAt)}</p></div><div className="order-columns"><section className="order-card"><h2>Productos</h2>{order.items.map((item) => <div className="summary-line" key={item.productId}><span>{item.name} × {item.quantity}</span><strong>{formatMoney(item.lineTotal)}</strong></div>)}<div className="summary-line"><span>Subtotal</span><strong>{formatMoney(order.totals.subtotal)}</strong></div>{BigInt(order.totals.discount.amountMinor) > 0n && <div className="summary-line loyalty-discount"><span>Descuento por puntos</span><strong>−{formatMoney(order.totals.discount)}</strong></div>}<div className="summary-line"><span>Envío</span><strong>{formatMoney(order.totals.shipping)}</strong></div><div className="summary-total"><span>Total</span><strong>{formatMoney(order.totals.total)}</strong></div>{(order.loyalty.pointsRedeemed > 0 || order.loyalty.pointsEarned > 0) && <div className="order-loyalty"><Coins size={18} /><div>{order.loyalty.pointsRedeemed > 0 && <p><strong>{order.loyalty.pointsRedeemed} puntos usados</strong> · {order.loyalty.redemptionStatus === 'RESERVED' ? 'reservados hasta acreditar el pago' : order.loyalty.redemptionStatus === 'RELEASED' ? 'devueltos por cierre de la orden' : order.loyalty.redemptionStatus === 'RESTORED' ? 'devueltos por reembolso' : 'canje acreditado'}</p>}<p><strong>{order.loyalty.pointsEarned} puntos por la compra</strong> · {order.status === 'REFUND_RECORDED' ? 'revertidos por reembolso' : credited ? 'acreditados' : 'se acreditan al aprobar el pago'}</p></div></div>}</section><section className="order-card"><h2>{order.fulfillmentType === 'PICKUP' ? 'Retiro' : 'Envío'}</h2><p>{order.fulfillmentType === 'PICKUP' ? 'Retiro en el punto seleccionado.' : `${String(order.fulfillment?.addressLine1 ?? '')}, ${String(order.fulfillment?.city ?? '')}, ${String(order.fulfillment?.province ?? '')}`}</p><h2 className="mt">Pago</h2><p>{payment?.method === 'BANK_TRANSFER' ? `Transferencia · referencia ${payment.bankReference ?? 'pendiente'}` : 'Mercado Pago'}</p>{payment?.bankInstructions && <div className="bank-details"><strong>Datos para transferir</strong><span>{payment.bankInstructions.bankName}</span><span>{payment.bankInstructions.accountHolder}</span>{payment.bankInstructions.cbu && <span>CBU: {payment.bankInstructions.cbu}</span>}{payment.bankInstructions.alias && <span>Alias: {payment.bankInstructions.alias}</span>}</div>}{payment?.method === 'BANK_TRANSFER' && !payment.receipt && canCancel && <label className="upload-box">Subir comprobante<input type="file" accept="image/jpeg,image/png,image/webp" disabled={busy} onChange={(event) => { const file = event.target.files?.[0]; if (file) void onReceipt(file); }} /></label>}{payment?.receipt && <p className="form-hint">Comprobante: {payment.receipt.review === 'APPROVED' ? 'aprobado' : payment.receipt.review === 'REJECTED' ? 'rechazado' : 'en revisión'}</p>}{canCancel && <Button variant="ghost" className="cancel-button" disabled={busy} onClick={async () => { if (!confirm('¿Cancelar esta orden?')) return; setBusy(true); try { await cancelOrder(order.number); await Promise.all([query.refetch(), queryClient.invalidateQueries({ queryKey: ['loyalty-account'] })]); } catch (error) { toast.error(error instanceof Error ? error.message : 'No se pudo cancelar'); } finally { setBusy(false); } }}>Cancelar orden</Button>}</section></div></div>;
+  return <div className="order-page">
+    <Link href="/account/orders" className="back-link"><ArrowLeft size={15} aria-hidden="true" />Volver a mis órdenes</Link>
+    <div className="section-heading">
+      <p className="eyebrow">Orden {order.number}</p>
+      <div className="heading-row"><h1>{statusLabel(order.status)}</h1><span className="status-pill">{statusLabel(order.status)}</span></div>
+      <p>Creada el {formatDate(order.createdAt)}</p>
+    </div>
+    <div className="order-columns">
+      <section className="order-card">
+        <h2>Productos</h2>
+        {order.items.map((item) => <div className="summary-line" key={item.productId}><span>{item.name} × {item.quantity}</span><strong>{formatMoney(item.lineTotal)}</strong></div>)}
+        <div className="summary-line"><span>Subtotal</span><strong>{formatMoney(order.totals.subtotal)}</strong></div>
+        {BigInt(order.totals.discount.amountMinor) > 0n && <div className="summary-line loyalty-discount"><span>Descuento por puntos</span><strong>−{formatMoney(order.totals.discount)}</strong></div>}
+        <div className="summary-line"><span>Envío</span><strong>{formatMoney(order.totals.shipping)}</strong></div>
+        <div className="summary-total"><span>Total</span><strong>{formatMoney(order.totals.total)}</strong></div>
+        {(order.loyalty.pointsRedeemed > 0 || order.loyalty.pointsEarned > 0) && <div className="order-loyalty"><Coins size={18} /><div>{order.loyalty.pointsRedeemed > 0 && <p><strong>{order.loyalty.pointsRedeemed} puntos usados</strong> · {order.loyalty.redemptionStatus === 'RESERVED' ? 'reservados hasta acreditar el pago' : order.loyalty.redemptionStatus === 'RELEASED' ? 'devueltos por cierre de la orden' : order.loyalty.redemptionStatus === 'RESTORED' ? 'devueltos por reembolso' : 'canje acreditado'}</p>}<p><strong>{order.loyalty.pointsEarned} puntos por la compra</strong> · {order.status === 'REFUND_RECORDED' ? 'revertidos por reembolso' : credited ? 'acreditados' : 'se acreditan al aprobar el pago'}</p></div></div>}
+      </section>
+      <section className="order-card">
+        <h2>{order.fulfillmentType === 'PICKUP' ? 'Retiro' : 'Envío'}</h2>
+        <p>{order.fulfillmentType === 'PICKUP' ? 'Retiro en el punto seleccionado.' : `${String(order.fulfillment?.addressLine1 ?? '')}, ${String(order.fulfillment?.city ?? '')}, ${String(order.fulfillment?.province ?? '')}`}</p>
+        <h2 className="mt">Pago</h2>
+        <p>{payment?.method === 'BANK_TRANSFER' ? `Transferencia · referencia ${payment.bankReference ?? 'pendiente'}` : 'Mercado Pago'}</p>
+        {payment?.bankInstructions && <div className="bank-details"><strong>Datos para transferir</strong><span>{payment.bankInstructions.bankName}</span><span>{payment.bankInstructions.accountHolder}</span>{payment.bankInstructions.cbu && <span>CBU: {payment.bankInstructions.cbu}</span>}{payment.bankInstructions.alias && <span>Alias: {payment.bankInstructions.alias}</span>}</div>}
+        {payment?.method === 'BANK_TRANSFER' && !payment.receipt && canCancel && <label className="upload-box">Subir comprobante<input type="file" accept="image/jpeg,image/png,image/webp" disabled={busy} onChange={(event) => { const file = event.target.files?.[0]; if (file) void onReceipt(file); }} /></label>}
+        {payment?.receipt && <p className="form-hint">Comprobante: {payment.receipt.review === 'APPROVED' ? 'aprobado' : payment.receipt.review === 'REJECTED' ? 'rechazado' : 'en revisión'}</p>}
+        {canCancel && <Button variant="ghost" className="cancel-button" disabled={busy} onClick={async () => { if (!confirm('¿Cancelar esta orden?')) return; setBusy(true); try { await cancelOrder(order.number); await Promise.all([query.refetch(), queryClient.invalidateQueries({ queryKey: ['loyalty-account'] })]); } catch (error) { toast.error(error instanceof Error ? error.message : 'No se pudo cancelar'); } finally { setBusy(false); } }}>Cancelar orden</Button>}
+      </section>
+    </div>
+  </div>;
 }
