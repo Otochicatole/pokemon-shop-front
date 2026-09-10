@@ -84,7 +84,7 @@ export function AdminProductEditor({ productId }: { productId?: string }) {
       form.setValue('condition', 'NM', { shouldDirty: true, shouldValidate: true });
       form.setValue('finish', card.holo ? 'Holo' : 'Normal', { shouldDirty: true });
       form.setValue('edition', card.firstEdition ? '1.ª edición' : '', { shouldDirty: true });
-      setTcgdexSelectedImage(card.imageUrl);
+      setTcgdexSelectedImage(card.imageUrl ?? summary.imageUrl);
       setTcgdexOpen(false);
       if (card.imageUrl) toast.success('Datos e imagen de TCGdex cargados. Solo falta definir el precio.');
       else toast.warning('Datos de TCGdex cargados; esta carta no tiene imagen disponible. Solo falta definir el precio.');
