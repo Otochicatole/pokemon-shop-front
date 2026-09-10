@@ -4,6 +4,7 @@ import { CatalogProductCard, listProducts } from '@/features/catalog';
 import { SectionHeading, TexturePanel } from '@/components';
 import { CompanionBattle } from '@/features/home';
 import { LoyaltyPromo } from '@/features/loyalty';
+import { listPublicNews, NewsCarousel } from '@/features/news';
 
 const collections = [
   { href: '/catalog?kind=SINGLE_CARD', label: 'Cartas sueltas', eyebrow: 'Completá tu pokédex', icon: Layers3, tone: 'yellow' },
@@ -12,10 +13,18 @@ const collections = [
 ] as const;
 
 export default async function Home() {
-  const products = await listProducts(new URLSearchParams({ limit: '8' })).catch(() => ({ data: [], nextCursor: null }));
+  const [products, news] = await Promise.all([
+    listProducts(new URLSearchParams({ limit: '8' })).catch(() => ({ data: [], nextCursor: null })),
+    listPublicNews().catch(() => ({ data: [] })),
+  ]);
   return <>
     <section className="hero">
-      <div className="hero-copy"><p className="eyebrow">Ruta 10 // central de coleccionistas</p><h1>Viví la aventura.<br /><em>Coleccioná.</em></h1><p className="hero-text">Cartas Pokémon, productos sellados y equipo para entrenadores. Explorá el catálogo y encontrá tu próxima pieza favorita.</p><div className="hero-actions"><Link className="button button-primary" href="/catalog">Entrar a la tienda <ArrowUpRight size={16} /></Link><Link className="text-button" href="/catalog?kind=SINGLE_CARD">Atacar <Sparkles size={14} /></Link></div></div>
+      <div className="hero-copy">
+        {news.data.length ? <>
+          <NewsCarousel items={news.data} variant="hero" />
+          <div className="hero-actions"><Link className="button button-primary" href="/catalog">Entrar a la tienda <ArrowUpRight size={16} /></Link><Link className="text-button" href="/catalog?kind=SINGLE_CARD">Atacar <Sparkles size={14} /></Link></div>
+        </> : <><p className="eyebrow">Ruta 10 // central de coleccionistas</p><h1>Viví la aventura.<br /><em>Coleccioná.</em></h1><p className="hero-text">Cartas Pokémon, productos sellados y equipo para entrenadores. Explorá el catálogo y encontrá tu próxima pieza favorita.</p><div className="hero-actions"><Link className="button button-primary" href="/catalog">Entrar a la tienda <ArrowUpRight size={16} /></Link><Link className="text-button" href="/catalog?kind=SINGLE_CARD">Atacar <Sparkles size={14} /></Link></div></>}
+      </div>
       <CompanionBattle />
     </section>
     <section className="trust-strip"><span><ShieldCheck size={16} /> Compra protegida</span><span><Sparkles size={16} /> Piezas verificadas</span><span><Truck size={16} /> Envíos a todo el país</span></section>
