@@ -697,3 +697,193 @@ button:disabled { cursor: not-allowed; opacity: .5; }
   .header-inner { padding-inline: 10px; gap: 6px; }
   .header-actions { gap: 3px; }
 }
+
+/* Checkout layout polish */
+.checkout-layout {
+  align-items: start;
+  gap: clamp(28px, 5vw, 64px);
+}
+
+.checkout-main {
+  min-width: 0;
+}
+
+.checkout-main > .section-heading {
+  margin-bottom: 38px;
+  padding-bottom: 28px;
+  border-bottom: 2px solid var(--line);
+}
+
+.checkout-section {
+  margin-top: 18px;
+  padding: 29px clamp(18px, 2.5vw, 32px);
+  border: 2px solid var(--line);
+  background: rgba(16, 22, 29, .62);
+  box-shadow: 4px 4px 0 #05070a;
+}
+
+.checkout-section + .checkout-section {
+  margin-top: 20px;
+}
+
+.checkout-section h2 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.checkout-section h2::before {
+  width: 8px;
+  height: 8px;
+  flex: 0 0 8px;
+  content: '';
+  background: var(--accent);
+  box-shadow: 0 0 10px rgba(255, 213, 47, .4);
+}
+
+.checkout-section > label,
+.checkout-section .form-grid > label {
+  margin-top: 17px;
+}
+
+.checkout-section > label:first-of-type,
+.checkout-section .form-grid > label:first-child {
+  margin-top: 0;
+}
+
+.checkout-section input,
+.checkout-section select {
+  min-height: 48px;
+}
+
+.segmented {
+  width: fit-content;
+  margin-bottom: 24px;
+  padding: 4px;
+  border: 2px solid var(--line);
+  background: #080d12;
+}
+
+.segmented button {
+  min-width: 112px;
+  min-height: 42px;
+}
+
+.payment-options {
+  gap: 13px;
+}
+
+.payment-option {
+  min-height: 72px;
+  align-items: center;
+  padding: 17px 18px;
+}
+
+.loyalty-checkout {
+  background: linear-gradient(135deg, rgba(255, 213, 47, .1), rgba(16, 22, 29, .72) 65%);
+}
+
+.loyalty-redeem-control {
+  margin-top: 23px;
+  padding-top: 21px;
+  border-top: 1px solid var(--line);
+  gap: 12px;
+}
+
+.loyalty-redeem-control button {
+  min-height: 48px;
+  padding-inline: 18px;
+  border-color: var(--line);
+}
+
+.loyalty-redeem-control button:hover:not(:disabled),
+.loyalty-redeem-control button:focus-visible:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.checkout-summary {
+  top: 108px;
+  padding: 28px;
+  background: linear-gradient(145deg, rgba(22, 30, 39, .98), rgba(10, 15, 20, .98));
+}
+
+.checkout-summary::before {
+  display: block;
+  margin-bottom: 14px;
+  content: 'REVISIÓN FINAL';
+  color: var(--cyan);
+  font: 7px var(--pixel-font);
+  letter-spacing: .08em;
+}
+
+.checkout-summary .summary-line {
+  margin: 0;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(119, 139, 153, .35);
+}
+
+.checkout-summary .summary-line + .summary-line {
+  padding-top: 12px;
+}
+
+.checkout-summary .summary-total {
+  margin-top: 20px;
+}
+
+.checkout-summary .loyalty-earn-note {
+  margin-top: 18px;
+  padding: 14px;
+  border: 1px solid rgba(255, 213, 47, .5);
+  border-left: 4px solid var(--accent);
+}
+
+.checkout-summary .button {
+  min-height: 52px;
+  margin-top: 24px;
+}
+
+@media (max-width: 1050px) {
+  .checkout-summary {
+    top: auto;
+  }
+}
+
+@media (max-width: 760px) {
+  .checkout-layout {
+    gap: 28px;
+  }
+
+  .checkout-main > .section-heading {
+    margin-bottom: 28px;
+    padding-bottom: 22px;
+  }
+
+  .checkout-section {
+    padding: 23px 16px;
+  }
+
+  .segmented {
+    width: 100%;
+  }
+
+  .segmented button {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .loyalty-redeem-control {
+    grid-template-columns: 1fr;
+  }
+
+  .loyalty-redeem-control button {
+    width: 100%;
+  }
+
+  .checkout-summary {
+    padding: 22px 18px;
+  }
+}
