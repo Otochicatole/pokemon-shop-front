@@ -117,6 +117,13 @@
 .admin-toolbar-actions { display: flex; gap: 8px; }
 .admin-toolbar > .admin-filter-submit { align-self: end; min-width: 142px; }
 
+/* Audit filters have six controls with very different content lengths. A
+   dedicated grid keeps identifiers readable and prevents date inputs from
+   collapsing into the neighboring field at desktop widths. */
+.audit-toolbar { display: grid; grid-template-columns: minmax(170px, 1.15fr) minmax(170px, 1fr) minmax(150px, .9fr) minmax(220px, 1.25fr) repeat(2, minmax(150px, .9fr)); align-items: end; }
+.audit-toolbar .component-field { width: 100%; min-width: 0; flex: initial; }
+.audit-toolbar input { width: 100%; min-width: 0; }
+
 /* Order filters stay on one compact control row at desktop sizes. The
    explicit grid prevents the search field and date controls from collapsing
    into uneven flex widths while retaining a clean reflow below. */
@@ -138,6 +145,7 @@
 @media (max-width: 1320px) {
   .admin-order-toolbar { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .admin-order-toolbar .admin-search-field { grid-column: span 2; }
+  .audit-toolbar { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 
 .admin-table-wrap { width: 100%; overflow-x: auto; border: 2px solid var(--line); background: rgba(12, 18, 25, .97); box-shadow: 5px 5px 0 #05070a; }
@@ -347,6 +355,7 @@
   .admin-login-panel { min-height: 620px; }
   .admin-order-toolbar { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .admin-order-toolbar .admin-search-field { grid-column: 1 / -1; }
+  .audit-toolbar { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 @media (max-width: 680px) {
@@ -359,6 +368,7 @@
   .admin-form-grid { grid-template-columns: 1fr; }
   .admin-form-span { grid-column: auto; }
   .admin-toolbar { align-items: stretch; flex-direction: column; }
+  .audit-toolbar { display: grid; grid-template-columns: 1fr; }
   .admin-order-toolbar { grid-template-columns: 1fr; }
   .admin-order-toolbar .admin-search-field { grid-column: auto; }
   .supplier-toolbar { grid-template-columns: 1fr; }
