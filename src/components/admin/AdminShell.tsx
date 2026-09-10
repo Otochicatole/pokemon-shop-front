@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { LogOut, Menu, ShieldCheck, X } from 'lucide-react';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { SupportNotificationBell } from '@/features/support-realtime';
 
 export interface AdminNavigationItem {
   href: string;
@@ -16,7 +17,7 @@ export function AdminShell({ adminName, adminEmail, navigation, onLogout, childr
   const [menuOpen, setMenuOpen] = useState(false);
   const sidebarRef = useRef<HTMLElement>(null);
   const closeMenu = () => setMenuOpen(false);
-  const labels: Record<string, string> = { products: 'Productos', new: 'Nuevo', inventory: 'Inventario', suppliers: 'Proveedores', orders: 'Órdenes', payments: 'Pagos', fulfillment: 'Envíos', customers: 'Clientes', loyalty: 'Fidelidad', audit: 'Auditoría' };
+  const labels: Record<string, string> = { products: 'Productos', new: 'Nuevo', inventory: 'Inventario', suppliers: 'Proveedores', orders: 'Órdenes', payments: 'Pagos', fulfillment: 'Envíos', customers: 'Clientes', loyalty: 'Fidelidad', support: 'Soporte', audit: 'Auditoría' };
   const pathSegments = pathname.split('/').filter(Boolean).slice(1);
   const crumbs = pathSegments.map((segment, index) => ({ href: `/admin/${pathSegments.slice(0, index + 1).join('/')}`, label: labels[segment] ?? 'Detalle' }));
   useEffect(() => {
@@ -51,7 +52,7 @@ export function AdminShell({ adminName, adminEmail, navigation, onLogout, childr
       <div className="admin-profile"><div><strong>{adminName}</strong><span>{adminEmail}</span></div><button type="button" onClick={() => void onLogout()}><LogOut size={16} />Cerrar sesión</button></div>
     </aside>
     <div className="admin-workspace">
-      <header className="admin-topbar"><button type="button" className="admin-menu-button" onClick={() => setMenuOpen(true)} aria-expanded={menuOpen} aria-label="Abrir menú"><Menu size={20} /></button><nav className="admin-breadcrumbs" aria-label="Migas de pan"><Link href="/admin">CMS</Link>{crumbs.map((crumb, index) => <span key={crumb.href}><b aria-hidden="true">/</b>{index === crumbs.length - 1 ? <strong aria-current="page">{crumb.label}</strong> : <Link href={crumb.href}>{crumb.label}</Link>}</span>)}</nav><Link href="/" target="_blank" rel="noreferrer">Ver tienda ↗</Link></header>
+      <header className="admin-topbar"><button type="button" className="admin-menu-button" onClick={() => setMenuOpen(true)} aria-expanded={menuOpen} aria-label="Abrir menú"><Menu size={20} /></button><nav className="admin-breadcrumbs" aria-label="Migas de pan"><Link href="/admin">CMS</Link>{crumbs.map((crumb, index) => <span key={crumb.href}><b aria-hidden="true">/</b>{index === crumbs.length - 1 ? <strong aria-current="page">{crumb.label}</strong> : <Link href={crumb.href}>{crumb.label}</Link>}</span>)}</nav><div className="admin-topbar-actions"><SupportNotificationBell variant="admin" /><Link href="/" target="_blank" rel="noreferrer">Ver tienda ↗</Link></div></header>
       <main id="admin-content" className="admin-content">{children}</main>
     </div>
   </div>;

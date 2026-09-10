@@ -38,6 +38,9 @@ button:disabled { cursor: not-allowed; opacity: .5; }
 .main-nav { display: flex; align-items: center; gap: 28px; margin-left: auto; margin-right: auto; color: var(--muted); font: 9px var(--pixel-font); text-transform: uppercase; }.main-nav a { padding: 9px 0; border-bottom: 2px solid transparent; }.main-nav a:hover, .main-nav a:focus-visible, .text-button:hover { color: var(--accent); border-color: var(--accent); }
 .header-actions { display: flex; align-items: center; gap: 10px; }.header-search { width: 210px; min-height: 42px; display: flex; align-items: center; gap: 8px; padding: 0 11px; border: 2px solid var(--line); background: var(--surface); color: var(--muted); }.header-search input { width: 100%; border: 0; outline: 0; background: transparent; color: var(--ink); font-size: 12px; }
 .icon-link, .points-link, .cart-link { min-height: 42px; display: inline-flex; align-items: center; justify-content: center; border: 2px solid var(--line); background: var(--surface); color: var(--ink); }.icon-link { width: 42px; }.points-link, .cart-link { gap: 8px; padding: 0 11px; font: 8px var(--pixel-font); text-transform: uppercase; }.points-link span, .cart-link span { min-width: 22px; padding: 5px 4px; text-align: center; }.points-link span { background: var(--cyan); color: #080a0e; }.cart-link span { background: var(--accent); color: #080a0e; }.points-link:hover, .points-link:focus-visible { border-color: var(--cyan); color: var(--cyan); }.header-login { font: 8px var(--pixel-font); color: var(--muted); }
+.support-notification-link-store { width: 42px; min-height: 42px; position: relative; display: inline-flex; align-items: center; justify-content: center; border: 2px solid var(--line); background: var(--surface); color: var(--ink); }
+.support-notification-link-store:hover, .support-notification-link-store:focus-visible, .support-notification-link-store.has-unread { border-color: var(--purple); color: var(--purple); }
+.support-notification-link-store span { min-width: 18px; height: 18px; position: absolute; top: -8px; right: -7px; display: grid; place-items: center; padding: 0 4px; border: 2px solid #070a0f; background: var(--warm); color: #fff; font: 6px var(--pixel-font); }
 .session-menu { position: relative; display: flex; align-items: center; }
 .session-trigger { width: 42px; min-height: 42px; display: inline-flex; align-items: center; justify-content: center; border: 2px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; }
 .session-trigger:hover, .session-trigger:focus-visible, .session-trigger[aria-expanded='true'] { border-color: var(--accent); color: var(--accent); outline: none; }
@@ -595,9 +598,11 @@ button:disabled { cursor: not-allowed; opacity: .5; }
 
 /* Loyalty program */
 .account-home { max-width: 980px; }
-.account-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.account-cards { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .account-cards .account-points-card { border-color: rgba(255, 213, 47, .52); background: linear-gradient(145deg, rgba(255, 213, 47, .11), var(--surface) 58%); }
 .account-cards .account-points-card span { width: 38px; height: 38px; display: grid; place-items: center; border: 2px solid var(--accent); border-radius: 50%; }
+.account-cards .account-support-card { border-color: rgba(83, 190, 229, .52); background: linear-gradient(145deg, rgba(83, 190, 229, .11), var(--surface) 58%); }
+.account-cards .account-support-card span { color: var(--cyan); }
 
 .loyalty-promo-rules { display: grid; gap: 13px; }
 .loyalty-promo-rules .xp-top { padding-bottom: 15px; border-bottom: 2px solid var(--line); }
@@ -655,6 +660,7 @@ button:disabled { cursor: not-allowed; opacity: .5; }
 .order-loyalty p:last-child { margin-bottom: 0; }
 
 @media (max-width: 1050px) {
+  .account-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .loyalty-rule-card { grid-template-columns: 1fr; }
   .loyalty-rule-card .button { justify-self: start; }
 }
@@ -666,4 +672,21 @@ button:disabled { cursor: not-allowed; opacity: .5; }
   .loyalty-transactions article { align-items: flex-start; }
   .loyalty-redeem-control { grid-template-columns: 1fr; }
   .loyalty-redeem-control button { width: 100%; }
+
+  .header-inner { gap: 10px; }
+  .header-actions { gap: 5px; }
+  .points-link,
+  .cart-link { width: 42px; padding: 0; position: relative; gap: 0; }
+  .points-link span,
+  .cart-link span { min-width: 18px; height: 18px; position: absolute; top: -7px; right: -6px; display: grid; place-items: center; padding: 0 3px; border: 2px solid var(--paper); font-size: 6px; }
+}
+
+@media (max-width: 520px) {
+  .site-header .brand > span:last-child { display: none; }
+  .site-header .brand { gap: 0; }
+}
+
+@media (max-width: 380px) {
+  .header-inner { padding-inline: 10px; gap: 6px; }
+  .header-actions { gap: 3px; }
 }

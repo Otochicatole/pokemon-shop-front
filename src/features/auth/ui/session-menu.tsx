@@ -6,6 +6,8 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { UserRound } from 'lucide-react';
 import { toast } from 'sonner';
 import { useEffect, useRef, useState } from 'react';
+import { clearUserSessionCache } from '../application/session-cache';
+import { publishSessionSync } from '@/shared/auth/session-sync';
 import { getMe, logout } from '../infrastructure/api';
 
 export function SessionMenu() {
@@ -24,7 +26,7 @@ export function SessionMenu() {
     return () => { document.removeEventListener('pointerdown', closeOnOutsideClick); document.removeEventListener('keydown', closeOnEscape); };
   }, [open]);
   const handleLogout = async () => {
-    try { await logout(); queryClient.setQueryData(['me'], null); queryClient.removeQueries({ queryKey: ['me'] }); router.replace('/'); router.refresh(); }
+    try { await logout(); clearUserSessionCache(queryClient); publishSessionSync('user', 'ended'); router.replace('/'); router.refresh(); }
     catch (error) { toast.error(error instanceof Error ? error.message : 'No se pudo cerrar la sesión'); }
   };
   if (query.isLoading) return <div className="session-menu"><button className="session-trigger" type="button" disabled aria-label="Cargando cuenta"><UserRound size={18} /></button></div>;

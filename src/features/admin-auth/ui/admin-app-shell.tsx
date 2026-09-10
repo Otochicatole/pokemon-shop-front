@@ -1,12 +1,13 @@
 'use client';
 
-import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Boxes, ClipboardList, Coins, CreditCard, Gauge, Handshake, History, PackageSearch, Truck, UsersRound } from 'lucide-react';
+import { Boxes, ClipboardList, Coins, CreditCard, Gauge, Handshake, History, MessagesSquare, PackageSearch, Truck, UsersRound } from 'lucide-react';
 import { toast } from 'sonner';
 import { AdminShell, type AdminNavigationItem } from '@/components/admin';
 import { adminErrorMessage } from '@/shared/admin/client';
+import { publishSessionSync } from '@/shared/auth/session-sync';
+import { clearAdminSessionCache } from '../application/session-cache';
 import type { AdminIdentity } from '../domain/contracts';
 import { getAdminMe, logoutAdmin } from '../infrastructure/api';
 
@@ -19,6 +20,7 @@ const navigation: AdminNavigationItem[] = [
   { href: '/admin/payments', label: 'Pagos', icon: <CreditCard size={18} /> },
   { href: '/admin/fulfillment', label: 'Envíos y retiro', icon: <Truck size={18} /> },
   { href: '/admin/customers', label: 'Clientes', icon: <UsersRound size={18} /> },
+  { href: '/admin/support', label: 'Soporte', icon: <MessagesSquare size={18} /> },
   { href: '/admin/loyalty', label: 'Fidelidad', icon: <Coins size={18} /> },
   { href: '/admin/audit', label: 'Auditoría', icon: <History size={18} /> },
 ];
@@ -27,15 +29,11 @@ export function AdminAppShell({ initialAdmin, children }: { initialAdmin: AdminI
   const router = useRouter();
   const queryClient = useQueryClient();
   const session = useQuery({ queryKey: ['admin', 'session'], queryFn: getAdminMe, initialData: initialAdmin, retry: false, refetchInterval: 60_000 });
-  useEffect(() => {
-    const unauthorized = () => { queryClient.removeQueries({ queryKey: ['admin'] }); router.replace('/admin/login'); router.refresh(); };
-    window.addEventListener('card-shop:admin-unauthorized', unauthorized);
-    return () => window.removeEventListener('card-shop:admin-unauthorized', unauthorized);
-  }, [queryClient, router]);
   const logout = async () => {
     try {
       await logoutAdmin();
-      queryClient.removeQueries({ queryKey: ['admin'] });
+      clearAdminSessionCache(queryClient);
+      publishSessionSync('admin', 'ended');
       router.replace('/admin/login');
       router.refresh();
     } catch (error) {

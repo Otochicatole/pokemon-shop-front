@@ -3,10 +3,13 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
 import { ShieldCheck } from 'lucide-react';
 import { toast } from 'sonner';
 import { PrimaryButton, TextField } from '@/components';
 import { adminErrorMessage } from '@/shared/admin/client';
+import { publishSessionSync } from '@/shared/auth/session-sync';
+import { clearAdminPrivateCache } from '../application/session-cache';
 import { adminLoginSchema, type AdminLoginInput } from '../domain/contracts';
 import { loginAdmin } from '../infrastructure/api';
 
@@ -16,10 +19,14 @@ function safeReturnTo(value?: string) {
 
 export function AdminLoginForm({ returnTo }: { returnTo?: string }) {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const form = useForm<AdminLoginInput>({ resolver: zodResolver(adminLoginSchema), defaultValues: { email: '', password: '' } });
   const submit = form.handleSubmit(async (values) => {
     try {
-      await loginAdmin(values);
+      const admin = await loginAdmin(values);
+      clearAdminPrivateCache(queryClient);
+      queryClient.setQueryData(['admin', 'session'], admin);
+      publishSessionSync('admin', 'changed');
       toast.success('Sesión administrativa iniciada');
       router.replace(safeReturnTo(returnTo));
       router.refresh();
