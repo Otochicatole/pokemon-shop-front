@@ -3,7 +3,7 @@ import { moneySchema, orderLoyaltySchema } from '@/shared/api/contracts';
 
 export const adminOrderStatusSchema = z.enum(['PENDING_PAYMENT', 'PAYMENT_REVIEW', 'PAID', 'PREPARING', 'READY_FOR_PICKUP', 'SHIPPED', 'COMPLETED', 'CANCELLED', 'EXPIRED', 'REFUND_RECORDED', 'PAYMENT_REQUIRES_REVIEW']);
 export const adminPaymentStatusSchema = z.enum(['PENDING', 'UNDER_REVIEW', 'APPROVED', 'REJECTED', 'FAILED', 'REFUNDED', 'DISPUTED', 'REQUIRES_REVIEW']);
-export const adminOrderActionSchema = z.enum(['TRANSITION_PREPARING', 'TRANSITION_READY_FOR_PICKUP', 'TRANSITION_SHIPPED', 'TRANSITION_COMPLETED', 'CANCEL', 'REVIEW_TRANSFER', 'FULFILL_LATE_PAYMENT', 'RECORD_FULL_REFUND']);
+export const adminOrderActionSchema = z.enum(['TRANSITION_PREPARING', 'TRANSITION_READY_FOR_PICKUP', 'TRANSITION_SHIPPED', 'TRANSITION_COMPLETED', 'ROLLBACK', 'CANCEL', 'REVIEW_TRANSFER', 'FULFILL_LATE_PAYMENT', 'RECORD_FULL_REFUND']);
 const customerSchema = z.object({ id: z.string().uuid(), email: z.email(), name: z.string().nullable(), status: z.enum(['ACTIVE', 'SUSPENDED']), emailVerifiedAt: z.string().nullable(), createdAt: z.string() });
 const itemSchema = z.object({ id: z.string(), productId: z.string(), sku: z.string(), name: z.string(), imageFileId: z.string().nullable(), imageUrl: z.string().nullable(), unitPrice: moneySchema, quantity: z.number().int(), lineTotal: moneySchema, snapshot: z.unknown() });
 const reservationSchema = z.object({ id: z.string(), productId: z.string(), quantity: z.number().int(), expiresAt: z.string(), releasedAt: z.string().nullable(), consumedAt: z.string().nullable() });

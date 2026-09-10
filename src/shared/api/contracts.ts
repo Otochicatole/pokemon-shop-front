@@ -128,7 +128,9 @@ export const orderLoyaltySchema = z.object({
   spendPerPoint: moneySchema.nullable(),
   pointValue: moneySchema.nullable(),
 });
-export const orderSchema = z.object({ id: z.string(), number: z.string(), status: z.string(), paymentMethod: z.string(), fulfillmentType: z.string(), totals: z.object({ subtotal: moneySchema, discount: moneySchema, shipping: moneySchema, total: moneySchema }), loyalty: orderLoyaltySchema, expiresAt: z.string().nullable().optional(), items: z.array(z.object({ productId: z.string(), sku: z.string(), name: z.string(), quantity: z.number(), unitPrice: moneySchema, lineTotal: moneySchema })), fulfillment: z.record(z.string(), z.unknown()).optional(), payment: z.record(z.string(), z.unknown()).nullable().optional(), createdAt: z.string().or(z.date()) });
+export const orderTimelineEventSchema = z.object({ id: z.string(), fromStatus: z.string().nullable(), toStatus: z.string(), createdAt: z.string().or(z.date()) });
+export type OrderTimelineEvent = z.infer<typeof orderTimelineEventSchema>;
+export const orderSchema = z.object({ id: z.string(), number: z.string(), status: z.string(), paymentMethod: z.string(), fulfillmentType: z.string(), totals: z.object({ subtotal: moneySchema, discount: moneySchema, shipping: moneySchema, total: moneySchema }), loyalty: orderLoyaltySchema, expiresAt: z.string().nullable().optional(), items: z.array(z.object({ productId: z.string(), sku: z.string(), name: z.string(), quantity: z.number(), unitPrice: moneySchema, lineTotal: moneySchema })), timeline: z.array(orderTimelineEventSchema).default([]), fulfillment: z.record(z.string(), z.unknown()).optional(), payment: z.record(z.string(), z.unknown()).nullable().optional(), createdAt: z.string().or(z.date()) });
 export type Order = z.infer<typeof orderSchema>;
 export const problemSchema = z.object({ code: z.string(), status: z.number(), title: z.string(), requestId: z.string().optional(), details: z.unknown().optional() });
 export type Problem = z.infer<typeof problemSchema>;

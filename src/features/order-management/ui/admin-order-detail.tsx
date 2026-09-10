@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, CheckCircle2, Coins, ExternalLink, RefreshCw, RotateCcw, XCircle } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, Coins, ExternalLink, RefreshCw, RotateCcw, Undo2, XCircle } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { AdminDataTable, AdminPageHeader, Button, ConfirmDialog, Dialog, TextareaField, TextField } from '@/components';
@@ -29,6 +29,14 @@ function earnedPointsState(order: AdminOrder) {
   return 'Pendientes hasta aprobar el pago';
 }
 
+function previousTimelineStatus(order: AdminOrder) {
+  if (!order.allowedActions.includes('ROLLBACK')) return null;
+  for (let index = order.timeline.length - 1; index >= 0; index -= 1) {
+    if (order.timeline[index]?.toStatus === order.status) return order.timeline[index - 1]?.toStatus ?? null;
+  }
+  return null;
+}
+
 function Detail({ order }: { order: AdminOrder }) {
   const fulfillment = order.fulfillment;
   return <div className="admin-detail-grid"><div className="admin-detail-stack"><section className="admin-panel"><div className="admin-panel-header"><h2>Ítems ({order.items.length})</h2></div><AdminDataTable rows={order.items} rowKey={(item) => item.id} columns={[{ key: 'item', header: 'Producto', render: (item) => <div className="admin-table-primary">{item.imageUrl ? <Image src={item.imageUrl} alt="" width={46} height={56} unoptimized /> : <span className="admin-table-thumb" />}<div><strong>{item.name}</strong><span>{item.sku}</span></div></div> }, { key: 'price', header: 'Precio', align: 'right', render: (item) => adminMoney(item.unitPrice) }, { key: 'qty', header: 'Cant.', align: 'center', render: (item) => item.quantity }, { key: 'total', header: 'Subtotal', align: 'right', render: (item) => <span className="admin-money">{adminMoney(item.lineTotal)}</span> }]} /></section>
@@ -46,12 +54,13 @@ export function AdminOrderDetailView({ number }: { number: string }) {
   if (query.isError || !query.data) return <div className="admin-error-panel"><div><h1>Orden no disponible</h1><p>{adminErrorMessage(query.error)}</p><Link className="button button-secondary" href="/admin/orders">Volver</Link></div></div>;
   const order = query.data;
   const transitions = order.allowedActions.filter((item) => item.startsWith('TRANSITION_')).map((item) => item.replace('TRANSITION_', ''));
+  const rollbackStatus = previousTimelineStatus(order);
   return <><AdminPageHeader eyebrow={`Orden // ${order.number}`} title={order.number} description={`${adminDate(order.createdAt, true)} · ${order.customer.email}`} actions={<><Link className="button button-secondary" href="/admin/orders"><ArrowLeft size={16} />Volver</Link><Button variant="secondary" onClick={() => void query.refetch()}><RefreshCw size={16} />Actualizar</Button><AdminBadge value={order.status} /></>} />
-    <div className="admin-order-actions">{transitions.map((status) => <Button key={status} variant="secondary" onClick={() => setAction({ kind: 'transition', status })}><CheckCircle2 size={16} />{adminLabel(status)}</Button>)}{order.allowedActions.includes('CANCEL') && <Button variant="danger" onClick={() => setAction({ kind: 'cancel' })}><XCircle size={16} />Cancelar</Button>}{order.allowedActions.includes('FULFILL_LATE_PAYMENT') && <Button onClick={() => setAction({ kind: 'late' })}>Validar stock y continuar</Button>}{order.allowedActions.includes('RECORD_FULL_REFUND') && <Button variant="danger" onClick={() => setAction({ kind: 'refund' })}><RotateCcw size={16} />Registrar reembolso total</Button>}</div>
+    <div className="admin-order-actions">{transitions.map((status) => <Button key={status} variant="secondary" onClick={() => setAction({ kind: 'transition', status })}><CheckCircle2 size={16} />{adminLabel(status)}</Button>)}{rollbackStatus && <Button variant="secondary" onClick={() => setAction({ kind: 'transition', status: rollbackStatus })}><Undo2 size={16} />Volver a {adminLabel(rollbackStatus)}</Button>}{order.allowedActions.includes('CANCEL') && <Button variant="danger" onClick={() => setAction({ kind: 'cancel' })}><XCircle size={16} />Cancelar</Button>}{order.allowedActions.includes('FULFILL_LATE_PAYMENT') && <Button onClick={() => setAction({ kind: 'late' })}>Validar stock y continuar</Button>}{order.allowedActions.includes('RECORD_FULL_REFUND') && <Button variant="danger" onClick={() => setAction({ kind: 'refund' })}><RotateCcw size={16} />Registrar reembolso total</Button>}</div>
     {order.allowedActions.includes('REVIEW_TRANSFER') && <div className="admin-notice is-warning">Hay un comprobante pendiente. Revisá el archivo exacto antes de aprobar o rechazar.</div>}
     {order.receipts.filter((receipt) => receipt.review === 'PENDING').map((receipt) => <div className="admin-receipt-review" key={receipt.id}><span>Comprobante {receipt.id.slice(0, 8)} · {adminDate(receipt.createdAt, true)}</span><div><Button variant="secondary" onClick={() => setAction({ kind: 'receipt', receiptId: receipt.id, decision: 'approve' })}>Aprobar</Button><Button variant="danger" onClick={() => setAction({ kind: 'receipt', receiptId: receipt.id, decision: 'reject' })}>Rechazar</Button></div></div>)}
     <Detail order={order} />
-    <ConfirmDialog open={Boolean(action && action.kind !== 'refund')} onClose={() => !mutation.isPending && setAction(null)} onConfirm={() => mutation.mutate()} busy={mutation.isPending} danger={action?.kind === 'cancel' || (action?.kind === 'receipt' && action.decision === 'reject')} title={action?.kind === 'transition' ? `Pasar a ${adminLabel(action.status)}` : action?.kind === 'cancel' ? 'Cancelar orden' : action?.kind === 'receipt' ? `${action.decision === 'approve' ? 'Aprobar' : 'Rechazar'} comprobante` : 'Continuar pago tardío'} description="El backend volverá a validar versión, estado, pago y reservas dentro de una transacción."><TextareaField label="Nota interna (opcional)" value={note} onChange={(event) => setNote(event.target.value)} /></ConfirmDialog>
+    <ConfirmDialog open={Boolean(action && action.kind !== 'refund')} onClose={() => !mutation.isPending && setAction(null)} onConfirm={() => mutation.mutate()} busy={mutation.isPending} danger={action?.kind === 'cancel' || (action?.kind === 'receipt' && action.decision === 'reject')} title={action?.kind === 'transition' ? `${rollbackStatus === action.status ? 'Volver a' : 'Pasar a'} ${adminLabel(action.status)}` : action?.kind === 'cancel' ? 'Cancelar orden' : action?.kind === 'receipt' ? `${action.decision === 'approve' ? 'Aprobar' : 'Rechazar'} comprobante` : 'Continuar pago tardío'} description="El backend volverá a validar versión, estado, pago y reservas dentro de una transacción."><TextareaField label="Nota interna (opcional)" value={note} onChange={(event) => setNote(event.target.value)} /></ConfirmDialog>
     <Dialog open={action?.kind === 'refund'} onClose={() => !mutation.isPending && setAction(null)} title="Registrar reembolso total" description={`Se registrará el monto completo pagado (${adminMoney(order.payment?.amount)}). Esta acción no repone stock.`} className="admin-confirm-dialog"><div className="admin-dialog-form"><TextareaField label="Motivo" value={note} onChange={(event) => setNote(event.target.value)} /><TextField label="Referencia externa" value={reference} onChange={(event) => setReference(event.target.value)} placeholder="ID del reembolso realizado" /><div className="admin-dialog-actions"><Button variant="secondary" onClick={() => setAction(null)} disabled={mutation.isPending}>Volver</Button><Button variant="danger" onClick={() => mutation.mutate()} disabled={mutation.isPending || note.trim().length < 3 || reference.trim().length < 3}>Registrar</Button></div></div></Dialog>
   </>;
 }

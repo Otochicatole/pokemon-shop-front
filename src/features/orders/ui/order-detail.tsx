@@ -53,6 +53,10 @@ export function OrderDetail({ number }: { number: string }) {
         {payment?.receipt && <p className="form-hint">Comprobante: {payment.receipt.review === 'APPROVED' ? 'aprobado' : payment.receipt.review === 'REJECTED' ? 'rechazado' : 'en revisión'}</p>}
         {canCancel && <Button variant="ghost" className="cancel-button" disabled={busy} onClick={async () => { if (!confirm('¿Cancelar esta orden?')) return; setBusy(true); try { await cancelOrder(order.number); await Promise.all([query.refetch(), queryClient.invalidateQueries({ queryKey: ['loyalty-account'] })]); } catch (error) { toast.error(error instanceof Error ? error.message : 'No se pudo cancelar'); } finally { setBusy(false); } }}>Cancelar orden</Button>}
       </section>
+      <section className="order-card order-timeline-card">
+        <h2>Seguimiento de la orden</h2>
+        {order.timeline.length > 0 ? <ol className="order-timeline">{order.timeline.map((event, index) => <li className={index === order.timeline.length - 1 ? 'is-current' : ''} key={event.id}><span className="order-timeline-marker" aria-hidden="true" /><div><strong>{statusLabel(event.toStatus)}</strong><span>{formatDate(event.createdAt)}{index === order.timeline.length - 1 ? ' · Estado actual' : ''}</span></div></li>)}</ol> : <p className="form-hint">Todavía no hay eventos de seguimiento para esta orden.</p>}
+      </section>
     </div>
   </div>;
 }
