@@ -36,6 +36,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         <div className="detail-copy">
           <div className="detail-kicker"><span className="pixel-badge pixel-badge-yellow">{kindLabel}</span><span className="detail-code">SKU {product.sku}</span></div>
           <h1>{product.name}</h1>
+          <p className="product-seller-line">Vendido por <strong>{product.seller.name}</strong></p>
           <div className="detail-price-row"><p className="detail-price">{formatMoney(product.price)}</p><span className={product.available > 0 ? 'detail-stock-chip is-available' : 'detail-stock-chip is-empty'}>{product.available > 0 ? 'Disponible' : 'Agotado'}</span></div>
           <section className="detail-description-block" aria-labelledby="product-description-title">
             <span className="detail-section-label" id="product-description-title">Descripción</span>

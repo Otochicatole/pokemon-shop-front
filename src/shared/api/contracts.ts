@@ -33,6 +33,7 @@ export const productSchema = z.object({
   pokemonCard: pokemonCardSchema.nullable().optional(),
   images: z.array(z.object({ id: z.string(), url: z.string(), altText: z.string().nullable(), sortOrder: z.number() })).default([]),
   updatedAt: z.string().or(z.date()).optional(),
+  seller: z.object({ type: z.enum(['STORE', 'AFFILIATE']), id: z.string().nullable(), name: z.string() }).default({ type: 'STORE', id: null, name: 'Card Shop' }),
 });
 export type Product = z.infer<typeof productSchema>;
 export const productListSchema = z.object({ data: z.array(productSchema), meta: z.object({ nextCursor: z.string().nullable() }) });
@@ -55,16 +56,25 @@ export const catalogFiltersEnvelopeSchema = z.object({ data: catalogFiltersSchem
 export type CatalogFacetOption = z.infer<typeof catalogFacetOptionSchema>;
 export type CatalogFilters = z.infer<typeof catalogFiltersSchema>;
 
-export const optionsSchema = z.object({
-  fulfillment: z.object({
+const fulfillmentOptionsSchema = z.object({
     shippingZones: z.array(z.object({ id: z.string(), name: z.string(), provinces: z.array(z.string()), rates: z.array(z.object({ id: z.string(), name: z.string(), price: moneySchema })) })),
     pickupPoints: z.array(z.object({ id: z.string(), name: z.string(), address: z.string() })),
-  }),
+  });
+export const optionsSchema = z.object({
+  fulfillment: fulfillmentOptionsSchema,
+  sellers: z.array(z.object({ sellerKey: z.string(), seller: z.object({ type: z.enum(['STORE', 'AFFILIATE']), id: z.string().nullable(), name: z.string() }), shippingZones: fulfillmentOptionsSchema.shape.shippingZones, pickupPoints: fulfillmentOptionsSchema.shape.pickupPoints })).optional(),
   paymentMethods: z.object({ BANK_TRANSFER: z.boolean(), MERCADO_PAGO: z.boolean() }),
 });
 export type CheckoutOptions = z.infer<typeof optionsSchema>;
 
-export const userSchema = z.object({ id: z.string(), email: z.string().email(), name: z.string().nullable(), emailVerified: z.boolean() });
+export const affiliateSummarySchema = z.object({ id: z.string(), publicName: z.string() });
+export const userSchema = z.object({
+  id: z.string(),
+  email: z.string().email(),
+  name: z.string().nullable(),
+  emailVerified: z.boolean(),
+  affiliate: affiliateSummarySchema.nullable().default(null),
+});
 export type User = z.infer<typeof userSchema>;
 export const loyaltyProgramSchema = z.object({
   enabled: z.boolean(),
@@ -102,6 +112,10 @@ export const orderInputSchema = z.object({
     z.object({ type: z.literal('PICKUP'), pickupPointId: z.string() }),
     z.object({ type: z.literal('SHIPMENT'), shippingRateId: z.string(), recipientName: z.string().min(1), recipientPhone: z.string().min(6), addressLine1: z.string().min(1), addressLine2: z.string().optional(), city: z.string().min(1), province: z.string().min(1), postalCode: z.string().min(3) }),
   ]),
+  sellerFulfillments: z.array(z.object({ sellerKey: z.string(), fulfillment: z.discriminatedUnion('type', [
+    z.object({ type: z.literal('PICKUP'), pickupPointId: z.string() }),
+    z.object({ type: z.literal('SHIPMENT'), shippingRateId: z.string(), recipientName: z.string().min(1), recipientPhone: z.string().min(6), addressLine1: z.string().min(1), addressLine2: z.string().optional(), city: z.string().min(1), province: z.string().min(1), postalCode: z.string().min(3) }),
+  ]) })).optional(),
   paymentMethod: z.enum(['BANK_TRANSFER', 'MERCADO_PAGO']),
   pointsToRedeem: z.number().int().min(0).max(2_000_000_000),
 });

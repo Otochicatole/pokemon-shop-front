@@ -19,7 +19,7 @@ export function CatalogProductCard({ product }: { product: Product }) {
     <BaseProductCard
       className={product.kind === 'SINGLE_CARD' ? 'product-card-single' : undefined}
       product={{ name: product.name, slug: product.slug, eyebrow: card?.setName ?? product.sku, kindLabel, price: product.price, available: product.available, image: product.images[0] }}
-      details={card ? <div className="product-card-details">{card.pokemonType && <PixelBadge tone={typeTones[card.pokemonType] ?? 'cyan'}>{pokemonTypeLabels[card.pokemonType]}</PixelBadge>}<span>{conditionLabels[card.condition]} · {card.language}</span></div> : <div className="product-card-details"><span>{productKindLabels[product.kind]}</span></div>}
+      details={<><div className="product-card-details">{card ? <>{card.pokemonType && <PixelBadge tone={typeTones[card.pokemonType] ?? 'cyan'}>{pokemonTypeLabels[card.pokemonType]}</PixelBadge>}<span>{conditionLabels[card.condition]} · {card.language}</span></> : <span>{productKindLabels[product.kind]}</span>}</div><small className="product-card-seller">Vende: {product.seller.name}</small></>}
       action={<AddToCartButton product={product} compact />}
     />
   );

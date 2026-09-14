@@ -17,6 +17,7 @@ const navigation: AdminNavigationItem[] = [
   { href: '/admin/inventory', label: 'Inventario', icon: <Boxes size={18} /> },
   { href: '/admin/suppliers', label: 'Proveedores', icon: <Handshake size={18} /> },
   { href: '/admin/news', label: 'Noticias', icon: <Newspaper size={18} /> },
+  { href: '/admin/affiliates', label: 'Afiliados', icon: <Handshake size={18} /> },
   { href: '/admin/orders', label: 'Órdenes', icon: <ClipboardList size={18} /> },
   { href: '/admin/payments', label: 'Pagos', icon: <CreditCard size={18} /> },
   { href: '/admin/fulfillment', label: 'Envíos y retiro', icon: <Truck size={18} /> },

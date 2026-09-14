@@ -1,6 +1,6 @@
 import { apiFetch } from '@/shared/api/client';
 import { checkoutPreviewSchema, optionsSchema, orderSchema, type OrderInput } from '@/shared/api/contracts';
-export async function getCheckoutOptions() { const response = await apiFetch('/checkout/options') as { data: unknown }; return optionsSchema.parse(response.data); }
+export async function getCheckoutOptions(items?: Array<{ productId: string; quantity: number; productVersion: number }>) { const response = items?.length ? await apiFetch('/checkout/options', { method: 'POST', body: JSON.stringify({ items }) }) : await apiFetch('/checkout/options'); return optionsSchema.parse((response as { data: unknown }).data); }
 export async function previewCheckout(input: OrderInput) { const response = await apiFetch('/checkout/preview', { method: 'POST', body: JSON.stringify(input) }) as { data: unknown }; return checkoutPreviewSchema.parse(response.data); }
 export async function createOrder(input: OrderInput, idempotencyKey: string) { const response = await apiFetch('/orders', { method: 'POST', headers: { 'Idempotency-Key': idempotencyKey }, body: JSON.stringify(input) }) as { data: { order: unknown; reused: boolean } }; return { order: orderSchema.parse(response.data.order), reused: response.data.reused }; }
 export async function uploadReceipt(number: string, file: File) { const form = new FormData(); form.append('receipt', file); return apiFetch(`/orders/${encodeURIComponent(number)}/transfer-receipt`, { method: 'POST', body: form }); }
