@@ -62,7 +62,15 @@ export function AdminAffiliateManagement() {
   });
   const review = useMutation({
     mutationFn: ({ id, decision, version, note }: ReviewTarget & { note?: string }) => adminFetch(`/admin/affiliates/listings/${id}/review`, { method: 'POST', body: JSON.stringify({ decision, expectedVersion: version, ...(note ? { note } : {}) }) }),
-    onSuccess: async () => { await client.invalidateQueries({ queryKey: ['admin', 'affiliate-listings'] }); toast.success('Revisión actualizada'); resetReview(); },
+    onSuccess: async (_result, variables) => {
+      // La cola solo contiene publicaciones pendientes: retirarla de inmediato
+      // evita que se pueda volver a aprobar una fila ya procesada mientras se
+      // completa la invalidación/refetch.
+      client.setQueryData<PendingListing[]>(['admin', 'affiliate-listings'], (current) => current?.filter((row) => row.id !== variables.id));
+      await client.invalidateQueries({ queryKey: ['admin', 'affiliate-listings'] });
+      toast.success('Revisión actualizada');
+      resetReview();
+    },
     onError: (error) => toast.error(adminErrorMessage(error)),
   });
   const changeStatus = useMutation({
