@@ -35,6 +35,7 @@ export async function updateAdminProduct(id: string, version: number, values: Pr
 }
 export async function publishAdminProduct(id: string, version: number) { return adminFetch(`/admin/products/${id}/publish`, { method: 'POST', body: JSON.stringify({ expectedVersion: version }) }, productStatusEnvelopeSchema); }
 export async function archiveAdminProduct(id: string, version: number) { return adminFetch(`/admin/products/${id}/archive`, { method: 'POST', body: JSON.stringify({ expectedVersion: version }) }, productStatusEnvelopeSchema); }
+export async function deleteAdminProduct(id: string, version: number) { await adminFetch(`/admin/products/${id}`, { method: 'DELETE', body: JSON.stringify({ expectedVersion: version }) }); }
 export async function adjustProductInventory(id: string, delta: number, reason: string) { return adminFetch(`/admin/products/${id}/inventory-adjustment`, { method: 'POST', body: JSON.stringify({ delta, reason }) }, inventoryMutationEnvelopeSchema); }
 export async function listInventoryAdjustments(id: string, cursor?: string): Promise<{ data: InventoryAdjustment[]; nextCursor: string | null }> { const params = cursor ? `?cursor=${encodeURIComponent(cursor)}` : ''; const response = await adminFetch(`/admin/products/${id}/inventory-adjustments${params}`, {}, inventoryHistoryEnvelopeSchema); return { data: response.data, nextCursor: response.meta.nextCursor }; }
 
