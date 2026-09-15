@@ -118,10 +118,10 @@
 .affiliate-admin-directory-list,
 .affiliate-admin-publications-list { margin: 0; }
 .affiliate-admin-directory-list li { padding-inline: 18px; }
-.affiliate-admin-publications-list li { padding-inline: 30px; transition: background .15s ease, padding-inline .15s ease; }
+.affiliate-admin-publications-list li { padding-inline: 0; transition: background .15s ease; }
+.affiliate-admin-publications-list .affiliate-admin-row { padding-inline: 30px; }
 .affiliate-admin-directory-list li:hover,
 .affiliate-admin-publications-list li:hover { background: rgba(83, 190, 229, .045); }
-.affiliate-admin-publications-list li:hover { padding-inline: 42px; }
 .affiliate-admin-publications-list .affiliate-admin-row > div:first-child { display: grid; gap: 4px; }
 .affiliate-admin-publications-list .affiliate-admin-row span { margin-top: 0; }
 .affiliate-admin-publication-name { display: grid; gap: 4px; width: 100%; padding: 0; border: 0; background: transparent; color: var(--ink); font: inherit; text-align: left; cursor: pointer; }
@@ -603,7 +603,7 @@
   .affiliate-admin-setting-card { margin-top: 8px; padding: 16px; }
   .affiliate-admin-settings-actions { align-items: stretch; flex-direction: column; gap: 12px; }
   .affiliate-admin-settings-actions .button { width: 100%; }
-  .affiliate-admin-publications-list li:hover { padding-inline: 34px; }
+  .affiliate-admin-publications-list .affiliate-admin-row { padding-inline: 30px; }
   .affiliate-admin-preview { grid-template-columns: 1fr; }
   .affiliate-admin-preview-image { max-height: 360px; }
   .affiliate-admin-preview-data { gap: 0 12px; }
