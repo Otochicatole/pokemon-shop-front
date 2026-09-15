@@ -3,13 +3,13 @@
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Image from 'next/image';
-import Link from 'next/link';
 import { Check, Eye, RefreshCw, Search, UserPlus, UserRound, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { AdminPageHeader, AdminTabPanel, AdminTabs, Button, Dialog, TextareaField, TextField } from '@/components';
 import type { AdminCustomer } from '@/features/customer-management/domain/contracts';
 import { listAdminCustomers } from '@/features/customer-management/infrastructure/api';
 import { adminFetch, adminErrorMessage } from '@/shared/admin/client';
+import { AffiliateAdminNavigation } from './affiliate-admin-navigation';
 
 type AffiliateAdminTab = 'affiliates' | 'listings';
 type AffiliateRow = { id: string; publicName: string; status: 'ACTIVE' | 'SUSPENDED'; version: number; user?: { id: string; email: string; name: string | null }; counts?: { listings: number; sellerOrders: number } };
@@ -86,11 +86,13 @@ export function AdminAffiliateManagement() {
     <AdminPageHeader
       eyebrow="Marketplace"
       title="Afiliados"
-      description="Habilitá vendedores existentes y supervisá sus publicaciones desde dos espacios separados."
+      description="Habilitá vendedores existentes y administrá publicaciones, ventas, incidencias y retiros desde el menú lateral."
       actions={<><Button variant="secondary" onClick={refresh} disabled={affiliates.isFetching || listings.isFetching}><RefreshCw size={16} />Actualizar</Button><Button onClick={openCreate}><UserPlus size={16} />Agregar afiliado</Button></>}
     />
-    <nav className="admin-tabs affiliate-admin-subnav" aria-label="Secciones de afiliados"><Link href="/admin/affiliates" className="is-active" aria-current="page">Resumen</Link><Link href="/admin/affiliates/sellers">Afiliados</Link><Link href="/admin/affiliates/listings">Publicaciones</Link><Link href="/admin/affiliates/orders">Ventas</Link><Link href="/admin/affiliates/issues">Incidencias</Link><Link href="/admin/affiliates/cancellations">Cancelaciones</Link><Link href="/admin/affiliates/payouts">Retiros</Link><Link href="/admin/affiliates/settings">Configuración</Link></nav>
-    <AdminTabs id="affiliate-tabs" label="Gestión de afiliados" active={tab} onChange={(value) => setTab(value as AffiliateAdminTab)} tabs={[{ id: 'affiliates', label: 'Afiliados', count: rows.length }, { id: 'listings', label: 'Publicaciones', count: pending.length }]} />
+    <div className="affiliate-admin-layout">
+      <AffiliateAdminNavigation active="overview" />
+      <div className="affiliate-admin-content">
+        <AdminTabs id="affiliate-tabs" label="Gestión de afiliados" active={tab} onChange={(value) => setTab(value as AffiliateAdminTab)} tabs={[{ id: 'affiliates', label: 'Afiliados', count: rows.length }, { id: 'listings', label: 'Publicaciones', count: pending.length }]} />
 
     <AdminTabPanel tabsId="affiliate-tabs" tabId="affiliates" active={tab === 'affiliates'} className="admin-tabs-content">
       <section className="admin-panel affiliate-admin-directory">
@@ -105,6 +107,9 @@ export function AdminAffiliateManagement() {
         {listings.isLoading ? <div className="admin-loading">Cargando publicaciones</div> : listings.isError ? <div className="affiliate-admin-inline-error" role="alert">{adminErrorMessage(listings.error)}</div> : <div className="admin-panel-body">{pending.length ? <ul className="admin-list affiliate-admin-publications-list">{pending.map((row) => <li key={row.id}><div className="admin-list-row affiliate-admin-row"><div><button type="button" className="affiliate-admin-publication-name" onClick={() => openPreview(row)}><strong>{row.product.name}</strong><span>{row.affiliate?.publicName ?? 'Afiliado'} · Stock disponible {row.product.inventory?.available ?? 0} · {row.product.images.length} imágenes</span></button></div><div className="admin-row-actions"><Button variant="ghost" onClick={() => openPreview(row)} disabled={busy}><Eye size={15} />Vista previa</Button><Button variant="secondary" onClick={() => review.mutate({ id: row.id, version: row.product.version, decision: 'APPROVED' })} disabled={busy}><Check size={15} />Aprobar</Button><Button variant="ghost" onClick={() => { setReviewNote(''); setReviewTarget({ id: row.id, version: row.product.version, decision: 'CHANGES_REQUESTED' }); }} disabled={busy}><X size={15} />Pedir cambios</Button></div></div></li>)}</ul> : <p className="admin-empty-copy">No hay publicaciones esperando revisión.</p>}</div>}
       </section>
     </AdminTabPanel>
+
+      </div>
+    </div>
 
     <Dialog open={Boolean(previewTarget)} title={previewTarget ? `Preview · ${previewTarget.product.name}` : 'Preview de publicación'} description="Revisá cómo se presenta el artículo antes de aprobarlo." onClose={closePreview} className="admin-wide-dialog affiliate-admin-preview-dialog">
       {previewTarget && <>

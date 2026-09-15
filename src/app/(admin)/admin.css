@@ -117,8 +117,8 @@
 .affiliate-admin-publications { overflow: hidden; }
 .affiliate-admin-directory-list,
 .affiliate-admin-publications-list { margin: 0; }
-.affiliate-admin-directory-list li,
-.affiliate-admin-publications-list li { padding-inline: 18px; }
+.affiliate-admin-directory-list li { padding-inline: 18px; }
+.affiliate-admin-publications-list li { padding-inline: 30px; }
 .affiliate-admin-directory-list li:hover,
 .affiliate-admin-publications-list li:hover { background: rgba(83, 190, 229, .045); }
 .affiliate-admin-publications-list .affiliate-admin-row > div:first-child { display: grid; gap: 4px; }
@@ -167,6 +167,28 @@
 .affiliate-admin-selected-user small { margin-top: 5px; color: var(--muted); font: 10px ui-monospace, SFMono-Regular, Consolas, monospace; overflow-wrap: anywhere; }
 .affiliate-admin-user-change { align-self: start; border: 0; background: transparent; color: var(--cyan); font: 9px var(--pixel-font); text-transform: uppercase; cursor: pointer; }
 .affiliate-admin-user-change:hover { color: var(--accent); }
+.affiliate-admin-layout { display: grid; grid-template-columns: minmax(190px, 220px) minmax(0, 1fr); align-items: start; gap: 20px; }
+.affiliate-admin-content { min-width: 0; }
+.affiliate-admin-navigation { position: sticky; top: 20px; padding: 14px; border: 2px solid var(--line); background: rgba(10, 15, 21, .97); box-shadow: 5px 5px 0 #05070a; }
+.affiliate-admin-navigation-heading { display: grid; gap: 4px; padding: 4px 8px 14px; border-bottom: 2px solid var(--line); }
+.affiliate-admin-navigation-heading .admin-panel-kicker { margin-bottom: 0; }
+.affiliate-admin-navigation-heading strong { color: var(--ink); font: 10px/1.4 var(--pixel-font); text-transform: uppercase; }
+.affiliate-admin-navigation nav { display: grid; gap: 4px; padding-top: 10px; }
+.affiliate-admin-navigation a { display: flex; align-items: center; min-height: 40px; padding: 0 10px; border: 1px solid transparent; color: var(--muted); font: 9px var(--pixel-font); text-transform: uppercase; }
+.affiliate-admin-navigation a:hover, .affiliate-admin-navigation a.is-active { border-color: var(--accent); background: rgba(255, 213, 47, .08); color: var(--accent); }
+.affiliate-admin-settings-panel { overflow: hidden; }
+.affiliate-admin-settings-header { min-height: 76px; padding: 20px 24px; }
+.affiliate-admin-settings-header h2 { font-size: 13px; }
+.affiliate-admin-settings-form { display: grid; gap: 26px; padding: 28px; }
+.affiliate-admin-settings-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; max-width: 980px; }
+.affiliate-admin-setting-card { display: grid; gap: 13px; margin-top: 12px; padding: 20px; border: 2px solid var(--line); background: rgba(10, 15, 21, .72); }
+.affiliate-admin-setting-description { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.55; }
+.affiliate-admin-settings-note { display: grid; gap: 7px; max-width: 980px; margin-top: 4px; padding: 16px 18px; border-left: 4px solid var(--cyan); background: rgba(83, 190, 229, .08); }
+.affiliate-admin-settings-note strong { color: var(--cyan); font: 9px var(--pixel-font); text-transform: uppercase; }
+.affiliate-admin-settings-note p { margin: 0; color: #c8d6dd; font-size: 13px; line-height: 1.55; }
+.affiliate-admin-settings-actions { display: flex; align-items: center; justify-content: space-between; gap: 20px; max-width: 980px; margin-top: 4px; padding-top: 22px; border-top: 2px solid var(--line); }
+.affiliate-admin-settings-actions > span { color: var(--muted); font-size: 12px; }
+.affiliate-admin-settings-actions .button { min-width: 220px; }
 .admin-panel-kicker { display: block; margin-bottom: 8px; color: var(--accent); font: 7px var(--pixel-font); letter-spacing: .05em; text-transform: uppercase; }
 .admin-count-badge { min-width: 30px; padding: 7px 9px; border: 1px solid var(--cyan); color: var(--cyan); font: 9px var(--pixel-font); text-align: center; }
 .admin-empty-copy { margin: 0; color: var(--muted); }
@@ -557,6 +579,13 @@
   .admin-order-toolbar { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .admin-order-toolbar .admin-search-field { grid-column: 1 / -1; }
   .audit-toolbar { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .affiliate-admin-layout { grid-template-columns: 1fr; gap: 14px; }
+  .affiliate-admin-navigation { position: static; padding: 10px; }
+  .affiliate-admin-navigation nav { display: flex; overflow-x: auto; padding-top: 8px; }
+  .affiliate-admin-navigation a { flex: 0 0 auto; white-space: nowrap; }
+  .affiliate-admin-settings-fields { grid-template-columns: 1fr; max-width: none; }
+  .affiliate-admin-settings-note,
+  .affiliate-admin-settings-actions { max-width: none; }
   .admin-support-message-list { min-height: 0; }
 }
 
@@ -568,6 +597,11 @@
   .admin-page-actions .button { flex: 1; }
   .affiliate-admin-row { align-items: flex-start; flex-direction: column; }
   .affiliate-admin-row .admin-row-actions { width: 100%; justify-content: flex-start; }
+  .affiliate-admin-settings-form { gap: 20px; padding: 18px; }
+  .affiliate-admin-settings-header { padding: 18px; }
+  .affiliate-admin-setting-card { margin-top: 8px; padding: 16px; }
+  .affiliate-admin-settings-actions { align-items: stretch; flex-direction: column; gap: 12px; }
+  .affiliate-admin-settings-actions .button { width: 100%; }
   .affiliate-admin-preview { grid-template-columns: 1fr; }
   .affiliate-admin-preview-image { max-height: 360px; }
   .affiliate-admin-preview-data { gap: 0 12px; }

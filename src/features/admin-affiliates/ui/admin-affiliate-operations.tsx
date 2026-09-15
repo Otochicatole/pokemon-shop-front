@@ -8,8 +8,9 @@ import { ArrowLeft, Check, Eye, RefreshCw, Search, Settings2, ShieldAlert, Walle
 import { toast } from 'sonner';
 import { AdminPageHeader, Button, Dialog, TextareaField, TextField } from '@/components';
 import { adminErrorMessage, adminFetch } from '@/shared/admin/client';
+import { AffiliateAdminNavigation, type AffiliateAdminSection } from './affiliate-admin-navigation';
 
-type Section = 'overview' | 'sellers' | 'listings' | 'orders' | 'issues' | 'cancellations' | 'payouts' | 'settings';
+type Section = AffiliateAdminSection;
 type Page<T> = { items: T[]; page: number; pageSize: number; total: number; totalPages: number };
 type Seller = { id: string; publicName: string; status: 'ACTIVE' | 'SUSPENDED'; version: number; commissionBpsOverride?: number | null; user?: { id: string; email: string; name: string | null }; counts?: { listings: number; sellerOrders: number; issues?: number; payoutRequests?: number } };
 type Listing = { id: string; status: string; reviewNote: string | null; product: { id: string; name: string; description: string; priceMinor: string; version: number; status: string; images: Array<{ id: string; url: string; altText: string | null }>; inventory?: { available: number } | null }; affiliate: { id: string; publicName: string; status?: string } };
@@ -26,25 +27,13 @@ function useQuery<TData>(options: { queryKey: readonly unknown[]; queryFn: () =>
   return { ...result, data: result.data as TData };
 }
 
-const nav: Array<{ key: Section; label: string; href: string }> = [
-  { key: 'overview', label: 'Resumen', href: '/admin/affiliates' },
-  { key: 'sellers', label: 'Afiliados', href: '/admin/affiliates/sellers' },
-  { key: 'listings', label: 'Publicaciones', href: '/admin/affiliates/listings' },
-  { key: 'orders', label: 'Ventas', href: '/admin/affiliates/orders' },
-  { key: 'issues', label: 'Incidencias', href: '/admin/affiliates/issues' },
-  { key: 'cancellations', label: 'Cancelaciones', href: '/admin/affiliates/cancellations' },
-  { key: 'payouts', label: 'Retiros', href: '/admin/affiliates/payouts' },
-  { key: 'settings', label: 'Configuración', href: '/admin/affiliates/settings' },
-];
-
 function payload<T>(value: T | { data: T }): T { return value && typeof value === 'object' && 'data' in value ? (value as { data: T }).data : value as T; }
 function money(value: string | null | undefined) { if (!value) return '—'; return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'USD' }).format(Number(BigInt(value)) / 100); }
 function label(value: string) { return value.replaceAll('_', ' ').toLowerCase().replace(/(^| )\w/g, (letter) => letter.toUpperCase()); }
 function date(value: string) { return new Intl.DateTimeFormat('es-AR', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value)); }
 function queryPage<T>(path: string) { return adminFetch<Page<T> | T[]>(path).then((result) => { const value = payload(result); return Array.isArray(value) ? { items: value, page: 1, pageSize: value.length, total: value.length, totalPages: 1 } : value; }); }
 
-function AffiliateAdminNav({ active }: { active: Section }) { return <nav className="admin-tabs affiliate-admin-subnav" aria-label="Secciones de afiliados">{nav.map((item) => <Link key={item.key} href={item.href} className={item.key === active ? 'is-active' : ''} aria-current={item.key === active ? 'page' : undefined}>{item.label}</Link>)}</nav>; }
-function Shell({ active, title, description, action, children }: { active: Section; title: string; description: string; action?: React.ReactNode; children: React.ReactNode }) { return <><AdminPageHeader eyebrow="Marketplace" title={title} description={description} actions={action} /><AffiliateAdminNav active={active} />{children}</>; }
+function Shell({ active, title, description, action, children }: { active: Section; title: string; description: string; action?: React.ReactNode; children: React.ReactNode }) { return <><AdminPageHeader eyebrow="Marketplace" title={title} description={description} actions={action} /><div className="affiliate-admin-layout"><AffiliateAdminNavigation active={active} /><div className="affiliate-admin-content">{children}</div></div></>; }
 function Feedback({ children, error = false }: { children: React.ReactNode; error?: boolean }) { return <div className={`admin-feedback ${error ? 'is-error' : ''}`} role={error ? 'alert' : undefined}>{children}</div>; }
 
 export function AdminAffiliateOperations({ section, id }: { section: Section; id?: string }) {
@@ -139,6 +128,63 @@ function Payouts({ id }: { id?: string }) {
 }
 
 function Settings() {
-  const client = useQueryClient(); const query = useQuery({ queryKey: ['admin', 'affiliate-settings'], queryFn: () => adminFetch<{ commissionBps: number; autoCompleteDays: number; version: number }>('/admin/affiliates/settings').then(payload) }); const [commission, setCommission] = useState<string | null>(null); const [days, setDays] = useState<string | null>(null); const save = useMutation({ mutationFn: () => { if (!query.data) throw new Error('Configuración no disponible'); return adminFetch('/admin/affiliates/settings', { method: 'PATCH', body: JSON.stringify({ expectedVersion: query.data.version, commissionBps: Number(commission ?? query.data.commissionBps), autoCompleteDays: Number(days ?? query.data.autoCompleteDays) }) }); }, onSuccess: () => { toast.success('Configuración guardada'); setCommission(null); setDays(null); void client.invalidateQueries({ queryKey: ['admin', 'affiliate-settings'] }); }, onError: (error) => toast.error(adminErrorMessage(error)) });
-  return <Shell active="settings" title="Configuración de afiliados" description="Comisión global y plazo de cierre automático. Cada suborden conserva la comisión aplicada al momento de la compra."><section className="admin-panel"><div className="admin-panel-header"><div><span className="admin-panel-kicker">Reglas comerciales</span><h2>Parámetros del programa</h2></div><Settings2 size={20} /></div>{query.isLoading ? <Feedback>Cargando configuración…</Feedback> : query.isError ? <Feedback error>{adminErrorMessage(query.error)}</Feedback> : query.data && <form className="admin-form" onSubmit={(event) => { event.preventDefault(); save.mutate(); }}><TextField label="Comisión global (%)" type="number" min="0" max="100" step="0.01" value={commission ?? String(query.data.commissionBps / 100)} onChange={(event) => setCommission(String(Math.round(Number(event.target.value) * 100)))} /><TextField label="Días hasta cierre automático" type="number" min="1" max="90" value={days ?? String(query.data.autoCompleteDays)} onChange={(event) => setDays(event.target.value)} /><p className="form-hint">La comisión queda congelada en cada suborden; el cambio solo afecta nuevas ventas.</p><div className="admin-dialog-actions"><Button type="submit" disabled={save.isPending}>{save.isPending ? 'Guardando…' : 'Guardar configuración'}</Button></div></form>}</section></Shell>;
+  const client = useQueryClient();
+  const query = useQuery({
+    queryKey: ['admin', 'affiliate-settings'],
+    queryFn: () => adminFetch<{ commissionBps: number; autoCompleteDays: number; version: number }>('/admin/affiliates/settings').then(payload),
+  });
+  const [commission, setCommission] = useState<string | null>(null);
+  const [days, setDays] = useState<string | null>(null);
+  const save = useMutation({
+    mutationFn: () => {
+      if (!query.data) throw new Error('Configuración no disponible');
+      return adminFetch('/admin/affiliates/settings', {
+        method: 'PATCH',
+        body: JSON.stringify({
+          expectedVersion: query.data.version,
+          commissionBps: commission === null ? query.data.commissionBps : Math.round(Number(commission) * 100),
+          autoCompleteDays: Number(days ?? query.data.autoCompleteDays),
+        }),
+      });
+    },
+    onSuccess: () => {
+      toast.success('Configuración guardada');
+      setCommission(null);
+      setDays(null);
+      void client.invalidateQueries({ queryKey: ['admin', 'affiliate-settings'] });
+    },
+    onError: (error) => toast.error(adminErrorMessage(error)),
+  });
+
+  return <Shell active="settings" title="Configuración de afiliados" description="Comisión global y plazo de cierre automático. Cada suborden conserva la comisión aplicada al momento de la compra.">
+    <section className="admin-panel affiliate-admin-settings-panel">
+      <div className="admin-panel-header affiliate-admin-settings-header">
+        <div>
+          <span className="admin-panel-kicker">Reglas comerciales</span>
+          <h2>Parámetros del programa</h2>
+        </div>
+        <Settings2 size={20} aria-hidden="true" />
+      </div>
+      {query.isLoading ? <Feedback>Cargando configuración…</Feedback> : query.isError ? <Feedback error>{adminErrorMessage(query.error)}</Feedback> : query.data && <form className="affiliate-admin-settings-form" onSubmit={(event) => { event.preventDefault(); save.mutate(); }}>
+        <div className="affiliate-admin-settings-fields">
+          <div className="affiliate-admin-setting-card">
+            <TextField label="Comisión global (%)" type="number" min="0" max="100" step="0.01" value={commission ?? String(query.data.commissionBps / 100)} onChange={(event) => setCommission(event.target.value)} />
+            <p className="affiliate-admin-setting-description">Porcentaje que recibe la plataforma en cada nueva venta de afiliado.</p>
+          </div>
+          <div className="affiliate-admin-setting-card">
+            <TextField label="Días hasta cierre automático" type="number" min="1" max="90" value={days ?? String(query.data.autoCompleteDays)} onChange={(event) => setDays(event.target.value)} />
+            <p className="affiliate-admin-setting-description">Tiempo de espera antes de completar automáticamente una venta sin incidencias.</p>
+          </div>
+        </div>
+        <div className="affiliate-admin-settings-note">
+          <strong>Importante</strong>
+          <p>La comisión queda congelada en cada suborden. Estos cambios solo afectan las nuevas ventas y no modifican el historial.</p>
+        </div>
+        <div className="affiliate-admin-settings-actions">
+          <span>Revisá los valores antes de guardar.</span>
+          <Button type="submit" disabled={save.isPending}>{save.isPending ? 'Guardando…' : 'Guardar configuración'}</Button>
+        </div>
+      </form>}
+    </section>
+  </Shell>;
 }
