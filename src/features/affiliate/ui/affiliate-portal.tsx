@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState, type FormEvent } from 'react';
 import { useMutation, useQuery, useQueryClient, type UseQueryResult } from '@tanstack/react-query';
-import { Archive, ArrowLeft, CheckCircle2, ClipboardList, FilePlus2, ImagePlus, LayoutDashboard, MapPin, Package, Pencil, Plus, Store, Trash2, Truck, WalletCards, Settings } from 'lucide-react';
+import { Archive, ArrowLeft, CheckCircle2, ClipboardList, FilePlus2, ImagePlus, LayoutDashboard, MapPin, Package, Pencil, Plus, Store, Trash2, Truck, WalletCards, Settings, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/button';
 import { ApiError } from '@/shared/api/client';
@@ -157,14 +157,93 @@ function AffiliateOrderDetailView({ order, onRefresh }: { order: AffiliateOrder;
 }
 
 function AffiliateBalanceView({ query, profile }: { query: QueryResult<AffiliateBalance>; profile: AffiliateProfile }) {
-  const queryClient = useQueryClient(); const [amount, setAmount] = useState('');
+  const queryClient = useQueryClient();
+  const [amount, setAmount] = useState('');
   const [payoutPage, setPayoutPage] = useState(1);
+  const [historyTab, setHistoryTab] = useState<'entries' | 'payouts'>('entries');
+  const [payoutModalOpen, setPayoutModalOpen] = useState(false);
   const canRequestPayout = profile.status === 'ACTIVE';
-  const payout = useMutation({ mutationFn: requestAffiliatePayout, onSuccess: () => { toast.success('Solicitud de retiro enviada'); setAmount(''); void query.refetch(); void queryClient.invalidateQueries({ queryKey: ['affiliate', 'payouts'] }); }, onError: (error) => toast.error(dataError(error)) });
-  const payoutHistory = useQuery({ queryKey: ['affiliate', 'payouts', payoutPage], queryFn: () => listAffiliatePayouts(payoutPage), enabled: query.isSuccess }) as { data: Awaited<ReturnType<typeof listAffiliatePayouts>>; isLoading: boolean; isError: boolean; error: Error | null };
+  const payout = useMutation({
+    mutationFn: requestAffiliatePayout,
+    onSuccess: () => {
+      toast.success('Solicitud de retiro enviada');
+      setAmount('');
+      setPayoutModalOpen(false);
+      setHistoryTab('payouts');
+      setPayoutPage(1);
+      void query.refetch();
+      void queryClient.invalidateQueries({ queryKey: ['affiliate', 'payouts'] });
+    },
+    onError: (error) => toast.error(dataError(error)),
+  });
+  const payoutHistory = useQuery({
+    queryKey: ['affiliate', 'payouts', payoutPage],
+    queryFn: () => listAffiliatePayouts(payoutPage),
+    enabled: query.isSuccess && historyTab === 'payouts',
+  });
   const balance = query.data;
   const amountMinor = parseMinor(amount);
-  return <><AffiliateHeader eyebrow="Finanzas del afiliado" title="Saldo y retiros" description="Las ventas completadas quedan disponibles. Los retiros se procesan desde administración." action={<span className="affiliate-account-chip">{profile.payoutAccountLast4 ? `Cuenta terminada en ${profile.payoutAccountLast4}` : 'Cuenta de retiro pendiente'}</span>} />{query.isLoading ? <AffiliateLoading /> : query.isError ? <AffiliateQueryError message={dataError(query.error)} /> : <><section className="affiliate-grid affiliate-balance-grid"><article className="affiliate-stat"><span>Pendiente</span><strong>{formatMinor(balance?.pendingMinor)}</strong><small>Se libera al completar la entrega</small></article><article className="affiliate-stat"><span>Disponible</span><strong>{formatMinor(balance?.availableMinor)}</strong><small>Podés solicitarlo ahora</small></article><article className="affiliate-stat"><span>Reservado</span><strong>{formatMinor(balance?.reservedMinor)}</strong><small>Retiros en proceso</small></article><article className="affiliate-stat"><span>Pagado</span><strong>{formatMinor(balance?.paidMinor)}</strong><small>Retiros confirmados</small></article></section><section className="affiliate-panel"><div className="affiliate-panel-heading"><div><p className="eyebrow">Retiro</p><h2>Solicitar saldo disponible</h2></div></div>{canRequestPayout ? <form className="affiliate-payout-form" onSubmit={(event) => { event.preventDefault(); if (!amountMinor || amountMinor === '0') return toast.error('Ingresá un importe válido'); if (BigInt(amountMinor) > BigInt(balance?.availableMinor ?? '0')) return toast.error('El importe supera tu saldo disponible'); payout.mutate(amountMinor); }}><label>Importe en USD<input type="number" min="0.01" step="0.01" inputMode="decimal" value={amount} onChange={(event) => setAmount(event.target.value)} placeholder="0,00" required /></label><Button type="submit" disabled={payout.isPending || !amount}>{payout.isPending ? 'Enviando…' : 'Solicitar retiro'}</Button></form> : <p className="form-hint">La cuenta está suspendida: los retiros están temporalmente bloqueados.</p>}<p className="form-hint">El importe se guarda en centavos y debe ser menor o igual al saldo disponible.</p></section><section className="affiliate-panel"><div className="affiliate-panel-heading"><div><p className="eyebrow">Movimientos</p><h2>Últimos movimientos</h2></div></div>{!balance?.entries.length ? <div className="affiliate-empty">Todavía no hay movimientos.</div> : <div className="affiliate-ledger-list">{balance.entries.map((entry) => <div className="affiliate-ledger-row" key={entry.id}><div><strong>{entry.type.replaceAll('_', ' ')}</strong><span>{formatDate(entry.createdAt)}</span></div><strong className={BigInt(entry.amountMinor) >= 0n ? 'affiliate-money-positive' : 'affiliate-money-negative'}>{BigInt(entry.amountMinor) >= 0n ? '+' : ''}{formatMinor(entry.amountMinor)}</strong></div>)}</div>}</section><section className="affiliate-panel"><div className="affiliate-panel-heading"><div><p className="eyebrow">Retiros</p><h2>Historial paginado</h2></div></div>{payoutHistory.isLoading ? <AffiliateLoading /> : payoutHistory.isError ? <AffiliateQueryError message={dataError(payoutHistory.error)} /> : !payoutHistory.data.items.length ? <div className="affiliate-empty">Todavía no hay retiros.</div> : <><div className="affiliate-ledger-list">{payoutHistory.data.items.map((item) => <div className="affiliate-ledger-row" key={item.id}><div><strong>{item.status.replaceAll('_', ' ')}</strong><span>{formatDate(item.createdAt)} · Cuenta terminada en {item.destinationLast4 ?? '—'}</span></div><strong>{formatMinor(item.amountMinor)}</strong></div>)}</div><div className="affiliate-row-actions"><Button variant="ghost" onClick={() => setPayoutPage((page) => Math.max(1, page - 1))} disabled={payoutPage === 1}>Anterior</Button><span className="form-hint">Página {payoutPage} de {payoutHistory.data.totalPages}</span><Button variant="ghost" onClick={() => setPayoutPage((page) => page + 1)} disabled={payoutPage >= payoutHistory.data.totalPages}>Siguiente</Button></div></>}</section></>}</>;
+
+  useEffect(() => {
+    if (!payoutModalOpen) return;
+    const closeOnEscape = (event: KeyboardEvent) => { if (event.key === 'Escape') setPayoutModalOpen(false); };
+    document.addEventListener('keydown', closeOnEscape);
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.removeEventListener('keydown', closeOnEscape);
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [payoutModalOpen]);
+
+  function submitPayout(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!amountMinor || amountMinor === '0') return toast.error('Ingresá un importe válido');
+    if (BigInt(amountMinor) > BigInt(balance?.availableMinor ?? '0')) return toast.error('El importe supera tu saldo disponible');
+    payout.mutate(amountMinor);
+  }
+
+  const entries = balance?.entries ?? [];
+  return <>
+    <AffiliateHeader eyebrow="Finanzas del afiliado" title="Saldo y retiros" description="Las ventas completadas quedan disponibles. Los retiros se procesan desde administración." action={<span className="affiliate-account-chip">{profile.payoutAccountLast4 ? `Cuenta terminada en ${profile.payoutAccountLast4}` : 'Cuenta de retiro pendiente'}</span>} />
+    {query.isLoading ? <AffiliateLoading /> : query.isError ? <AffiliateQueryError message={dataError(query.error)} /> : <>
+      <section className="affiliate-grid affiliate-balance-grid">
+        <article className="affiliate-stat"><span>Pendiente</span><strong>{formatMinor(balance?.pendingMinor)}</strong><small>Se libera al completar la entrega</small></article>
+        <article className="affiliate-stat"><span>Disponible</span><strong>{formatMinor(balance?.availableMinor)}</strong><small>Podés solicitarlo ahora</small></article>
+        <article className="affiliate-stat"><span>Reservado</span><strong>{formatMinor(balance?.reservedMinor)}</strong><small>Retiros en proceso</small></article>
+        <article className="affiliate-stat"><span>Pagado</span><strong>{formatMinor(balance?.paidMinor)}</strong><small>Retiros confirmados</small></article>
+      </section>
+
+      <section className="affiliate-panel affiliate-payout-launcher">
+        <div className="affiliate-panel-heading">
+          <div><p className="eyebrow">Retiro</p><h2>Solicitar saldo disponible</h2><p className="affiliate-muted">Abrí el formulario cuando quieras enviar una solicitud a administración.</p></div>
+          {canRequestPayout ? <Button type="button" onClick={() => setPayoutModalOpen(true)}>Solicitar retiro</Button> : null}
+        </div>
+        {canRequestPayout ? <p className="form-hint">Saldo disponible para retirar: <strong>{formatMinor(balance?.availableMinor)}</strong></p> : <p className="form-hint">La cuenta está suspendida: los retiros están temporalmente bloqueados.</p>}
+      </section>
+
+      <section className="affiliate-panel affiliate-balance-history">
+        <div className="affiliate-panel-heading"><div><p className="eyebrow">Historial financiero</p><h2>Actividad de saldo</h2></div></div>
+        <div className="affiliate-balance-tabs" role="tablist" aria-label="Historial financiero">
+          <button id="affiliate-balance-entries-tab" type="button" role="tab" aria-selected={historyTab === 'entries'} aria-controls="affiliate-balance-entries" className={`affiliate-balance-tab ${historyTab === 'entries' ? 'is-active' : ''}`} onClick={() => setHistoryTab('entries')}>Movimientos<span>{entries.length}</span></button>
+          <button id="affiliate-balance-payouts-tab" type="button" role="tab" aria-selected={historyTab === 'payouts'} aria-controls="affiliate-balance-payouts" className={`affiliate-balance-tab ${historyTab === 'payouts' ? 'is-active' : ''}`} onClick={() => setHistoryTab('payouts')}>Retiros{payoutHistory.data ? <span>{payoutHistory.data.total}</span> : null}</button>
+        </div>
+        {historyTab === 'entries' ? <div id="affiliate-balance-entries" role="tabpanel" aria-labelledby="affiliate-balance-entries-tab" className="affiliate-balance-tabpanel">
+          {!entries.length ? <div className="affiliate-empty">Todavía no hay movimientos.</div> : <div className="affiliate-ledger-list">{entries.map((entry) => <div className="affiliate-ledger-row" key={entry.id}><div><strong>{entry.type.replaceAll('_', ' ')}</strong><span>{formatDate(entry.createdAt)}</span></div><strong className={BigInt(entry.amountMinor) >= 0n ? 'affiliate-money-positive' : 'affiliate-money-negative'}>{BigInt(entry.amountMinor) >= 0n ? '+' : ''}{formatMinor(entry.amountMinor)}</strong></div>)}</div>}
+        </div> : <div id="affiliate-balance-payouts" role="tabpanel" aria-labelledby="affiliate-balance-payouts-tab" className="affiliate-balance-tabpanel">
+          {payoutHistory.isLoading ? <AffiliateLoading /> : payoutHistory.isError ? <AffiliateQueryError message={dataError(payoutHistory.error)} /> : !payoutHistory.data?.items.length ? <div className="affiliate-empty">Todavía no hay retiros.</div> : <><div className="affiliate-ledger-list">{payoutHistory.data.items.map((item) => <div className="affiliate-ledger-row" key={item.id}><div><strong>{item.status.replaceAll('_', ' ')}</strong><span>{formatDate(item.createdAt)} · Cuenta terminada en {item.destinationLast4 ?? '—'}</span></div><strong>{formatMinor(item.amountMinor)}</strong></div>)}</div><div className="affiliate-pagination" aria-label="Paginación de retiros"><Button variant="ghost" onClick={() => setPayoutPage((page) => Math.max(1, page - 1))} disabled={payoutPage === 1}>Anterior</Button><span>Página {payoutPage} de {payoutHistory.data.totalPages}</span><Button variant="ghost" onClick={() => setPayoutPage((page) => page + 1)} disabled={payoutPage >= payoutHistory.data.totalPages}>Siguiente</Button></div></>}
+        </div>}
+      </section>
+    </>}
+    {payoutModalOpen && canRequestPayout ? <div className="affiliate-modal-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget && !payout.isPending) setPayoutModalOpen(false); }}>
+      <div className="affiliate-modal" role="dialog" aria-modal="true" aria-labelledby="affiliate-payout-title" aria-describedby="affiliate-payout-description">
+        <div className="affiliate-modal-header"><div><p className="eyebrow">Retiro</p><h2 id="affiliate-payout-title">Solicitar retiro</h2></div><button type="button" className="affiliate-modal-close" aria-label="Cerrar solicitud de retiro" onClick={() => setPayoutModalOpen(false)} disabled={payout.isPending}><X size={18} /></button></div>
+        <p id="affiliate-payout-description" className="affiliate-modal-description">Indicá cuánto querés retirar. El importe se guarda en centavos y no puede superar tu saldo disponible.</p>
+        <div className="affiliate-modal-balance"><span>Saldo disponible</span><strong>{formatMinor(balance?.availableMinor)}</strong></div>
+        <form className="affiliate-payout-form affiliate-payout-modal-form" onSubmit={submitPayout}><label>Importe en USD<input autoFocus type="number" min="0.01" step="0.01" inputMode="decimal" value={amount} onChange={(event) => setAmount(event.target.value)} placeholder="0,00" required /></label><div className="affiliate-modal-actions"><Button type="button" variant="ghost" onClick={() => setPayoutModalOpen(false)} disabled={payout.isPending}>Cancelar</Button><Button type="submit" disabled={payout.isPending || !amount}>{payout.isPending ? 'Enviando…' : 'Solicitar retiro'}</Button></div></form>
+      </div>
+    </div> : null}
+  </>;
 }
 
 function AffiliateLogisticsView({ query, onRefresh }: { query: QueryResult<AffiliateLogistics>; onRefresh: () => void }) {
