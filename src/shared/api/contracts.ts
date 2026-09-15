@@ -3,6 +3,8 @@ import { BASE_CURRENCY } from '@/shared/lib/currency';
 
 export const moneySchema = z.object({ amountMinor: z.string(), currency: z.literal(BASE_CURRENCY) });
 export type Money = z.infer<typeof moneySchema>;
+export const providerMoneySchema = z.object({ amountMinor: z.string(), currency: z.literal('ARS') });
+export type ProviderMoney = z.infer<typeof providerMoneySchema>;
 
 export const productKindSchema = z.enum(['SINGLE_CARD', 'SEALED_PRODUCT', 'ACCESSORY']);
 export const pokemonTypeSchema = z.enum(['COLORLESS', 'DARKNESS', 'DRAGON', 'FAIRY', 'FIGHTING', 'FIRE', 'GRASS', 'LIGHTNING', 'METAL', 'PSYCHIC', 'WATER']);
@@ -64,6 +66,7 @@ export const optionsSchema = z.object({
   fulfillment: fulfillmentOptionsSchema,
   sellers: z.array(z.object({ sellerKey: z.string(), seller: z.object({ type: z.enum(['STORE', 'AFFILIATE']), id: z.string().nullable(), name: z.string() }), shippingZones: fulfillmentOptionsSchema.shape.shippingZones, pickupPoints: fulfillmentOptionsSchema.shape.pickupPoints })).optional(),
   paymentMethods: z.object({ BANK_TRANSFER: z.boolean(), MERCADO_PAGO: z.boolean() }),
+  paymentMethodUnavailableReasons: z.object({ MERCADO_PAGO: z.enum(['NOT_CONFIGURED', 'FX_UNAVAILABLE']).optional() }).optional(),
 });
 export type CheckoutOptions = z.infer<typeof optionsSchema>;
 
@@ -118,6 +121,7 @@ export const orderInputSchema = z.object({
   ]) })).optional(),
   paymentMethod: z.enum(['BANK_TRANSFER', 'MERCADO_PAGO']),
   pointsToRedeem: z.number().int().min(0).max(2_000_000_000),
+  rateSnapshotId: z.string().uuid().optional(),
 });
 export type OrderInput = z.infer<typeof orderInputSchema>;
 export const checkoutPreviewSchema = z.object({
@@ -131,6 +135,9 @@ export const checkoutPreviewSchema = z.object({
     minimumRedemptionPoints: z.number().int().positive(), pointsToEarn: z.number().int().nonnegative(), pointValue: moneySchema,
   }),
   expiresAt: z.string().or(z.date()),
+  mercadoPago: z.object({
+    rateSnapshotId: z.string().uuid(), source: z.literal('DOLARAPI_BLUE_VENTA'), rate: z.string(), fetchedAt: z.string().or(z.date()), expiresAt: z.string().or(z.date()), total: providerMoneySchema,
+  }).nullable().optional(),
 });
 export type CheckoutPreview = z.infer<typeof checkoutPreviewSchema>;
 export const orderLoyaltySchema = z.object({
@@ -151,7 +158,19 @@ export const sellerOrderBuyerSchema = z.object({
   carrier: z.string().nullable().optional(), trackingCode: z.string().nullable().optional(), items: z.array(z.object({ productId: z.string(), name: z.string(), quantity: z.number().int(), unitPrice: moneySchema, lineTotal: moneySchema })), timeline: z.array(orderTimelineEventSchema).default([]), issues: z.array(z.object({ id: z.string(), status: z.string(), reason: z.string(), createdAt: z.string().or(z.date()) }).passthrough()).default([]),
 }).passthrough();
 export type SellerOrderBuyer = z.infer<typeof sellerOrderBuyerSchema>;
-export const orderSchema = z.object({ id: z.string(), number: z.string(), status: z.string(), paymentMethod: z.string(), fulfillmentType: z.string(), totals: z.object({ subtotal: moneySchema, discount: moneySchema, shipping: moneySchema, total: moneySchema }), loyalty: orderLoyaltySchema, expiresAt: z.string().nullable().optional(), items: z.array(z.object({ productId: z.string(), sku: z.string(), name: z.string(), quantity: z.number(), unitPrice: moneySchema, lineTotal: moneySchema })), timeline: z.array(orderTimelineEventSchema).default([]), sellerOrders: z.array(sellerOrderBuyerSchema).default([]), fulfillment: z.record(z.string(), z.unknown()).optional(), payment: z.record(z.string(), z.unknown()).nullable().optional(), createdAt: z.string().or(z.date()) });
+const orderPaymentSchema = z.object({
+  method: z.enum(['BANK_TRANSFER', 'MERCADO_PAGO']),
+  status: z.string(),
+  bankReference: z.string().nullable().optional(),
+  bankInstructions: z.object({ bankName: z.string(), accountHolder: z.string(), cbu: z.string().nullable(), alias: z.string().nullable() }).nullable().optional(),
+  receipt: z.object({ fileId: z.string(), review: z.string(), createdAt: z.string().or(z.date()) }).nullable().optional(),
+  checkoutUrl: z.string().url().nullable().optional(),
+  paymentSessionStatus: z.enum(['READY', 'RETRY_REQUIRED', 'CLOSED']).nullable().optional(),
+  mercadoPago: z.object({
+    integrationMode: z.enum(['PREFERENCE_V1', 'ORDER_V1']), providerOrderId: z.string().nullable(), checkoutUrl: z.string().url().nullable(), checkoutStatus: z.enum(['READY', 'RETRY_REQUIRED', 'CLOSED']).nullable(), amount: providerMoneySchema.nullable(), rate: z.object({ source: z.string(), rate: z.string(), fetchedAt: z.string().or(z.date()), expiresAt: z.string().or(z.date()) }).nullable(), expiresAt: z.string().or(z.date()).nullable(),
+  }).nullable().optional(),
+}).passthrough();
+export const orderSchema = z.object({ id: z.string(), number: z.string(), status: z.string(), paymentMethod: z.string(), fulfillmentType: z.string(), totals: z.object({ subtotal: moneySchema, discount: moneySchema, shipping: moneySchema, total: moneySchema }), loyalty: orderLoyaltySchema, expiresAt: z.string().nullable().optional(), items: z.array(z.object({ productId: z.string(), sku: z.string(), name: z.string(), quantity: z.number(), unitPrice: moneySchema, lineTotal: moneySchema })), timeline: z.array(orderTimelineEventSchema).default([]), sellerOrders: z.array(sellerOrderBuyerSchema).default([]), fulfillment: z.record(z.string(), z.unknown()).optional(), payment: orderPaymentSchema.nullable().optional(), createdAt: z.string().or(z.date()) });
 export type Order = z.infer<typeof orderSchema>;
 export const problemSchema = z.object({ code: z.string(), status: z.number(), title: z.string(), requestId: z.string().optional(), details: z.unknown().optional() });
 export type Problem = z.infer<typeof problemSchema>;

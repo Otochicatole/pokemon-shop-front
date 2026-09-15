@@ -1,27 +1,34 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { AlertTriangle, ArrowLeft, CheckCircle2, Coins, Truck } from 'lucide-react';
 import { toast } from 'sonner';
 import { confirmSellerOrder, getOrder, cancelOrder, openSellerOrderIssue } from '../infrastructure/api';
-import { uploadReceipt } from '@/features/checkout/infrastructure/api';
+import { resumePaymentSession, uploadReceipt } from '@/features/checkout/infrastructure/api';
 import { formatDate, formatMoney, statusLabel } from '@/shared/lib/format';
 import { Button } from '@/components/button';
 import { Dialog } from '@/components/overlay';
 
 export function OrderDetail({ number }: { number: string }) {
   const queryClient = useQueryClient();
-  const query = useQuery({ queryKey: ['order', number], queryFn: () => getOrder(number) });
+  const [pollingStopped, setPollingStopped] = useState(false);
+  const query = useQuery({ queryKey: ['order', number], queryFn: () => getOrder(number), refetchInterval: (current) => !pollingStopped && ['PENDING_PAYMENT', 'PAYMENT_REVIEW'].includes(current.state.data?.status ?? '') ? 2000 : false, refetchIntervalInBackground: false });
   const [busy, setBusy] = useState(false);
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
   const [issueTarget, setIssueTarget] = useState<string | null>(null);
   const [issueReason, setIssueReason] = useState('');
+  const paymentPending = ['PENDING_PAYMENT', 'PAYMENT_REVIEW'].includes(query.data?.status ?? '');
+  useEffect(() => {
+    if (!paymentPending) return;
+    const timer = window.setTimeout(() => setPollingStopped(true), 60_000);
+    return () => window.clearTimeout(timer);
+  }, [paymentPending]);
   if (query.isLoading) return <div className="page-loading">Cargando orden…</div>;
   if (query.isError || !query.data) return <div className="empty-state"><h1>Orden no encontrada</h1><Link href="/account/orders" className="button button-secondary">Volver a mis órdenes</Link></div>;
   const order = query.data;
-  const payment = order.payment as { method?: string; bankReference?: string; bankInstructions?: { bankName?: string; accountHolder?: string; cbu?: string | null; alias?: string | null }; receipt?: { review?: string }; checkoutUrl?: string | null } | null;
+  const payment = order.payment;
   const canCancel = ['PENDING_PAYMENT', 'PAYMENT_REVIEW'].includes(order.status);
   const credited = ['PAID', 'PREPARING', 'READY_FOR_PICKUP', 'SHIPPED', 'COMPLETED'].includes(order.status);
   const onReceipt = async (file: File) => {
@@ -55,6 +62,18 @@ export function OrderDetail({ number }: { number: string }) {
     catch (error) { toast.error(error instanceof Error ? error.message : 'No se pudo abrir el reclamo'); }
     finally { setBusy(false); }
   };
+  const resumeCheckout = async () => {
+    setBusy(true);
+    try {
+      const result = await resumePaymentSession(order.number);
+      if (!result.checkoutUrl) throw new Error('Mercado Pago todavía no devolvió una URL de checkout');
+      const url = new URL(result.checkoutUrl);
+      const hostname = url.hostname.toLowerCase();
+      if (url.protocol !== 'https:' || !(hostname === 'mercadopago.com' || hostname.endsWith('.mercadopago.com') || hostname === 'mercadopago.com.ar' || hostname.endsWith('.mercadopago.com.ar'))) throw new Error('URL de pago no segura');
+      window.location.assign(url.toString());
+    } catch (error) { toast.error(error instanceof Error ? error.message : 'No se pudo retomar el pago'); }
+    finally { setBusy(false); }
+  };
   return <div className="order-page">
     <Link href="/account/orders" className="back-link"><ArrowLeft size={15} aria-hidden="true" />Volver a mis órdenes</Link>
     <div className="section-heading">
@@ -76,7 +95,11 @@ export function OrderDetail({ number }: { number: string }) {
         <h2>{order.fulfillmentType === 'PICKUP' ? 'Retiro' : 'Envío'}</h2>
         <p>{order.fulfillmentType === 'PICKUP' ? 'Retiro en el punto seleccionado.' : `${String(order.fulfillment?.addressLine1 ?? '')}, ${String(order.fulfillment?.city ?? '')}, ${String(order.fulfillment?.province ?? '')}`}</p>
         <h2 className="mt">Pago</h2>
-        <p>{payment?.method === 'BANK_TRANSFER' ? `Transferencia · referencia ${payment.bankReference ?? 'pendiente'}` : 'Mercado Pago'}</p>
+        <p>{payment?.method === 'BANK_TRANSFER' ? `Transferencia · referencia ${payment.bankReference ?? 'pendiente'}` : `Mercado Pago · ${payment?.status ?? 'pendiente'}`}</p>
+        {payment?.method === 'MERCADO_PAGO' && payment.mercadoPago?.amount && <div className="bank-details"><strong>Total cobrado en Mercado Pago</strong><span>{formatMoney(payment.mercadoPago.amount)}</span>{payment.mercadoPago.rate && <span>Cotización DólarAPI blue venta: {payment.mercadoPago.rate.rate}</span>}</div>}
+        {payment?.method === 'MERCADO_PAGO' && ['PENDING_PAYMENT', 'PAYMENT_REVIEW'].includes(order.status) && ['READY', 'RETRY_REQUIRED'].includes(payment.paymentSessionStatus ?? '') && <Button variant="secondary" disabled={busy} onClick={() => void resumeCheckout()}>{payment.paymentSessionStatus === 'READY' ? 'Pagar con Mercado Pago' : 'Retomar pago con Mercado Pago'}</Button>}
+        {payment?.method === 'MERCADO_PAGO' && !pollingStopped && <p className="form-hint">Confirmando el estado del pago…</p>}
+        {payment?.method === 'MERCADO_PAGO' && pollingStopped && paymentPending && <div className="form-hint"><p>La confirmación está tardando más de lo esperado.</p><Button variant="ghost" disabled={query.isFetching} onClick={() => { setPollingStopped(false); void query.refetch(); }}>Actualizar estado</Button></div>}
         {payment?.bankInstructions && <div className="bank-details"><strong>Datos para transferir</strong><span>{payment.bankInstructions.bankName}</span><span>{payment.bankInstructions.accountHolder}</span>{payment.bankInstructions.cbu && <span>CBU: {payment.bankInstructions.cbu}</span>}{payment.bankInstructions.alias && <span>Alias: {payment.bankInstructions.alias}</span>}</div>}
         {payment?.method === 'BANK_TRANSFER' && !payment.receipt && canCancel && <label className="upload-box">Subir comprobante<input type="file" accept="image/jpeg,image/png,image/webp" disabled={busy} onChange={(event) => { const file = event.target.files?.[0]; if (file) void onReceipt(file); }} /></label>}
         {payment?.receipt && <p className="form-hint">Comprobante: {payment.receipt.review === 'APPROVED' ? 'aprobado' : payment.receipt.review === 'REJECTED' ? 'rechazado' : 'en revisión'}</p>}
