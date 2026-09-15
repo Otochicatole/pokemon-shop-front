@@ -25,10 +25,11 @@ const shipmentSchema = z.object({
 });
 const pickupSchema = z.object({ type: z.literal('PICKUP'), pickupPointId: z.string().nullable(), name: z.string().nullable(), address: z.string().nullable() });
 const sellerOrderStatusSchema = z.enum(['PENDING_PAYMENT', 'PAID', 'PREPARING', 'READY_FOR_PICKUP', 'PICKED_UP', 'SHIPPED', 'COMPLETED', 'CANCELLATION_REQUESTED', 'CANCELLED', 'DISPUTED', 'REFUNDED']);
+const sellerOrderActionSchema = z.enum(['START_PREPARING', 'READY_FOR_PICKUP', 'MARK_SHIPPED', 'MARK_PICKED_UP', 'CONFIRM_RECEIPT', 'REQUEST_CANCELLATION', 'OPEN_ISSUE', 'COMPLETE', 'CANCEL', 'REFUND']);
 const sellerOrderItemSchema = z.object({ id: z.string(), productId: z.string(), name: z.string(), quantity: z.number().int(), unitPrice: moneySchema, lineTotal: moneySchema });
 const sellerOrderTimelineSchema = z.object({ id: z.string(), sellerOrderId: z.string(), fromStatus: sellerOrderStatusSchema.nullable(), toStatus: sellerOrderStatusSchema, note: z.string().nullable(), createdAt: z.string(), changedByType: z.string().nullable(), changedById: z.string().nullable() });
 const sellerOrderIssueSchema = z.object({ id: z.string(), status: z.string(), reason: z.string(), createdAt: z.string() });
-const sellerOrderSchema = z.object({ id: z.string(), number: z.string(), sellerType: z.enum(['STORE', 'AFFILIATE']), affiliateId: z.string().nullable(), sellerName: z.string(), status: sellerOrderStatusSchema, version: z.number().int(), subtotal: moneySchema, shipping: moneySchema, commission: moneySchema, sellerNet: moneySchema, fulfillmentType: z.enum(['SHIPMENT', 'PICKUP']), items: z.array(sellerOrderItemSchema), timeline: z.array(sellerOrderTimelineSchema), issues: z.array(sellerOrderIssueSchema) });
+const sellerOrderSchema = z.object({ id: z.string(), number: z.string(), sellerType: z.enum(['STORE', 'AFFILIATE']), affiliateId: z.string().nullable(), sellerName: z.string(), status: sellerOrderStatusSchema, version: z.number().int(), subtotal: moneySchema, shipping: moneySchema, commission: moneySchema, sellerNet: moneySchema, fulfillmentType: z.enum(['SHIPMENT', 'PICKUP']), allowedActions: z.array(sellerOrderActionSchema), items: z.array(sellerOrderItemSchema), timeline: z.array(sellerOrderTimelineSchema), issues: z.array(sellerOrderIssueSchema) });
 
 export const adminOrderSchema = z.object({
   id: z.string(), number: z.string(), version: z.number().int(), status: adminOrderStatusSchema,
@@ -47,3 +48,4 @@ export const orderDetailEnvelopeSchema = z.object({ data: z.object({ order: admi
 export const orderStatusEnvelopeSchema = z.object({ data: z.object({ number: z.string(), status: adminOrderStatusSchema, version: z.number().int() }), meta: z.record(z.string(), z.unknown()).optional() });
 export const transferReviewEnvelopeSchema = z.object({ data: z.object({ number: z.string(), receiptId: z.string(), decision: z.enum(['APPROVED', 'REJECTED']), status: z.enum(['PAID', 'CANCELLED']), version: z.number().int() }), meta: z.record(z.string(), z.unknown()).optional() });
 export const fullRefundEnvelopeSchema = z.object({ data: z.object({ refundId: z.string(), number: z.string(), status: z.literal('REFUND_RECORDED'), amount: moneySchema, version: z.number().int() }), meta: z.record(z.string(), z.unknown()).optional() });
+export const sellerOrderStatusEnvelopeSchema = z.object({ data: z.object({ id: z.string(), status: sellerOrderStatusSchema, version: z.number().int(), allowedActions: z.array(sellerOrderActionSchema) }), meta: z.record(z.string(), z.unknown()).optional() });

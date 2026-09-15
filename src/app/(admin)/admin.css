@@ -117,7 +117,7 @@
 .affiliate-admin-publications { overflow: hidden; }
 .affiliate-admin-directory-list,
 .affiliate-admin-publications-list { margin: 0; }
-.affiliate-admin-directory-list li { padding-inline: 18px; }
+.affiliate-admin-directory-list li { padding-inline: 30px; }
 .affiliate-admin-publications-list li { padding-inline: 0; transition: background .15s ease; }
 .affiliate-admin-publications-list .affiliate-admin-row { padding-inline: 30px; }
 .affiliate-admin-directory-list li:hover,
