@@ -3,9 +3,9 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, Coins } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, CheckCircle2, Coins, Truck } from 'lucide-react';
 import { toast } from 'sonner';
-import { getOrder, cancelOrder } from '../infrastructure/api';
+import { confirmSellerOrder, getOrder, cancelOrder, openSellerOrderIssue } from '../infrastructure/api';
 import { uploadReceipt } from '@/features/checkout/infrastructure/api';
 import { formatDate, formatMoney, statusLabel } from '@/shared/lib/format';
 import { Button } from '@/components/button';
@@ -16,6 +16,8 @@ export function OrderDetail({ number }: { number: string }) {
   const query = useQuery({ queryKey: ['order', number], queryFn: () => getOrder(number) });
   const [busy, setBusy] = useState(false);
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+  const [issueTarget, setIssueTarget] = useState<string | null>(null);
+  const [issueReason, setIssueReason] = useState('');
   if (query.isLoading) return <div className="page-loading">Cargando orden…</div>;
   if (query.isError || !query.data) return <div className="empty-state"><h1>Orden no encontrada</h1><Link href="/account/orders" className="button button-secondary">Volver a mis órdenes</Link></div>;
   const order = query.data;
@@ -39,6 +41,19 @@ export function OrderDetail({ number }: { number: string }) {
     } finally {
       setBusy(false);
     }
+  };
+  const confirmSellerDelivery = async (sellerOrderId: string, expectedVersion: number) => {
+    setBusy(true);
+    try { await confirmSellerOrder(order.number, sellerOrderId, expectedVersion); await query.refetch(); toast.success('Recepción confirmada'); }
+    catch (error) { toast.error(error instanceof Error ? error.message : 'No se pudo confirmar la recepción'); }
+    finally { setBusy(false); }
+  };
+  const submitIssue = async () => {
+    if (!issueTarget || issueReason.trim().length < 3) return;
+    setBusy(true);
+    try { await openSellerOrderIssue(order.number, issueTarget, issueReason.trim()); await query.refetch(); setIssueTarget(null); setIssueReason(''); toast.success('Reclamo abierto'); }
+    catch (error) { toast.error(error instanceof Error ? error.message : 'No se pudo abrir el reclamo'); }
+    finally { setBusy(false); }
   };
   return <div className="order-page">
     <Link href="/account/orders" className="back-link"><ArrowLeft size={15} aria-hidden="true" />Volver a mis órdenes</Link>
@@ -72,11 +87,15 @@ export function OrderDetail({ number }: { number: string }) {
         {order.timeline.length > 0 ? <ol className="order-timeline">{order.timeline.map((event, index) => <li className={index === order.timeline.length - 1 ? 'is-current' : ''} key={event.id}><span className="order-timeline-marker" aria-hidden="true" /><div><strong>{statusLabel(event.toStatus)}</strong><span>{formatDate(event.createdAt)}{index === order.timeline.length - 1 ? ' · Estado actual' : ''}</span></div></li>)}</ol> : <p className="form-hint">Todavía no hay eventos de seguimiento para esta orden.</p>}
       </section>
     </div>
+    {order.sellerOrders.length > 0 && <section className="order-card order-seller-orders"><div className="section-heading"><p className="eyebrow">Marketplace</p><h2>Entregas por vendedor</h2><p>La orden se actualiza automáticamente a partir de cada suborden.</p></div><div className="seller-order-cards">{order.sellerOrders.map((sellerOrder) => <article className="seller-order-card" key={sellerOrder.id}><div className="seller-order-card-header"><div><span className="eyebrow">{sellerOrder.sellerType === 'AFFILIATE' ? 'Afiliado' : 'Tienda'}</span><h3>{sellerOrder.sellerName}</h3><p>{sellerOrder.number} · {statusLabel(sellerOrder.status)}</p></div><span className="status-pill">{statusLabel(sellerOrder.status)}</span></div><div className="seller-order-card-content"><div><h4>Productos</h4>{sellerOrder.items.map((item) => <div className="summary-line" key={item.productId}><span>{item.name} × {item.quantity}</span><strong>{formatMoney(item.lineTotal)}</strong></div>)}</div><div><h4><Truck size={15} /> Entrega</h4>{sellerOrder.fulfillment.hidden ? <p>Los datos de entrega se habilitan cuando el pago esté acreditado.</p> : sellerOrder.fulfillmentType === 'SHIPMENT' ? <p>{sellerOrder.fulfillment.addressLine1}, {sellerOrder.fulfillment.city}, {sellerOrder.fulfillment.province}</p> : <p>{sellerOrder.fulfillment.pickupPointName}<br />{sellerOrder.fulfillment.pickupPointAddress}</p>}{sellerOrder.trackingCode && <p className="form-hint">Seguimiento: {sellerOrder.carrier ? `${sellerOrder.carrier} · ` : ''}{sellerOrder.trackingCode}</p>}</div></div>{sellerOrder.timeline.length > 0 && <ol className="order-timeline seller-order-timeline">{sellerOrder.timeline.map((event, index) => <li className={index === sellerOrder.timeline.length - 1 ? 'is-current' : ''} key={event.id}><span className="order-timeline-marker" aria-hidden="true" /><div><strong>{statusLabel(event.toStatus)}</strong><span>{formatDate(event.createdAt)}</span></div></li>)}</ol>}{sellerOrder.allowedActions.includes('CONFIRM_RECEIPT') && <Button variant="secondary" disabled={busy} onClick={() => void confirmSellerDelivery(sellerOrder.id, sellerOrder.version)}><CheckCircle2 size={16} />Confirmar recepción</Button>}{sellerOrder.allowedActions.includes('OPEN_ISSUE') && <Button variant="ghost" disabled={busy} onClick={() => { setIssueTarget(sellerOrder.id); setIssueReason(''); }}><AlertTriangle size={16} />Abrir reclamo</Button>}{sellerOrder.sellerContactPhone && <p className="form-hint">Contacto del vendedor: {sellerOrder.sellerContactPhone}</p>}</article>)}</div></section>}
     <Dialog open={cancelDialogOpen} title="Cancelar orden" description="Esta acción cancelará la orden y liberará las reservas asociadas. ¿Querés continuar?" onClose={() => !busy && setCancelDialogOpen(false)} className="order-cancel-dialog">
       <div className="order-dialog-actions">
         <Button type="button" variant="secondary" onClick={() => setCancelDialogOpen(false)} disabled={busy}>Volver</Button>
         <Button type="button" variant="danger" onClick={() => void confirmCancel()} disabled={busy}>{busy ? 'Cancelando…' : 'Confirmar cancelación'}</Button>
       </div>
+    </Dialog>
+    <Dialog open={Boolean(issueTarget)} title="Abrir reclamo" description="Contanos qué ocurrió con la entrega. El vendedor y la administración recibirán el aviso." onClose={() => !busy && setIssueTarget(null)}>
+      <form className="order-dialog-actions" onSubmit={(event) => { event.preventDefault(); void submitIssue(); }}><label className="form-field"><span>Motivo</span><textarea value={issueReason} onChange={(event) => setIssueReason(event.target.value)} minLength={3} maxLength={1000} rows={5} placeholder="Describí el problema con la entrega" required /></label><Button type="button" variant="secondary" onClick={() => setIssueTarget(null)} disabled={busy}>Cancelar</Button><Button type="submit" disabled={busy || issueReason.trim().length < 3}>{busy ? 'Enviando…' : 'Abrir reclamo'}</Button></form>
     </Dialog>
   </div>;
 }

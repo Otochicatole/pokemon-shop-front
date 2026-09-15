@@ -7,10 +7,22 @@ export const notificationTypeSchema = z.enum([
   'TRANSFER_RECEIPT_SUBMITTED',
   'PAYMENT_REQUIRES_REVIEW',
   'PAYMENT_APPROVED',
+  'AFFILIATE_LISTING_SUBMITTED',
+  'AFFILIATE_LISTING_REVIEWED',
+  'AFFILIATE_ORDER_CREATED',
+  'AFFILIATE_ORDER_STATUS_CHANGED',
+  'AFFILIATE_ISSUE_OPENED',
+  'AFFILIATE_CANCELLATION_REQUESTED',
+  'AFFILIATE_CANCELLATION_UPDATED',
+  'AFFILIATE_PAYOUT_REQUESTED',
+  'AFFILIATE_PAYOUT_UPDATED',
 ]);
 
 export const notificationReferenceSchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('ORDER'), orderNumber: z.string().min(1) }),
+  z.object({ kind: z.literal('SELLER_ORDER'), sellerOrderId: z.string().uuid(), orderNumber: z.string().min(1) }),
+  z.object({ kind: z.literal('AFFILIATE_LISTING'), listingId: z.string().uuid(), productName: z.string() }),
+  z.object({ kind: z.literal('AFFILIATE_PAYOUT'), payoutId: z.string().uuid() }),
   z.object({ kind: z.literal('SUPPORT_CONVERSATION'), conversationId: z.string().uuid() }),
 ]);
 

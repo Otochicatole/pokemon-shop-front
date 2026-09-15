@@ -31,9 +31,24 @@ function errorMessage(error: unknown) {
 }
 
 function notificationHref(notification: Notification, role: Role) {
-  return notification.reference.kind === 'ORDER'
-    ? `${role === 'admin' ? '/admin/orders' : '/account/orders'}/${encodeURIComponent(notification.reference.orderNumber)}`
-    : `${role === 'admin' ? '/admin/support' : '/account/support'}/${encodeURIComponent(notification.reference.conversationId)}`;
+  switch (notification.reference.kind) {
+    case 'ORDER':
+      return `${role === 'admin' ? '/admin/orders' : '/account/orders'}/${encodeURIComponent(notification.reference.orderNumber)}`;
+    case 'SELLER_ORDER':
+      return role === 'admin'
+        ? `/admin/affiliates/orders/${encodeURIComponent(notification.reference.sellerOrderId)}`
+        : '/affiliate/orders';
+    case 'AFFILIATE_LISTING':
+      return role === 'admin'
+        ? `/admin/affiliates/listings/${encodeURIComponent(notification.reference.listingId)}`
+        : '/affiliate/listings';
+    case 'AFFILIATE_PAYOUT':
+      return role === 'admin'
+        ? `/admin/affiliates/payouts/${encodeURIComponent(notification.reference.payoutId)}`
+        : '/affiliate/balance';
+    case 'SUPPORT_CONVERSATION':
+      return `${role === 'admin' ? '/admin/support' : '/account/support'}/${encodeURIComponent(notification.reference.conversationId)}`;
+  }
 }
 
 function notificationIcon(type: Notification['type']) {

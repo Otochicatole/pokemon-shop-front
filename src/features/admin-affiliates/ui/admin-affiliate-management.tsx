@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Image from 'next/image';
+import Link from 'next/link';
 import { Check, Eye, RefreshCw, Search, UserPlus, UserRound, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { AdminPageHeader, AdminTabPanel, AdminTabs, Button, Dialog, TextareaField, TextField } from '@/components';
@@ -31,8 +32,8 @@ type PendingListing = {
 type ReviewTarget = { id: string; version: number; decision: 'APPROVED' | 'CHANGES_REQUESTED' };
 
 function unwrap<T>(value: unknown): T { return value && typeof value === 'object' && 'data' in value ? (value as { data: T }).data : value as T; }
-async function getAffiliates() { return unwrap<AffiliateRow[]>(await adminFetch('/admin/affiliates')); }
-async function getPendingListings() { return unwrap<PendingListing[]>(await adminFetch('/admin/affiliates/listings?status=PENDING_REVIEW')); }
+async function getAffiliates() { const payload = unwrap<AffiliateRow[] | { items: AffiliateRow[] }>(await adminFetch('/admin/affiliates')); return Array.isArray(payload) ? payload : payload.items; }
+async function getPendingListings() { const payload = unwrap<PendingListing[] | { items: PendingListing[] }>(await adminFetch('/admin/affiliates/listings?status=PENDING_REVIEW')); return Array.isArray(payload) ? payload : payload.items; }
 function formatPrice(priceMinor: string) { return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(BigInt(priceMinor)) / 100); }
 function listingKindLabel(kind: PendingListing['product']['kind']) { return ({ SINGLE_CARD: 'Carta suelta', SEALED_PRODUCT: 'Producto sellado', ACCESSORY: 'Accesorio' })[kind]; }
 
@@ -88,6 +89,7 @@ export function AdminAffiliateManagement() {
       description="Habilitá vendedores existentes y supervisá sus publicaciones desde dos espacios separados."
       actions={<><Button variant="secondary" onClick={refresh} disabled={affiliates.isFetching || listings.isFetching}><RefreshCw size={16} />Actualizar</Button><Button onClick={openCreate}><UserPlus size={16} />Agregar afiliado</Button></>}
     />
+    <nav className="admin-tabs affiliate-admin-subnav" aria-label="Secciones de afiliados"><Link href="/admin/affiliates" className="is-active" aria-current="page">Resumen</Link><Link href="/admin/affiliates/sellers">Afiliados</Link><Link href="/admin/affiliates/listings">Publicaciones</Link><Link href="/admin/affiliates/orders">Ventas</Link><Link href="/admin/affiliates/issues">Incidencias</Link><Link href="/admin/affiliates/cancellations">Cancelaciones</Link><Link href="/admin/affiliates/payouts">Retiros</Link><Link href="/admin/affiliates/settings">Configuración</Link></nav>
     <AdminTabs id="affiliate-tabs" label="Gestión de afiliados" active={tab} onChange={(value) => setTab(value as AffiliateAdminTab)} tabs={[{ id: 'affiliates', label: 'Afiliados', count: rows.length }, { id: 'listings', label: 'Publicaciones', count: pending.length }]} />
 
     <AdminTabPanel tabsId="affiliate-tabs" tabId="affiliates" active={tab === 'affiliates'} className="admin-tabs-content">

@@ -34,7 +34,12 @@ export function SessionMenu() {
     try { await logout(); clearUserSessionCache(queryClient); publishSessionSync('user', 'ended'); router.replace('/'); router.refresh(); }
     catch (error) { toast.error(error instanceof Error ? error.message : 'No se pudo cerrar la sesión'); }
   };
-  if (!mounted || query.isLoading) return <div className="session-menu"><button className="session-trigger" type="button" disabled aria-label="Cargando cuenta"><UserRound size={18} /></button></div>;
+  // Keep the server render and the first client render identical. The account
+  // query can have a different loading state on each side of hydration, so it
+  // must not decide whether the button has a `disabled` attribute until after
+  // the client has mounted.
+  if (!mounted) return <div className="session-menu"><button className="session-trigger" type="button" aria-label="Cuenta"><UserRound size={18} /></button></div>;
+  if (query.isLoading) return <div className="session-menu"><button className="session-trigger" type="button" disabled aria-label="Cargando cuenta"><UserRound size={18} /></button></div>;
   if (!query.data) return <div className="session-menu" ref={menuRef}><button className="session-trigger" type="button" aria-label="Abrir menú de cuenta" aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen((value) => !value)}><UserRound size={18} /></button>{open && <div className="session-dropdown" role="menu"><p className="session-dropdown-name">Visitante</p><Link className="session-dropdown-login" href="/auth/login" role="menuitem" onClick={() => setOpen(false)}>Iniciar sesión</Link></div>}</div>;
   const displayName = query.data.name?.trim() || query.data.email.split('@')[0] || 'coleccionista';
   return <div className="session-menu" ref={menuRef}><button className="session-trigger" type="button" aria-label="Abrir menú de cuenta" aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen((value) => !value)}><UserRound size={18} /></button>{open && <div className="session-dropdown" role="menu"><p className="session-dropdown-name">{displayName}</p><Link href="/account" role="menuitem" onClick={() => setOpen(false)}>Mi cuenta</Link><button type="button" role="menuitem" onClick={() => void handleLogout()}>Cerrar sesión</button></div>}</div>;

@@ -1,9 +1,9 @@
 import { z } from 'zod';
 import { moneySchema, orderLoyaltySchema } from '@/shared/api/contracts';
 
-export const adminOrderStatusSchema = z.enum(['PENDING_PAYMENT', 'PAYMENT_REVIEW', 'PAID', 'PREPARING', 'READY_FOR_PICKUP', 'SHIPPED', 'COMPLETED', 'CANCELLED', 'EXPIRED', 'REFUND_RECORDED', 'PAYMENT_REQUIRES_REVIEW']);
-export const adminPaymentStatusSchema = z.enum(['PENDING', 'UNDER_REVIEW', 'APPROVED', 'REJECTED', 'FAILED', 'REFUNDED', 'DISPUTED', 'REQUIRES_REVIEW']);
-export const adminOrderActionSchema = z.enum(['TRANSITION_PREPARING', 'TRANSITION_READY_FOR_PICKUP', 'TRANSITION_SHIPPED', 'TRANSITION_COMPLETED', 'ROLLBACK', 'CANCEL', 'REVIEW_TRANSFER', 'FULFILL_LATE_PAYMENT', 'RECORD_FULL_REFUND']);
+export const adminOrderStatusSchema = z.enum(['PENDING_PAYMENT', 'PAYMENT_REVIEW', 'PAID', 'PREPARING', 'READY_FOR_PICKUP', 'SHIPPED', 'COMPLETED', 'CANCELLED', 'EXPIRED', 'REFUND_RECORDED', 'PAYMENT_REQUIRES_REVIEW', 'IN_FULFILLMENT', 'PARTIALLY_COMPLETED', 'ACTION_REQUIRED']);
+export const adminPaymentStatusSchema = z.enum(['PENDING', 'UNDER_REVIEW', 'APPROVED', 'REJECTED', 'FAILED', 'PARTIALLY_REFUNDED', 'REFUNDED', 'DISPUTED', 'REQUIRES_REVIEW']);
+export const adminOrderActionSchema = z.enum(['TRANSITION_PREPARING', 'TRANSITION_READY_FOR_PICKUP', 'TRANSITION_SHIPPED', 'TRANSITION_COMPLETED', 'ROLLBACK', 'CANCEL', 'REVIEW_TRANSFER', 'FULFILL_LATE_PAYMENT', 'RECORD_FULL_REFUND', 'VIEW_SELLER_ORDERS']);
 const customerSchema = z.object({ id: z.string().uuid(), email: z.email(), name: z.string().nullable(), status: z.enum(['ACTIVE', 'SUSPENDED']), emailVerifiedAt: z.string().nullable(), createdAt: z.string() });
 const itemSchema = z.object({ id: z.string(), productId: z.string(), sku: z.string(), name: z.string(), imageFileId: z.string().nullable(), imageUrl: z.string().nullable(), unitPrice: moneySchema, quantity: z.number().int(), lineTotal: moneySchema, snapshot: z.unknown() });
 const reservationSchema = z.object({ id: z.string(), productId: z.string(), quantity: z.number().int(), expiresAt: z.string(), releasedAt: z.string().nullable(), consumedAt: z.string().nullable() });
@@ -24,6 +24,11 @@ const shipmentSchema = z.object({
   city: z.string().nullable(), province: z.string().nullable(), postalCode: z.string().nullable(),
 });
 const pickupSchema = z.object({ type: z.literal('PICKUP'), pickupPointId: z.string().nullable(), name: z.string().nullable(), address: z.string().nullable() });
+const sellerOrderStatusSchema = z.enum(['PENDING_PAYMENT', 'PAID', 'PREPARING', 'READY_FOR_PICKUP', 'PICKED_UP', 'SHIPPED', 'COMPLETED', 'CANCELLATION_REQUESTED', 'CANCELLED', 'DISPUTED', 'REFUNDED']);
+const sellerOrderItemSchema = z.object({ id: z.string(), productId: z.string(), name: z.string(), quantity: z.number().int(), unitPrice: moneySchema, lineTotal: moneySchema });
+const sellerOrderTimelineSchema = z.object({ id: z.string(), sellerOrderId: z.string(), fromStatus: sellerOrderStatusSchema.nullable(), toStatus: sellerOrderStatusSchema, note: z.string().nullable(), createdAt: z.string(), changedByType: z.string(), changedById: z.string().nullable() });
+const sellerOrderIssueSchema = z.object({ id: z.string(), status: z.string(), reason: z.string(), createdAt: z.string() });
+const sellerOrderSchema = z.object({ id: z.string(), number: z.string(), sellerType: z.enum(['STORE', 'AFFILIATE']), affiliateId: z.string().nullable(), sellerName: z.string(), status: sellerOrderStatusSchema, version: z.number().int(), subtotal: moneySchema, shipping: moneySchema, commission: moneySchema, sellerNet: moneySchema, fulfillmentType: z.enum(['SHIPMENT', 'PICKUP']), items: z.array(sellerOrderItemSchema), timeline: z.array(sellerOrderTimelineSchema), issues: z.array(sellerOrderIssueSchema) });
 
 export const adminOrderSchema = z.object({
   id: z.string(), number: z.string(), version: z.number().int(), status: adminOrderStatusSchema,
@@ -32,7 +37,7 @@ export const adminOrderSchema = z.object({
   loyalty: orderLoyaltySchema,
   customer: customerSchema,
   fulfillment: z.discriminatedUnion('type', [shipmentSchema, pickupSchema]), items: z.array(itemSchema), reservations: z.array(reservationSchema),
-  payment: paymentSchema.nullable(), receipts: z.array(receiptSchema), timeline: z.array(timelineSchema), allowedActions: z.array(adminOrderActionSchema),
+  payment: paymentSchema.nullable(), receipts: z.array(receiptSchema), timeline: z.array(timelineSchema), sellerOrders: z.array(sellerOrderSchema).default([]), allowedActions: z.array(adminOrderActionSchema),
   expiresAt: z.string().nullable(), createdAt: z.string(), updatedAt: z.string(),
 });
 export type AdminOrder = z.infer<typeof adminOrderSchema>;

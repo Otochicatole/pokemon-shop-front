@@ -67,7 +67,7 @@ export const optionsSchema = z.object({
 });
 export type CheckoutOptions = z.infer<typeof optionsSchema>;
 
-export const affiliateSummarySchema = z.object({ id: z.string(), publicName: z.string() });
+export const affiliateSummarySchema = z.object({ id: z.string(), publicName: z.string(), status: z.enum(['ACTIVE', 'SUSPENDED']).default('ACTIVE') });
 export const userSchema = z.object({
   id: z.string(),
   email: z.string().email(),
@@ -144,7 +144,14 @@ export const orderLoyaltySchema = z.object({
 });
 export const orderTimelineEventSchema = z.object({ id: z.string(), fromStatus: z.string().nullable(), toStatus: z.string(), createdAt: z.string().or(z.date()) });
 export type OrderTimelineEvent = z.infer<typeof orderTimelineEventSchema>;
-export const orderSchema = z.object({ id: z.string(), number: z.string(), status: z.string(), paymentMethod: z.string(), fulfillmentType: z.string(), totals: z.object({ subtotal: moneySchema, discount: moneySchema, shipping: moneySchema, total: moneySchema }), loyalty: orderLoyaltySchema, expiresAt: z.string().nullable().optional(), items: z.array(z.object({ productId: z.string(), sku: z.string(), name: z.string(), quantity: z.number(), unitPrice: moneySchema, lineTotal: moneySchema })), timeline: z.array(orderTimelineEventSchema).default([]), fulfillment: z.record(z.string(), z.unknown()).optional(), payment: z.record(z.string(), z.unknown()).nullable().optional(), createdAt: z.string().or(z.date()) });
+export const sellerOrderBuyerSchema = z.object({
+  id: z.string(), number: z.string(), sellerType: z.enum(['STORE', 'AFFILIATE']), affiliateId: z.string().nullable(), sellerName: z.string(), sellerContactPhone: z.string().nullable().optional(),
+  status: z.string(), version: z.number().int(), allowedActions: z.array(z.string()).default([]), subtotal: moneySchema, shipping: moneySchema, commission: moneySchema, sellerNet: moneySchema,
+  fulfillmentType: z.enum(['SHIPMENT', 'PICKUP']), fulfillment: z.object({ type: z.string(), hidden: z.boolean().optional(), recipientName: z.string().nullable().optional(), recipientPhone: z.string().nullable().optional(), addressLine1: z.string().nullable().optional(), addressLine2: z.string().nullable().optional(), city: z.string().nullable().optional(), province: z.string().nullable().optional(), postalCode: z.string().nullable().optional(), pickupPointName: z.string().nullable().optional(), pickupPointAddress: z.string().nullable().optional() }),
+  carrier: z.string().nullable().optional(), trackingCode: z.string().nullable().optional(), items: z.array(z.object({ productId: z.string(), name: z.string(), quantity: z.number().int(), unitPrice: moneySchema, lineTotal: moneySchema })), timeline: z.array(orderTimelineEventSchema).default([]), issues: z.array(z.object({ id: z.string(), status: z.string(), reason: z.string(), createdAt: z.string().or(z.date()) }).passthrough()).default([]),
+}).passthrough();
+export type SellerOrderBuyer = z.infer<typeof sellerOrderBuyerSchema>;
+export const orderSchema = z.object({ id: z.string(), number: z.string(), status: z.string(), paymentMethod: z.string(), fulfillmentType: z.string(), totals: z.object({ subtotal: moneySchema, discount: moneySchema, shipping: moneySchema, total: moneySchema }), loyalty: orderLoyaltySchema, expiresAt: z.string().nullable().optional(), items: z.array(z.object({ productId: z.string(), sku: z.string(), name: z.string(), quantity: z.number(), unitPrice: moneySchema, lineTotal: moneySchema })), timeline: z.array(orderTimelineEventSchema).default([]), sellerOrders: z.array(sellerOrderBuyerSchema).default([]), fulfillment: z.record(z.string(), z.unknown()).optional(), payment: z.record(z.string(), z.unknown()).nullable().optional(), createdAt: z.string().or(z.date()) });
 export type Order = z.infer<typeof orderSchema>;
 export const problemSchema = z.object({ code: z.string(), status: z.number(), title: z.string(), requestId: z.string().optional(), details: z.unknown().optional() });
 export type Problem = z.infer<typeof problemSchema>;

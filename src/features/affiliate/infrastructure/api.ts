@@ -1,5 +1,5 @@
 import { apiFetch } from '@/shared/api/client';
-import { affiliateBalanceSchema, affiliateListingSchema, affiliateLogisticsSchema, affiliateOrderSchema, affiliateProfileSchema } from '../domain/contracts';
+import { affiliateBalanceSchema, affiliateListingSchema, affiliateLogisticsSchema, affiliateOrderSchema, affiliateOrdersEnvelopeSchema, affiliatePayoutsEnvelopeSchema, affiliateProfileSchema } from '../domain/contracts';
 
 function data<T>(payload: unknown): T {
   if (payload && typeof payload === 'object' && 'data' in payload) return (payload as { data: T }).data;
@@ -17,11 +17,22 @@ export async function getAffiliateLogistics() { return affiliateLogisticsSchema.
 export async function createAffiliateShippingZone(input: { name: string; provinces: string[] }) { return data(await apiFetch('/affiliate/shipping-zones', { method: 'POST', body: JSON.stringify(input) })); }
 export async function createAffiliateShippingRate(zoneId: string, input: { name: string; priceMinor: string }) { return data(await apiFetch(`/affiliate/shipping-zones/${zoneId}/rates`, { method: 'POST', body: JSON.stringify(input) })); }
 export async function createAffiliatePickupPoint(input: { name: string; address: string }) { return data(await apiFetch('/affiliate/pickup-points', { method: 'POST', body: JSON.stringify(input) })); }
-export async function listAffiliateOrders() { const rows = data<unknown[]>(await apiFetch('/affiliate/orders')); return rows.map((row) => affiliateOrderSchema.parse(row)); }
+export async function listAffiliateOrders() {
+  const payload = data<unknown>(await apiFetch('/affiliate/orders'));
+  const parsed = affiliateOrdersEnvelopeSchema.safeParse(payload);
+  if (parsed.success) return parsed.data.items;
+  if (Array.isArray(payload)) return payload.map((row) => affiliateOrderSchema.parse(row));
+  throw new Error('La respuesta de ventas del afiliado no tiene un formato válido');
+}
+export async function getAffiliateOrder(id: string) { const payload = data<{ order: unknown }>(await apiFetch(`/affiliate/orders/${id}`)); return affiliateOrderSchema.parse(payload.order); }
 export async function getAffiliateBalance() { return affiliateBalanceSchema.parse(data(await apiFetch('/affiliate/balance'))); }
 export async function requestAffiliatePayout(amountMinor: string) { return data(await apiFetch('/affiliate/payouts', { method: 'POST', body: JSON.stringify({ amountMinor }) })); }
-export async function updateAffiliateOrderStatus(id: string, input: { expectedVersion: number; status: string; note?: string }) { return data(await apiFetch(`/affiliate/orders/${id}/status`, { method: 'POST', body: JSON.stringify(input) })); }
+export async function listAffiliatePayouts(page = 1, pageSize = 20) { return affiliatePayoutsEnvelopeSchema.parse(data(await apiFetch(`/affiliate/payouts?page=${page}&pageSize=${pageSize}`))); }
+export async function updateAffiliateOrderStatus(id: string, input: { expectedVersion: number; status: string; note?: string; carrier?: string | null; trackingCode?: string | null }) { return data(await apiFetch(`/affiliate/orders/${id}/status`, { method: 'POST', body: JSON.stringify(input) })); }
 export async function requestAffiliateOrderCancellation(id: string, input: { expectedVersion: number; note: string }) { return data(await apiFetch(`/affiliate/orders/${id}/cancellation-request`, { method: 'POST', body: JSON.stringify(input) })); }
+export async function updateAffiliateShippingZone(id: string, input: Record<string, unknown>) { return data(await apiFetch(`/affiliate/shipping-zones/${id}`, { method: 'PATCH', body: JSON.stringify(input) })); }
+export async function updateAffiliateShippingRate(zoneId: string, rateId: string, input: Record<string, unknown>) { return data(await apiFetch(`/affiliate/shipping-zones/${zoneId}/rates/${rateId}`, { method: 'PATCH', body: JSON.stringify(input) })); }
+export async function updateAffiliatePickupPoint(id: string, input: Record<string, unknown>) { return data(await apiFetch(`/affiliate/pickup-points/${id}`, { method: 'PATCH', body: JSON.stringify(input) })); }
 
 export async function deleteAffiliateListing(id: string, expectedVersion: number) { await apiFetch(`/affiliate/listings/${id}`, { method: 'DELETE', body: JSON.stringify({ expectedVersion }) }); }
 export async function archiveAffiliateListing(id: string, expectedVersion: number) { return data(await apiFetch(`/affiliate/listings/${id}/archive`, { method: 'POST', body: JSON.stringify({ expectedVersion }) })); }
