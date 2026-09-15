@@ -1610,6 +1610,7 @@ button:disabled { cursor: not-allowed; opacity: .5; }
 
 .affiliate-new-form,
 .affiliate-compact-form { gap: 20px; }
+.affiliate-new-form { width: 100%; max-width: none; }
 .affiliate-new-form label,
 .affiliate-compact-form label,
 .affiliate-inline-grid label,
