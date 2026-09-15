@@ -1,30 +1,69 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { AlertTriangle, ArrowLeft, CheckCircle2, Coins, Truck } from 'lucide-react';
 import { toast } from 'sonner';
-import { confirmSellerOrder, getOrder, cancelOrder, openSellerOrderIssue } from '../infrastructure/api';
+import { confirmSellerOrder, getOrder, cancelOrder, openSellerOrderIssue, refreshOrderPaymentStatus } from '../infrastructure/api';
 import { resumePaymentSession, uploadReceipt } from '@/features/checkout/infrastructure/api';
 import { formatDate, formatMoney, statusLabel } from '@/shared/lib/format';
 import { Button } from '@/components/button';
 import { Dialog } from '@/components/overlay';
 
+const mercadoPagoReturnParams = [
+  'collection_id',
+  'collection_status',
+  'payment_id',
+  'status',
+  'external_reference',
+  'payment_type',
+  'merchant_order_id',
+  'preference_id',
+  'order_id',
+  'site_id',
+  'processing_mode',
+  'merchant_account_id',
+] as const;
+
 export function OrderDetail({ number }: { number: string }) {
   const queryClient = useQueryClient();
+  const paymentReturnRefreshKey = useRef<string | null>(null);
   const [pollingStopped, setPollingStopped] = useState(false);
   const query = useQuery({ queryKey: ['order', number], queryFn: () => getOrder(number), refetchInterval: (current) => !pollingStopped && ['PENDING_PAYMENT', 'PAYMENT_REVIEW'].includes(current.state.data?.status ?? '') ? 2000 : false, refetchIntervalInBackground: false });
   const [busy, setBusy] = useState(false);
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
   const [issueTarget, setIssueTarget] = useState<string | null>(null);
   const [issueReason, setIssueReason] = useState('');
+  const [refreshingPayment, setRefreshingPayment] = useState(false);
   const paymentPending = ['PENDING_PAYMENT', 'PAYMENT_REVIEW'].includes(query.data?.status ?? '');
+  const reconcilePaymentStatus = useCallback(async () => {
+    await refreshOrderPaymentStatus(number);
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: ['order', number], exact: true, refetchType: 'active' }),
+      queryClient.invalidateQueries({ queryKey: ['orders'] }),
+      queryClient.invalidateQueries({ queryKey: ['loyalty-account'] }),
+    ]);
+  }, [number, queryClient]);
   useEffect(() => {
-    if (!paymentPending) return;
+    if (!paymentPending || pollingStopped) return;
     const timer = window.setTimeout(() => setPollingStopped(true), 60_000);
     return () => window.clearTimeout(timer);
-  }, [paymentPending]);
+  }, [paymentPending, pollingStopped]);
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const paymentResult = params.get('payment');
+    const isPaymentReturn = paymentResult === 'success' || paymentResult === 'pending' || paymentResult === 'failure';
+    const hasMercadoPagoParams = mercadoPagoReturnParams.some((key) => params.has(key));
+    if (!isPaymentReturn && !hasMercadoPagoParams) return;
+
+    const refreshKey = `${number}?${params.toString()}`;
+    if (paymentReturnRefreshKey.current === refreshKey) return;
+    paymentReturnRefreshKey.current = refreshKey;
+
+    void reconcilePaymentStatus()
+      .catch((error) => toast.error(error instanceof Error ? error.message : 'No pudimos actualizar el estado del pago'));
+  }, [number, reconcilePaymentStatus]);
   if (query.isLoading) return <div className="page-loading">Cargando orden…</div>;
   if (query.isError || !query.data) return <div className="empty-state"><h1>Orden no encontrada</h1><Link href="/account/orders" className="button button-secondary">Volver a mis órdenes</Link></div>;
   const order = query.data;
@@ -74,6 +113,18 @@ export function OrderDetail({ number }: { number: string }) {
     } catch (error) { toast.error(error instanceof Error ? error.message : 'No se pudo retomar el pago'); }
     finally { setBusy(false); }
   };
+  const manuallyRefreshPaymentStatus = async () => {
+    if (refreshingPayment) return;
+    setRefreshingPayment(true);
+    try {
+      await reconcilePaymentStatus();
+      setPollingStopped(false);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'No pudimos actualizar el estado del pago');
+    } finally {
+      setRefreshingPayment(false);
+    }
+  };
   return <div className="order-page">
     <Link href="/account/orders" className="back-link"><ArrowLeft size={15} aria-hidden="true" />Volver a mis órdenes</Link>
     <div className="section-heading">
@@ -99,7 +150,7 @@ export function OrderDetail({ number }: { number: string }) {
         {payment?.method === 'MERCADO_PAGO' && payment.mercadoPago?.amount && <div className="bank-details"><strong>Total cobrado en Mercado Pago</strong><span>{formatMoney(payment.mercadoPago.amount)}</span>{payment.mercadoPago.rate && <span>Cotización DólarAPI blue venta: {payment.mercadoPago.rate.rate}</span>}</div>}
         {payment?.method === 'MERCADO_PAGO' && ['PENDING_PAYMENT', 'PAYMENT_REVIEW'].includes(order.status) && ['READY', 'RETRY_REQUIRED'].includes(payment.paymentSessionStatus ?? '') && <Button variant="secondary" disabled={busy} onClick={() => void resumeCheckout()}>{payment.paymentSessionStatus === 'READY' ? 'Pagar con Mercado Pago' : 'Retomar pago con Mercado Pago'}</Button>}
         {payment?.method === 'MERCADO_PAGO' && !pollingStopped && <p className="form-hint">Confirmando el estado del pago…</p>}
-        {payment?.method === 'MERCADO_PAGO' && pollingStopped && paymentPending && <div className="form-hint"><p>La confirmación está tardando más de lo esperado.</p><Button variant="ghost" disabled={query.isFetching} onClick={() => { setPollingStopped(false); void query.refetch(); }}>Actualizar estado</Button></div>}
+        {payment?.method === 'MERCADO_PAGO' && pollingStopped && paymentPending && <div className="form-hint"><p>La confirmación está tardando más de lo esperado.</p><Button variant="ghost" disabled={refreshingPayment || query.isFetching} onClick={() => void manuallyRefreshPaymentStatus()}>{refreshingPayment ? 'Actualizando…' : 'Actualizar estado'}</Button></div>}
         {payment?.bankInstructions && <div className="bank-details"><strong>Datos para transferir</strong><span>{payment.bankInstructions.bankName}</span><span>{payment.bankInstructions.accountHolder}</span>{payment.bankInstructions.cbu && <span>CBU: {payment.bankInstructions.cbu}</span>}{payment.bankInstructions.alias && <span>Alias: {payment.bankInstructions.alias}</span>}</div>}
         {payment?.method === 'BANK_TRANSFER' && !payment.receipt && canCancel && <label className="upload-box">Subir comprobante<input type="file" accept="image/jpeg,image/png,image/webp" disabled={busy} onChange={(event) => { const file = event.target.files?.[0]; if (file) void onReceipt(file); }} /></label>}
         {payment?.receipt && <p className="form-hint">Comprobante: {payment.receipt.review === 'APPROVED' ? 'aprobado' : payment.receipt.review === 'REJECTED' ? 'rechazado' : 'en revisión'}</p>}
