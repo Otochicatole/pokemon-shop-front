@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { useMutation, useQuery as useReactQuery, useQueryClient, type UseQueryResult } from '@tanstack/react-query';
-import { ArrowLeft, Check, Eye, RefreshCw, Search, Settings2, ShieldAlert, WalletCards, X } from 'lucide-react';
+import { ArrowDownToLine, ArrowLeft, Check, CircleDollarSign, Clock3, Eye, Landmark, RefreshCw, Search, Settings2, ShieldAlert, WalletCards, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { AdminPageHeader, Button, Dialog, TextareaField, TextField } from '@/components';
 import { adminErrorMessage, adminFetch } from '@/shared/admin/client';
@@ -19,6 +19,7 @@ type RefundInput = { amountMinor: string; reason: string; externalReference: str
 type Issue = { id: string; status: string; reason: string; resolutionNote?: string | null; createdAt: string; version?: number; affiliate: { id: string; publicName: string }; sellerOrder: SellerOrder };
 type Cancellation = { id: string; status: string; reason: string; resolutionNote?: string | null; version: number; createdAt: string; affiliate: { id: string; publicName: string }; sellerOrder: SellerOrder; orderNumber?: string };
 type Payout = { id: string; amountMinor: string; status: 'REQUESTED' | 'PROCESSING' | 'PAID' | 'REJECTED'; version: number; destinationLast4?: string | null; externalReference?: string | null; createdAt: string; affiliate: { id: string; publicName: string } };
+type PayoutDetail = { payout: Payout; availableMinor: string; ledger: Array<{ id: string; bucket: string; type: string; amountMinor: string; createdAt: string }> };
 type Summary = { affiliates: number; listings: Array<{ status: string; _count: { _all: number } }>; orders: Array<{ status: string; _count: { _all: number }; _sum: { sellerNetMinor: string | null } }>; queues: { issues: number; cancellations: number; payouts: number }; obligationsMinor: string };
 type QueryState<T> = { data: T; isLoading: boolean; isError: boolean; error: Error | null };
 
@@ -32,6 +33,9 @@ function money(value: string | null | undefined) { if (!value) return '—'; ret
 function label(value: string) { return value.replaceAll('_', ' ').toLowerCase().replace(/(^| )\w/g, (letter) => letter.toUpperCase()); }
 function date(value: string) { return new Intl.DateTimeFormat('es-AR', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value)); }
 function queryPage<T>(path: string) { return adminFetch<Page<T> | T[]>(path).then((result) => { const value = payload(result); return Array.isArray(value) ? { items: value, page: 1, pageSize: value.length, total: value.length, totalPages: 1 } : value; }); }
+function payoutStatusClass(status: string) { return `admin-payout-status is-${status.toLowerCase()}`; }
+function ledgerBucket(value: string) { return ({ AVAILABLE: 'Disponible', RESERVED: 'Reservado', PENDING: 'Pendiente', PAID: 'Pagado' } as Record<string, string>)[value] ?? label(value); }
+function ledgerType(value: string) { return ({ PAYOUT_RESERVED: 'Reserva del retiro', PAYOUT_PAID: 'Retiro pagado', PAYOUT_RELEASED: 'Reserva liberada', SALE_RELEASED: 'Venta liberada' } as Record<string, string>)[value] ?? label(value); }
 
 function Shell({ active, title, description, action, children }: { active: Section; title: string; description: string; action?: React.ReactNode; children: React.ReactNode }) { return <><AdminPageHeader eyebrow="Marketplace" title={title} description={description} actions={action} /><div className="affiliate-admin-layout"><AffiliateAdminNavigation active={active} /><div className="affiliate-admin-content">{children}</div></div></>; }
 function Feedback({ children, error = false }: { children: React.ReactNode; error?: boolean }) { return <div className={`admin-feedback ${error ? 'is-error' : ''}`} role={error ? 'alert' : undefined}>{children}</div>; }
@@ -131,6 +135,46 @@ function ResolutionDialog({ isIssue, resolution, note, setNote, decision, setDec
 }
 
 function Payouts({ id }: { id?: string }) {
+  return id ? <PayoutDetailView id={id} /> : <PayoutsLegacy />;
+}
+
+function PayoutDetailView({ id }: { id: string }) {
+  const [externalReference, setExternalReference] = useState('');
+  const [revealedDestination, setRevealedDestination] = useState<string | null>(null);
+  const client = useQueryClient();
+  const detail = useQuery({ queryKey: ['admin', 'affiliate-payout', id], queryFn: () => adminFetch<PayoutDetail>(`/admin/affiliates/payouts/${id}`).then(payload) });
+  const process = useMutation({ mutationFn: ({ row, next }: { row: Payout; next: 'PROCESSING' | 'PAID' | 'REJECTED' }) => { if (externalReference.trim().length < 2) throw new Error('Ingresá una referencia externa'); return adminFetch(`/admin/affiliates/payouts/${row.id}/process`, { method: 'POST', body: JSON.stringify({ expectedVersion: row.version, status: next, externalReference: externalReference.trim(), note: 'Procesado desde el panel administrativo.' }) }); }, onSuccess: () => { toast.success('Retiro actualizado'); void client.invalidateQueries({ queryKey: ['admin', 'affiliate-payouts'] }); void detail.refetch(); }, onError: (error) => toast.error(adminErrorMessage(error)) });
+  const reveal = useMutation({ mutationFn: () => adminFetch<{ destination: string; expiresInSeconds: number }>(`/admin/affiliates/payouts/${id}/reveal-destination`, { method: 'POST', body: JSON.stringify({}) }).then(payload), onSuccess: (result) => { setRevealedDestination(result.destination); toast.success(`Destino revelado por ${result.expiresInSeconds} segundos`); }, onError: (error) => toast.error(adminErrorMessage(error)) });
+  useEffect(() => { if (!revealedDestination) return; const timer = window.setTimeout(() => setRevealedDestination(null), 60_000); return () => window.clearTimeout(timer); }, [revealedDestination]);
+  return <Shell active="payouts" title="Detalle de retiro" description="Revisá el saldo del afiliado, protegé su destino y completá el circuito de pago." action={<Link className="button button-secondary" href="/admin/affiliates/payouts"><ArrowLeft size={16} />Volver a retiros</Link>}>
+    {detail.isLoading ? <Feedback>Cargando retiro…</Feedback> : detail.isError || !detail.data ? <Feedback error>{detail.error ? adminErrorMessage(detail.error) : 'No encontrado'}</Feedback> : <PayoutDetailContent detail={detail.data} externalReference={externalReference} setExternalReference={setExternalReference} revealedDestination={revealedDestination} revealPending={reveal.isPending} onReveal={() => reveal.mutate()} processPending={process.isPending} onProcess={(next) => process.mutate({ row: detail.data!.payout, next })} />}
+  </Shell>;
+}
+
+function PayoutDetailContent({ detail, externalReference, setExternalReference, revealedDestination, revealPending, onReveal, processPending, onProcess }: { detail: PayoutDetail; externalReference: string; setExternalReference: (value: string) => void; revealedDestination: string | null; revealPending: boolean; onReveal: () => void; processPending: boolean; onProcess: (next: 'PROCESSING' | 'PAID' | 'REJECTED') => void }) {
+  const { payout, availableMinor, ledger } = detail;
+  const canProcess = payout.status === 'REQUESTED' || payout.status === 'PROCESSING';
+  return <div className="admin-payout-detail">
+    <section className="admin-payout-hero">
+      <div className="admin-payout-hero-top"><span className="admin-payout-kicker"><WalletCards size={16} /> Operación financiera</span><span className={payoutStatusClass(payout.status)}>{label(payout.status)}</span></div>
+      <div className="admin-payout-hero-copy"><div><h2>{payout.affiliate.publicName}</h2><p>Solicitud creada el {date(payout.createdAt)}</p></div><div className="admin-payout-amount"><span>Monto solicitado</span><strong>{money(payout.amountMinor)}</strong></div></div>
+    </section>
+    <div className="admin-payout-summary">
+      <article className="admin-payout-summary-card is-highlight"><span><CircleDollarSign size={15} /> Disponible del afiliado</span><strong>{money(availableMinor)}</strong><small>Saldo actual luego de reservar este retiro</small></article>
+      <article className="admin-payout-summary-card"><span><ArrowDownToLine size={15} /> Importe reservado</span><strong>{money(payout.amountMinor)}</strong><small>Solicitud asociada a este movimiento</small></article>
+      <article className="admin-payout-summary-card"><span><Landmark size={15} /> Cuenta de destino</span><strong>{payout.destinationLast4 ? `•••• ${payout.destinationLast4}` : 'Sin cuenta'}</strong><small>La cuenta completa permanece protegida</small></article>
+    </div>
+    <div className="admin-payout-columns">
+      <div className="admin-payout-primary">
+        <section className="admin-payout-card"><div className="admin-payout-section-heading"><div className="admin-payout-icon"><CircleDollarSign size={18} /></div><div><span>Gestión</span><h3>Procesar retiro</h3></div></div><div className="admin-payout-meta"><div><span>Referencia registrada</span><strong>{payout.externalReference ?? 'Pendiente de cargar'}</strong></div><div><span>Creado</span><strong>{date(payout.createdAt)}</strong></div></div><div className="admin-payout-reveal"><div><span>Destino bancario</span><strong>{revealedDestination ?? (payout.destinationLast4 ? `Termina en ${payout.destinationLast4}` : 'No configurado')}</strong></div><Button variant="ghost" onClick={onReveal} disabled={revealPending || !payout.destinationLast4}><Eye size={15} />{revealPending ? 'Revelando…' : 'Revelar destino'}</Button></div>{canProcess && <div className="admin-payout-actions"><TextField label="Referencia externa del pago" value={externalReference} onChange={(event) => setExternalReference(event.target.value)} placeholder="Transferencia-2026-001" required /><div className="admin-row-actions">{payout.status === 'REQUESTED' && <Button onClick={() => onProcess('PROCESSING')} disabled={processPending || externalReference.trim().length < 2}>Pasar a procesando</Button>}{payout.status === 'PROCESSING' && <><Button onClick={() => onProcess('PAID')} disabled={processPending || externalReference.trim().length < 2}>Marcar pagado</Button><Button variant="danger" onClick={() => onProcess('REJECTED')} disabled={processPending || externalReference.trim().length < 2}>Rechazar</Button></>}</div></div>}{!canProcess && <div className="admin-payout-complete"><Check size={16} /> Este retiro ya fue {payout.status === 'PAID' ? 'pagado' : 'rechazado'}.</div>}</section>
+        <section className="admin-payout-card"><div className="admin-payout-section-heading"><div className="admin-payout-icon is-cyan"><Clock3 size={18} /></div><div><span>Contabilidad</span><h3>Movimientos del retiro</h3></div></div><div className="admin-payout-ledger">{ledger.map((entry) => <div className="admin-payout-ledger-row" key={entry.id}><div className="admin-payout-ledger-copy"><span className="admin-payout-ledger-bucket">{ledgerBucket(entry.bucket)}</span><strong>{ledgerType(entry.type)}</strong><small>{date(entry.createdAt)}</small></div><strong className={`admin-payout-ledger-amount ${entry.amountMinor.startsWith('-') ? 'is-negative' : 'is-positive'}`}>{money(entry.amountMinor)}</strong></div>)}</div></section>
+      </div>
+      <aside className="admin-payout-aside"><section className="admin-payout-card admin-payout-aside-card"><span className="admin-payout-aside-label">Estado de la operación</span><span className={payoutStatusClass(payout.status)}>{label(payout.status)}</span><p>El saldo disponible se calcula desde el ledger del afiliado y se actualiza con cada movimiento.</p></section><section className="admin-payout-card admin-payout-aside-card"><span className="admin-payout-aside-label">Controles de seguridad</span><div className="admin-payout-security-item"><Eye size={15} /><span>Destino enmascarado por defecto</span></div><div className="admin-payout-security-item"><Check size={15} /><span>Revelación auditada por administrador</span></div></section></aside>
+    </div>
+  </div>;
+}
+
+function PayoutsLegacy({ id }: { id?: string }) {
   const [status, setStatus] = useState(''); const [externalReference, setExternalReference] = useState(''); const [revealedDestination, setRevealedDestination] = useState<string | null>(null); const client = useQueryClient(); const query = useQuery({ queryKey: ['admin', 'affiliate-payouts', status], queryFn: () => queryPage<Payout>(`/admin/affiliates/payouts?pageSize=50${status ? `&status=${status}` : ''}`) });
   const detail = useQuery({ queryKey: ['admin', 'affiliate-payout', id], queryFn: () => adminFetch<{ payout: Payout; ledger: Array<{ id: string; bucket: string; type: string; amountMinor: string }> }>(`/admin/affiliates/payouts/${id}`).then(payload), enabled: Boolean(id) });
   const process = useMutation({ mutationFn: ({ row, next }: { row: Payout; next: 'PROCESSING' | 'PAID' | 'REJECTED' }) => { if (externalReference.trim().length < 2) throw new Error('Ingresá la referencia externa del pago'); return adminFetch(`/admin/affiliates/payouts/${row.id}/process`, { method: 'POST', body: JSON.stringify({ expectedVersion: row.version, status: next, externalReference: externalReference.trim(), note: 'Procesado desde el panel administrativo.' }) }); }, onSuccess: () => { toast.success('Retiro actualizado'); void client.invalidateQueries({ queryKey: ['admin', 'affiliate-payouts'] }); void detail.refetch(); }, onError: (error) => toast.error(adminErrorMessage(error)) });
