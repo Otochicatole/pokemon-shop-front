@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, CheckCircle2, Coins, ExternalLink, RefreshCw, RotateCcw, Undo2, XCircle } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, Coins, ExternalLink, Handshake, Package, RefreshCw, RotateCcw, Store, Undo2, XCircle } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { AdminDataTable, AdminPageHeader, Button, ConfirmDialog, Dialog, TextareaField, TextField } from '@/components';
@@ -61,7 +61,73 @@ function Detail({ order }: { order: AdminOrder }) {
 
 function SellerOrdersAdminSection({ order, onTransition, busy }: { order: AdminOrder; onTransition: (sellerOrder: SellerOrder, status: SellerOrder['status']) => void; busy: boolean }) {
   if (order.sellerOrders.length === 0) return null;
-  return <section className="admin-panel admin-seller-orders-panel"><div className="admin-panel-header"><div><span className="admin-panel-kicker">Operación logística</span><h2>Subórdenes por vendedor</h2></div><AdminBadge value={`${order.sellerOrders.length} vendedores`} /></div><div className="admin-panel-body seller-order-admin-list">{order.sellerOrders.map((sellerOrder) => { const transitions = sellerTransitions(sellerOrder); return <article className="seller-order-admin-card" key={sellerOrder.id}><div><span className="admin-panel-kicker">{sellerOrder.sellerType === 'AFFILIATE' ? 'Afiliado' : 'Tienda'}</span><h3>{sellerOrder.sellerName}</h3><p>{sellerOrder.number} · {adminLabel(sellerOrder.status)} · {sellerOrder.items.length} productos</p></div><div className="seller-order-admin-card-meta"><AdminBadge value={sellerOrder.status} /><span>{adminMoney(sellerOrder.sellerNet)}</span>{transitions.map((transition) => <Button key={transition.action} variant="secondary" onClick={() => onTransition(sellerOrder, transition.status)} disabled={busy}><CheckCircle2 size={16} />{transition.label}</Button>)}{sellerOrder.sellerType === 'AFFILIATE' && <Link className="button button-secondary" href={`/admin/affiliates/orders/${sellerOrder.id}`}>Ver detalle</Link>}</div></article>; })}</div></section>;
+  return (
+    <section className="admin-panel admin-seller-orders-panel">
+      <div className="admin-panel-header seller-order-admin-header">
+        <div>
+          <span className="admin-panel-kicker">Operación logística</span>
+          <h2>Subórdenes por vendedor</h2>
+          <p>Gestioná la preparación y entrega de cada vendedor por separado.</p>
+        </div>
+        <AdminBadge value={`${order.sellerOrders.length} ${order.sellerOrders.length === 1 ? 'vendedor' : 'vendedores'}`} />
+      </div>
+
+      <div className="admin-panel-body seller-order-admin-list">
+        {order.sellerOrders.map((sellerOrder) => {
+          const transitions = sellerTransitions(sellerOrder);
+          const isAffiliate = sellerOrder.sellerType === 'AFFILIATE';
+          const productCount = sellerOrder.items.length;
+          const hasActions = transitions.length > 0 || isAffiliate;
+
+          return (
+            <article className={`seller-order-admin-card ${isAffiliate ? 'is-affiliate' : 'is-store'}${hasActions ? '' : ' has-no-actions'}`} key={sellerOrder.id}>
+              <div className="seller-order-admin-identity">
+                <span className="seller-order-admin-icon" aria-hidden="true">
+                  {isAffiliate ? <Handshake size={21} /> : <Store size={21} />}
+                </span>
+                <div>
+                  <span className="seller-order-admin-type">{isAffiliate ? 'Afiliado' : 'Tienda propia'}</span>
+                  <h3>{sellerOrder.sellerName}</h3>
+                  <span className="seller-order-admin-number">{sellerOrder.number}</span>
+                </div>
+              </div>
+
+              <div className="seller-order-admin-summary">
+                <div className="seller-order-admin-summary-item">
+                  <span>Estado actual</span>
+                  <AdminBadge value={sellerOrder.status} />
+                </div>
+                <div className="seller-order-admin-summary-item">
+                  <span>{isAffiliate ? 'Neto afiliado' : 'Importe tienda'}</span>
+                  <strong>{adminMoney(sellerOrder.sellerNet)}</strong>
+                </div>
+                <div className="seller-order-admin-summary-item seller-order-admin-products">
+                  <span>Contenido</span>
+                  <strong><Package size={15} />{productCount} {productCount === 1 ? 'producto' : 'productos'}</strong>
+                </div>
+              </div>
+
+              {hasActions && (
+                <div className="seller-order-admin-actions">
+                  {transitions.map((transition) => (
+                    <Button key={transition.action} onClick={() => onTransition(sellerOrder, transition.status)} disabled={busy}>
+                      <CheckCircle2 size={16} />
+                      {transition.label}
+                    </Button>
+                  ))}
+                  {isAffiliate && (
+                    <Link className="button button-secondary" href={`/admin/affiliates/orders/${sellerOrder.id}`}>
+                      Ver detalle
+                    </Link>
+                  )}
+                </div>
+              )}
+            </article>
+          );
+        })}
+      </div>
+    </section>
+  );
 }
 
 export function AdminOrderDetailView({ number }: { number: string }) {
