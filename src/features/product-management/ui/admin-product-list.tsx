@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Eye, Plus, Search, Trash2 } from 'lucide-react';
 import { useState } from 'react';
-import { toast } from 'sonner';
+import { toast } from '@/components/feedback';
 import { AdminDataTable, AdminPageHeader, Button, ConfirmDialog, CursorPagination, SelectField, TextField } from '@/components';
 import { adminErrorMessage } from '@/shared/admin/client';
 import { adminMoney, AdminBadge } from '@/shared/admin/format';

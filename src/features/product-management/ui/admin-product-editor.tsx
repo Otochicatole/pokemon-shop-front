@@ -9,7 +9,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Archive, ArrowLeft, Check, ImagePlus, LoaderCircle, PackageCheck, Save, Search, Trash2, Upload } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { toast } from 'sonner';
+import { toast } from '@/components/feedback';
 import { AdminPageHeader, Button, ConfirmDialog, Dialog, ImageManager, MoneyField, SelectField, TextareaField, TextField } from '@/components';
 import { adminErrorMessage } from '@/shared/admin/client';
 import { adminDate, AdminBadge } from '@/shared/admin/format';

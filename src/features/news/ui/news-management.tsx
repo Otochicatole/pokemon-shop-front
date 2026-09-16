@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { toast } from 'sonner';
+import { toast } from '@/components/feedback';
 import { AdminDataTable, AdminPageHeader, Button, ConfirmDialog, CursorPagination, Dialog, SwitchField, TextareaField, TextField } from '@/components';
 import { adminErrorMessage } from '@/shared/admin/client';
 import { adminDate, AdminBadge } from '@/shared/admin/format';

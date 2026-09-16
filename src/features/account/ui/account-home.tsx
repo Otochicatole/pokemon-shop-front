@@ -12,7 +12,7 @@ import {
   Package,
   UserRound,
 } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from '@/components/feedback';
 import { Button } from '@/components/button';
 import { EmptyState, Notice } from '@/components/feedback';
 import { SectionHeading } from '@/components/heading';

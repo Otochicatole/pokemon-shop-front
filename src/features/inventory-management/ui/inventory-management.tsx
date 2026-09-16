@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { History, PackagePlus, RefreshCw } from 'lucide-react';
 import { useState } from 'react';
-import { toast } from 'sonner';
+import { toast } from '@/components/feedback';
 import { AdminDataTable, AdminPageHeader, Button, CursorPagination, Dialog, SelectField, TextField, TextareaField } from '@/components';
 import { adminErrorMessage } from '@/shared/admin/client';
 import { adminDate, AdminBadge } from '@/shared/admin/format';

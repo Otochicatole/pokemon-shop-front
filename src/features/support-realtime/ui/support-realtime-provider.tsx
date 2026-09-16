@@ -3,9 +3,9 @@
 import { createContext, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { toast } from 'sonner';
-import styles from './support-realtime-provider.module.css';
+import { toast } from '@/components/feedback';
 import { getMe } from '@/features/auth/infrastructure/api';
+import { RealtimeNotificationToast } from './realtime-notification-toast';
 import { markUserSessionEnded, refreshUserSessionFromCookie } from '@/features/auth/application/session-cache';
 import { getAdminMe } from '@/features/admin-auth/infrastructure/api';
 import { markAdminSessionEnded, refreshAdminSessionFromCookie } from '@/features/admin-auth/application/session-cache';
@@ -193,32 +193,51 @@ export function SupportRealtimeProvider({ children }: { children: ReactNode }) {
         if (event.type === 'notification.created') {
           void queryClient.invalidateQueries({ queryKey: ['notifications'] });
           const payload = notificationEventPayload(event);
-          const reference = payload?.reference;
-          const href = reference && typeof reference === 'object'
-            ? (reference as Record<string, unknown>).kind === 'ORDER' && typeof (reference as Record<string, unknown>).orderNumber === 'string'
-              ? `${role === 'admin' ? '/admin/orders' : '/account/orders'}/${encodeURIComponent(String((reference as Record<string, unknown>).orderNumber))}`
-              : (reference as Record<string, unknown>).kind === 'SUPPORT_CONVERSATION' && typeof (reference as Record<string, unknown>).conversationId === 'string'
-                ? `${role === 'admin' ? '/admin/support' : '/account/support'}/${encodeURIComponent(String((reference as Record<string, unknown>).conversationId))}`
-                : (role === 'admin' ? '/admin/notifications' : '/account/notifications')
-            : (role === 'admin' ? '/admin/notifications' : '/account/notifications');
-          const orderNumber = reference && typeof reference === 'object' && (reference as Record<string, unknown>).kind === 'ORDER' ? (reference as Record<string, unknown>).orderNumber : null;
-          if (typeof orderNumber === 'string') {
+          const reference = payload?.reference && typeof payload.reference === 'object'
+            ? payload.reference as Record<string, unknown>
+            : null;
+          const notificationsPath = role === 'admin' ? '/admin/notifications' : '/account/notifications';
+          let href = notificationsPath;
+          if (reference?.kind === 'ORDER' && typeof reference.orderNumber === 'string') {
+            href = `${role === 'admin' ? '/admin/orders' : '/account/orders'}/${encodeURIComponent(reference.orderNumber)}`;
+          } else if (reference?.kind === 'SUPPORT_CONVERSATION' && typeof reference.conversationId === 'string') {
+            href = `${role === 'admin' ? '/admin/support' : '/account/support'}/${encodeURIComponent(reference.conversationId)}`;
+          } else if (reference?.kind === 'SELLER_ORDER' && typeof reference.sellerOrderId === 'string') {
+            href = role === 'admin'
+              ? `/admin/affiliates/orders/${encodeURIComponent(reference.sellerOrderId)}`
+              : '/affiliate/orders';
+          } else if (reference?.kind === 'AFFILIATE_LISTING' && typeof reference.listingId === 'string') {
+            href = role === 'admin'
+              ? `/admin/affiliates/listings/${encodeURIComponent(reference.listingId)}`
+              : '/affiliate/listings';
+          } else if (reference?.kind === 'AFFILIATE_PAYOUT' && typeof reference.payoutId === 'string') {
+            href = role === 'admin'
+              ? `/admin/affiliates/payouts/${encodeURIComponent(reference.payoutId)}`
+              : '/affiliate/balance';
+          }
+          if (reference?.kind === 'ORDER' && typeof reference.orderNumber === 'string') {
             void queryClient.invalidateQueries({ queryKey: ['orders'] });
-            void queryClient.invalidateQueries({ queryKey: ['order', orderNumber] });
+            void queryClient.invalidateQueries({ queryKey: ['order', reference.orderNumber] });
           }
           playSupportNotificationSound();
           const title = String(payload?.title ?? 'Nueva notificación');
           const message = typeof payload?.message === 'string' ? payload.message : 'Tenés una novedad para revisar.';
-          toast.custom((id) => <button
-            type="button"
-            className={`${styles.realtimeNotificationToast} realtime-notification-toast`}
-            aria-label={`Abrir notificación: ${title}`}
-            onClick={() => { toast.dismiss(id); router.push(href); }}
-          >
-
-            <strong>{title}</strong>
-            <span>{message}</span>
-          </button>);
+          const type = typeof payload?.type === 'string' ? payload.type : undefined;
+          toast.custom(
+            (id) => (
+              <RealtimeNotificationToast
+                title={title}
+                message={message}
+                type={type}
+                variant={role === 'admin' ? 'admin' : 'store'}
+                onOpen={() => {
+                  toast.dismiss(id);
+                  router.push(href);
+                }}
+              />
+            ),
+            { duration: 6500, unstyled: true },
+          );
           return;
         }
 

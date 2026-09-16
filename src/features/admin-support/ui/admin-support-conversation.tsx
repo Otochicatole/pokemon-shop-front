@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, CheckCircle2, Clock3, MessageSquareReply, RefreshCw, Send, UserRound } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { toast } from 'sonner';
+import { toast } from '@/components/feedback';
 import { AdminPageHeader, Button, SelectField } from '@/components';
 import { useSupportRealtime } from '@/features/support-realtime';
 import { adminErrorMessage } from '@/shared/admin/client';

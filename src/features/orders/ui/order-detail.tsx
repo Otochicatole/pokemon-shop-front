@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { AlertTriangle, ArrowLeft, CheckCircle2, Coins, Truck } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from '@/components/feedback';
 import { StatusBadge } from '@/components/badge';
 import type { BadgeTone } from '@/components/badge';
 import { Button } from '@/components/button';

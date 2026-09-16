@@ -3,7 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Banknote, RefreshCw } from 'lucide-react';
 import { useState } from 'react';
-import { toast } from 'sonner';
+import { toast } from '@/components/feedback';
 import { AdminPageHeader, Button, SwitchField, TextField } from '@/components';
 import { adminErrorMessage } from '@/shared/admin/client';
 import type { AdminTransferSettings } from '../domain/contracts';

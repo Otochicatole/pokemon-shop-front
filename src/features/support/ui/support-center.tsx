@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, Clock3, Headphones, MessageCircleMore, Plus, RefreshCw } from 'lucide-react';
 import { type FormEvent, useState } from 'react';
-import { toast } from 'sonner';
+import { toast } from '@/components/feedback';
 import { Button } from '@/components/button';
 import { ErrorState } from '@/components/feedback';
 import { Dialog } from '@/components/overlay';

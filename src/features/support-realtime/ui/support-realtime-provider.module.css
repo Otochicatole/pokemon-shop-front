@@ -1,19 +1,23 @@
 .realtimeNotificationToast {
-  width: 100%;
+  width: min(100%, 360px);
   display: grid;
-  gap: 7px;
+  gap: 10px;
   padding: 14px 16px;
-  border: 1px solid #d8dde2;
-  border-radius: 6px;
-  background: #fff;
-  color: #1b2229;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, .16);
+  border: 2px solid rgba(255, 213, 47, .72);
+  border-radius: 0;
+  background: linear-gradient(135deg, rgba(255, 213, 47, .12), rgba(10, 16, 22, .98) 52%);
+  color: var(--ink);
+  box-shadow: 5px 5px 0 #05070a;
   text-align: left;
   cursor: pointer;
+  transition: border-color .15s, transform .15s, box-shadow .15s, background .15s;
 }
 
 .realtimeNotificationToast:hover {
-  background: #f5f7f8;
+  border-color: var(--accent);
+  background: linear-gradient(135deg, rgba(255, 213, 47, .16), rgba(10, 16, 22, .98) 58%);
+  box-shadow: 7px 7px 0 #05070a;
+  transform: translate(-2px, -2px);
 }
 
 .realtimeNotificationToast:focus-visible {
@@ -21,13 +25,167 @@
   outline-offset: 3px;
 }
 
-.realtimeNotificationToast strong {
-  font-size: 14px;
-  line-height: 1.35;
+.toastTop {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
 }
 
-.realtimeNotificationToast span {
-  color: #4f5b65;
+.toastIcon {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 34px;
+  border: 2px solid currentColor;
+}
+
+.toastIconSupport {
+  color: var(--cyan);
+  background: rgba(83, 190, 229, .1);
+}
+
+.toastIconOrder {
+  color: var(--green);
+  background: rgba(121, 201, 107, .1);
+}
+
+.toastIconPayment {
+  color: var(--accent);
+  background: rgba(255, 213, 47, .1);
+}
+
+.toastIconAffiliate {
+  color: var(--purple);
+  background: rgba(183, 123, 225, .1);
+}
+
+.toastBadge,
+.toastNew {
+  display: inline-grid;
+  place-items: center;
+  border: 2px solid currentColor;
+  font: 7px var(--pixel-font);
+  text-transform: uppercase;
+  min-height: 24px;
+  padding: 3px 7px;
+}
+
+.toastBadgeSupport {
+  color: var(--cyan);
+}
+
+.toastBadgeOrder {
+  color: var(--green);
+}
+
+.toastBadgePayment {
+  color: var(--accent);
+}
+
+.toastBadgeAffiliate {
+  color: var(--purple);
+}
+
+.toastNew {
+  margin-left: auto;
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #080a0e;
+}
+
+.toastTitle {
+  overflow: hidden;
+  color: var(--ink);
+  font: 10px/1.45 var(--pixel-font);
+  text-transform: uppercase;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.toastMessage {
+  overflow: hidden;
+  color: var(--muted);
   font-size: 13px;
-  line-height: 1.35;
+  line-height: 1.45;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.toastFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-top: 2px;
+  border-top: 1px solid var(--line);
+}
+
+.toastHint {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #80909c;
+  font-size: 11px;
+}
+
+.toastOpen {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--accent);
+  font: 7px var(--pixel-font);
+  text-transform: uppercase;
+}
+
+.realtimeNotificationToastAdmin {
+  border-color: rgba(83, 190, 229, .7);
+  background: linear-gradient(135deg, rgba(83, 190, 229, .12), rgba(10, 16, 22, .98) 52%);
+  font-family: 'Nunito', var(--font-geist), Arial, sans-serif;
+}
+
+.realtimeNotificationToastAdmin:hover {
+  border-color: var(--cyan);
+  background: linear-gradient(135deg, rgba(83, 190, 229, .16), rgba(10, 16, 22, .98) 58%);
+}
+
+.realtimeNotificationToastAdmin:focus-visible {
+  outline-color: var(--cyan);
+}
+
+.realtimeNotificationToastAdmin .toastTitle {
+  font: 800 15px/1.35 'Nunito', var(--font-geist), Arial, sans-serif;
+  text-transform: none;
+  letter-spacing: -.01em;
+}
+
+.realtimeNotificationToastAdmin .toastBadge,
+.realtimeNotificationToastAdmin .toastNew,
+.realtimeNotificationToastAdmin .toastScope,
+.realtimeNotificationToastAdmin .toastOpen {
+  font: 800 11px/1.3 'Nunito', var(--font-geist), Arial, sans-serif;
+  letter-spacing: .04em;
+}
+
+.realtimeNotificationToastAdmin .toastNew {
+  border-color: var(--cyan);
+  background: var(--cyan);
+  color: #05070a;
+}
+
+.realtimeNotificationToastAdmin .toastOpen {
+  color: var(--cyan);
+}
+
+.toastScope {
+  display: inline-grid;
+  place-items: center;
+  min-height: 24px;
+  padding: 3px 7px;
+  border: 2px solid var(--line-strong);
+  color: var(--muted);
+  font: 7px var(--pixel-font);
+  text-transform: uppercase;
 }

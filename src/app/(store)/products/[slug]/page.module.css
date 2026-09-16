@@ -214,8 +214,7 @@
 .detailDescriptionBlock {
   margin-top: 22px;
   padding: 16px 19px 17px;
-  border: 1px solid var(--line-strong);
-  border-left: 3px solid var(--cyan);
+  border: 2px solid var(--line-strong);
   background: linear-gradient(135deg, rgba(22,30,39,.72), rgba(12,18,25,.62));
 }
 

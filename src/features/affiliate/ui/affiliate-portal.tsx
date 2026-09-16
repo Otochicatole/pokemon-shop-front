@@ -6,7 +6,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState, type FormEvent } from 'react';
 import { useMutation, useQuery, useQueryClient, type UseQueryResult } from '@tanstack/react-query';
 import { Archive, ArrowLeft, CheckCircle2, ClipboardList, FilePlus2, ImagePlus, LayoutDashboard, MapPin, Package, Pencil, Plus, Store, Trash2, Truck, WalletCards, Settings, X } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from '@/components/feedback';
 import { Button } from '@/components/button';
 import { ApiError } from '@/shared/api/client';
 import { formatDate } from '@/shared/lib/format';

@@ -90,7 +90,7 @@
 .admin-topbar a:hover { color: var(--accent); }
 .admin-topbar-actions { display: flex; align-items: center; gap: 14px; }
 .admin-topbar .support-notification-link-admin { width: 38px; height: 38px; position: relative; display: grid; place-items: center; border: 2px solid var(--line); background: var(--surface); color: var(--muted); }
-.admin-topbar .support-notification-link-admin:hover, .admin-topbar .support-notification-link-admin:focus-visible, .admin-topbar .support-notification-link-admin.has-unread { border-color: var(--purple); color: var(--purple); }
+.admin-topbar .support-notification-link-admin:hover, .admin-topbar .support-notification-link-admin:focus-visible, .admin-topbar .support-notification-link-admin.has-unread { border-color: var(--cyan); color: var(--cyan); background: rgba(83, 190, 229, .1); }
 .admin-topbar .support-notification-link-admin span { min-width: 18px; height: 18px; position: absolute; top: -7px; right: -7px; display: grid; place-items: center; padding: 0 4px; border: 2px solid #070a0f; background: var(--warm); color: #fff; font: 700 10px/1.3 'Nunito', var(--font-geist), Arial, sans-serif; }
 .admin-breadcrumbs { min-width: 0; display: flex; align-items: center; gap: 8px; margin-right: auto; color: var(--muted); font: 700 12px/1.4 'Nunito', var(--font-geist), Arial, sans-serif; text-transform: uppercase; }
 .admin-breadcrumbs span { min-width: 0; display: flex; align-items: center; gap: 8px; }
@@ -198,7 +198,7 @@
 .affiliate-admin-settings-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; max-width: 980px; }
 .affiliate-admin-setting-card { display: grid; gap: 13px; margin-top: 12px; padding: 20px; border: 2px solid var(--line); background: rgba(10, 15, 21, .72); }
 .affiliate-admin-setting-description { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.55; }
-.affiliate-admin-settings-note { display: grid; gap: 7px; max-width: 980px; margin-top: 4px; padding: 16px 18px; border-left: 4px solid var(--cyan); background: rgba(83, 190, 229, .08); }
+.affiliate-admin-settings-note { display: grid; gap: 7px; max-width: 980px; margin-top: 4px; padding: 16px 18px; border: 2px solid rgba(83, 190, 229, .4); background: rgba(83, 190, 229, .08); }
 .affiliate-admin-settings-note strong { color: var(--cyan); font: 700 12px/1.4 'Nunito', var(--font-geist), Arial, sans-serif; text-transform: uppercase; }
 .affiliate-admin-settings-note p { margin: 0; color: #c8d6dd; font-size: 13px; line-height: 1.55; }
 .affiliate-admin-settings-actions { display: flex; align-items: center; justify-content: space-between; gap: 20px; max-width: 980px; margin-top: 4px; padding-top: 22px; border-top: 2px solid var(--line); }

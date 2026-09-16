@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Coins, Gift, Percent, RefreshCw } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from '@/components/feedback';
 import { AdminPageHeader, Button, MoneyField, SwitchField, TextField } from '@/components';
 import { adminErrorMessage } from '@/shared/admin/client';
 import { adminMoney } from '@/shared/admin/format';

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Coins } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from '@/components/feedback';
 import { useCartStore } from '@/features/cart/infrastructure/store';
 import { cartTotal } from '@/features/cart/domain/cart';
 import { getProduct } from '@/features/catalog/infrastructure/api';

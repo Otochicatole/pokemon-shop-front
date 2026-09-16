@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import { ShieldCheck } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from '@/components/feedback';
 import { PrimaryButton, TextField } from '@/components';
 import { adminErrorMessage } from '@/shared/admin/client';
 import { publishSessionSync } from '@/shared/auth/session-sync';

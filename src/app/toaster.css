@@ -1,0 +1,21 @@
+[data-sonner-toaster] {
+  --width: 360px;
+  --border-radius: 0;
+  font-family: 'Nunito', var(--font-geist), Arial, sans-serif;
+}
+
+/* Slot transparente: el contenido visual vive en AppToast / RealtimeNotificationToast */
+[data-sonner-toast].app-toast-slot,
+[data-sonner-toast][data-styled='false'] {
+  width: var(--width);
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: inherit !important;
+}
+
+[data-sonner-toast][data-y-position='bottom'] {
+  /* Sonner calcula --offset por altura; el gap del Toaster evita solapamiento */
+}

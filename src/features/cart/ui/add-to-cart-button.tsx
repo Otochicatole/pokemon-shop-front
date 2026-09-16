@@ -1,7 +1,7 @@
 'use client';
 import { Check, Plus } from 'lucide-react';
 import { useState } from 'react';
-import { toast } from 'sonner';
+import { toast } from '@/components/feedback';
 import type { Product } from '@/shared/api/contracts';
 import { Button } from '@/components/button';
 import { useCartStore } from '../infrastructure/store';

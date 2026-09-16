@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, CheckCircle2, Coins, ExternalLink, Handshake, Package, RefreshCw, RotateCcw, Store, Undo2, XCircle } from 'lucide-react';
 import { useState } from 'react';
-import { toast } from 'sonner';
+import { toast } from '@/components/feedback';
 import { AdminDataTable, AdminPageHeader, Button, ConfirmDialog, Dialog, TextareaField, TextField } from '@/components';
 import { adminErrorMessage } from '@/shared/admin/client';
 import { adminDate, AdminBadge, adminLabel, adminMoney } from '@/shared/admin/format';

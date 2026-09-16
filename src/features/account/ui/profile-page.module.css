@@ -128,7 +128,7 @@
 .profileError {
   margin: 0;
   padding: 12px 14px;
-  border-left: 4px solid var(--warm);
+  border: 2px solid rgba(255, 91, 85, .55);
   background: rgba(255, 91, 85, .12);
   color: #ffaaa6;
   font-size: 13px;

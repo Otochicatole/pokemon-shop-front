@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Boxes, ClipboardList, Coins, CreditCard, Gauge, Handshake, MessagesSquare, Newspaper, PackageSearch, Settings, Store, Truck, UsersRound } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from '@/components/feedback';
 import { AdminShell, type AdminNavigationItem } from '@/components/admin';
 import { adminErrorMessage } from '@/shared/admin/client';
 import { publishSessionSync } from '@/shared/auth/session-sync';

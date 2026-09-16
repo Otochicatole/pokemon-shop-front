@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Eye, MessageCirclePlus, MessagesSquare, RefreshCw, UserRound } from 'lucide-react';
 import { useDeferredValue, useState } from 'react';
-import { toast } from 'sonner';
+import { toast } from '@/components/feedback';
 import { AdminDataTable, AdminPageHeader, Button, CursorPagination, Dialog, SelectField, TextareaField, TextField } from '@/components';
 import type { AdminCustomer } from '@/features/customer-management/domain/contracts';
 import { listAdminCustomers } from '@/features/customer-management/infrastructure/api';

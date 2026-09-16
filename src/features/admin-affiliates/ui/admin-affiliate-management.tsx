@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Image from 'next/image';
 import { Check, Eye, RefreshCw, Search, UserPlus, UserRound, X } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from '@/components/feedback';
 import { AdminPageHeader, AdminTabPanel, AdminTabs, Button, Dialog, TextareaField, TextField } from '@/components';
 import type { AdminCustomer } from '@/features/customer-management/domain/contracts';
 import { listAdminCustomers } from '@/features/customer-management/infrastructure/api';

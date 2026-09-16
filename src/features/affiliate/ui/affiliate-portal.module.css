@@ -212,7 +212,6 @@
   min-height: 44px;
   padding: 0 11px;
   border: 2px solid transparent;
-  border-left-width: 3px;
   color: var(--muted);
   font: 8px var(--pixel-font);
   letter-spacing: .03em;
@@ -731,7 +730,7 @@
 .affiliateNewForm small,
 .affiliateCompactForm small { color: var(--muted); font: 11px/1.5 var(--font-geist), Arial, sans-serif; text-transform: none; }
 .affiliateNewForm :global(.form-hint),
-.affiliateCompactForm :global(.form-hint) { margin: 0; padding: 12px 14px; border-left: 4px solid var(--cyan); background: rgba(83, 190, 229, .06); }
+.affiliateCompactForm :global(.form-hint) { margin: 0; padding: 12px 14px; border: 2px solid rgba(83, 190, 229, .4); background: rgba(83, 190, 229, .06); }
 .affiliateNewForm input[type='file'] {
   min-height: 52px;
   padding: 14px;
@@ -1083,8 +1082,6 @@
   margin-bottom: 20px;
   padding: 14px 16px;
   border: 2px solid rgba(255, 213, 47, .45);
-  border-left-width: 4px;
-  border-left-color: var(--accent);
   background: rgba(255, 213, 47, .08);
 }
 .affiliateModalBalance span { color: var(--muted); font: 8px var(--pixel-font); text-transform: uppercase; }

@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, Shield, UserRound } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from '@/components/feedback';
 import { Button } from '@/components/button';
 import { EmptyState } from '@/components/feedback';
 import { getMe, updateProfile, type ProfileUpdateInput } from '@/features/auth/infrastructure/api';

@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { useMutation, useQuery as useReactQuery, useQueryClient, type UseQueryResult } from '@tanstack/react-query';
 import { ArrowDownToLine, ArrowLeft, Check, CircleDollarSign, Clock3, Eye, Landmark, RefreshCw, Search, Settings2, ShieldAlert, WalletCards, X } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from '@/components/feedback';
 import { AdminPageHeader, Button, Dialog, TextareaField, TextField } from '@/components';
 import { adminErrorMessage, adminFetch } from '@/shared/admin/client';
 import { AffiliateAdminNavigation, type AffiliateAdminSection } from './affiliate-admin-navigation';

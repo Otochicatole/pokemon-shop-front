@@ -133,7 +133,7 @@
 .catalogFacetWarning {
   margin: 12px 0 0;
   padding: 10px 12px;
-  border-left: 3px solid var(--warm);
+  border: 2px solid rgba(255, 91, 85, .45);
   background: rgba(255, 91, 85, .06);
   color: #e0b8b5;
   font-size: 11px;

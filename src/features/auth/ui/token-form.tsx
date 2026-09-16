@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
-import { toast } from 'sonner';
+import { toast } from '@/components/feedback';
 import { forgotPassword, resetPassword, verifyEmail } from '../infrastructure/api';
 import { refreshUserSessionFromCookie } from '../application/session-cache';
 import { publishSessionSync } from '@/shared/auth/session-sync';

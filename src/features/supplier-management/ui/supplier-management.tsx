@@ -5,7 +5,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { CheckCircle2, Mail, Pencil, Phone, Plus, RefreshCw, XCircle } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { useState } from 'react';
-import { toast } from 'sonner';
+import { toast } from '@/components/feedback';
 import { AdminDataTable, AdminPageHeader, Button, ConfirmDialog, CursorPagination, Dialog, TextareaField, TextField } from '@/components';
 import { adminErrorMessage } from '@/shared/admin/client';
 import { adminDate, AdminBadge } from '@/shared/admin/format';

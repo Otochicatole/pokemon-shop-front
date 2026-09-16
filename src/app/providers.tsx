@@ -1,11 +1,31 @@
 'use client';
+
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Toaster } from 'sonner';
 import { SupportRealtimeProvider } from '@/features/support-realtime';
-import styles from './providers.module.css';
+import './toaster.css';
 
 export function Providers({ children }: { children: React.ReactNode }) {
-  const [queryClient] = useState(() => new QueryClient({ defaultOptions: { queries: { staleTime: 15_000, retry: 1 } } }));
-  return <QueryClientProvider client={queryClient}><SupportRealtimeProvider>{children}</SupportRealtimeProvider><Toaster position="bottom-right" richColors /></QueryClientProvider>;
+  const [queryClient] = useState(() => new QueryClient({
+    defaultOptions: { queries: { staleTime: 15_000, retry: 1 } },
+  }));
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <SupportRealtimeProvider>{children}</SupportRealtimeProvider>
+      <Toaster
+        theme="dark"
+        position="bottom-right"
+        expand
+        gap={14}
+        visibleToasts={6}
+        offset={20}
+        toastOptions={{
+          unstyled: true,
+          className: 'app-toast-slot',
+        }}
+      />
+    </QueryClientProvider>
+  );
 }

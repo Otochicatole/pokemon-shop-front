@@ -3,7 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { MapPin, Pencil, Plus, RefreshCw, Truck } from 'lucide-react';
 import { useState } from 'react';
-import { toast } from 'sonner';
+import { toast } from '@/components/feedback';
 import { AdminPageHeader, AdminTabPanel, AdminTabs, Button, Dialog, MoneyField, SwitchField, TextareaField, TextField } from '@/components';
 import { adminErrorMessage } from '@/shared/admin/client';
 import { adminMoney } from '@/shared/admin/format';
