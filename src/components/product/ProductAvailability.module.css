@@ -1,0 +1,18 @@
+.stockMuted,
+.stockWarn,
+.stockAvailable {
+  margin: 10px 0 0;
+  font: 9px var(--pixel-font);
+}
+
+.stockMuted {
+  color: var(--muted);
+}
+
+.stockWarn {
+  color: var(--warm);
+}
+
+.stockAvailable {
+  color: var(--green);
+}

@@ -16,6 +16,7 @@ import { getCheckoutOptions, previewCheckout, createOrder } from '../infrastruct
 import { getMe } from '@/features/auth/infrastructure/api';
 import { getLoyaltyAccount } from '@/features/loyalty';
 import type { CheckoutPreview, OrderInput } from '@/shared/api/contracts';
+import styles from './checkout-flow.module.css';
 
 type SellerDeliverySelection = { delivery: 'PICKUP' | 'SHIPMENT'; pickupPointId?: string; shippingRateId?: string };
 
@@ -152,10 +153,380 @@ export function CheckoutFlow() {
   if (!me.data.emailVerified) return <div className="empty-state"><h2>Verificá tu email</h2><p>Revisá tu correo y luego volvé a intentar el checkout.</p><Link href="/auth/verify-email" className="button button-secondary">Verificar email</Link></div>;
   if (!items.length) return <div className="empty-state"><h2>Tu carrito está vacío</h2><Link href="/catalog" className="button button-primary">Explorar catálogo</Link></div>;
 
-  return <div className="checkout-layout"><div className="checkout-main"><div className="section-heading checkout-heading"><p className="eyebrow">Paso final · Compra segura</p><h1>Confirmá tu compra</h1><p>Revisá la entrega, elegí cómo pagar y confirmá. El total, el stock y tus puntos se validan nuevamente en el servidor.</p><div className="checkout-progress" aria-label="Progreso del checkout"><span className="is-active">1 Entrega</span><span className="is-active">2 Pago</span><span>3 Confirmación</span></div></div>
-    {sellerOptions.length > 1 && <section className="checkout-section checkout-delivery-section seller-delivery-groups"><h2>1. Entrega por vendedor</h2><p className="form-hint">Elegí una opción independiente para cada vendedor. La dirección se comparte entre los envíos.</p>{sellerOptions.map((seller) => { const selection = sellerSelections[seller.sellerKey] ?? { delivery: seller.pickupPoints.length ? 'PICKUP' : 'SHIPMENT' }; return <div className="seller-delivery-group" key={seller.sellerKey}><h3>{seller.seller.name}</h3><div className="segmented"><button type="button" className={selection.delivery === 'PICKUP' ? 'active' : ''} disabled={!seller.pickupPoints.length} onClick={() => { setSellerSelections((current) => ({ ...current, [seller.sellerKey]: { ...selection, delivery: 'PICKUP', pickupPointId: selection.pickupPointId ?? seller.pickupPoints[0]?.id } })); resetQuote(); }}>Retiro</button><button type="button" className={selection.delivery === 'SHIPMENT' ? 'active' : ''} disabled={!seller.shippingZones.some((zone) => zone.rates.length)} onClick={() => { setSellerSelections((current) => ({ ...current, [seller.sellerKey]: { ...selection, delivery: 'SHIPMENT', shippingRateId: selection.shippingRateId ?? seller.shippingZones[0]?.rates[0]?.id } })); resetQuote(); }}>Envío</button></div>{selection.delivery === 'PICKUP' ? <label>Punto de retiro<select value={selection.pickupPointId ?? ''} onChange={(event) => { setSellerSelections((current) => ({ ...current, [seller.sellerKey]: { ...selection, pickupPointId: event.target.value } })); resetQuote(); }}><option value="">Elegí un punto</option>{seller.pickupPoints.map((point) => <option key={point.id} value={point.id}>{point.name} · {point.address}</option>)}</select></label> : <label>Tarifa de envío<select value={selection.shippingRateId ?? ''} onChange={(event) => { setSellerSelections((current) => ({ ...current, [seller.sellerKey]: { ...selection, shippingRateId: event.target.value } })); resetQuote(); }}><option value="">Elegí una tarifa</option>{seller.shippingZones.flatMap((zone) => zone.rates.map((rate) => <option key={rate.id} value={rate.id}>{zone.name} · {rate.name} · {formatMoney(rate.price)}</option>))}</select></label>}</div>})}<div className="form-grid">{[['recipientName','Nombre completo'],['recipientPhone','Teléfono'],['addressLine1','Dirección'],['addressLine2','Piso/departamento (opcional)'],['city','Ciudad'],['province','Provincia'],['postalCode','Código postal']].map(([key,label]) => <label key={key}>{label}<input value={form[key as keyof typeof form]} onChange={update(key as keyof typeof form)} /></label>)}</div></section>}
-    <section className="checkout-section checkout-delivery-section" style={sellerOptions.length > 1 ? { display: 'none' } : undefined}><h2>1. Entrega</h2><div className="segmented"><button type="button" className={delivery === 'PICKUP' ? 'active' : ''} onClick={() => { setDelivery('PICKUP'); resetQuote(); }}>Retiro</button><button type="button" className={delivery === 'SHIPMENT' ? 'active' : ''} onClick={() => { setDelivery('SHIPMENT'); resetQuote(); }}>Envío</button></div>{delivery === 'PICKUP' ? <label>Punto de retiro<select value={pickupPointId} onChange={(event) => { setPickupPointId(event.target.value); resetQuote(); }}><option value="">Elegí un punto</option>{options.data?.fulfillment.pickupPoints.map((point) => <option key={point.id} value={point.id}>{point.name} · {point.address}</option>)}</select></label> : <><label>Tarifa de envío<select value={shippingRateId} onChange={(event) => { setShippingRateId(event.target.value); resetQuote(); }}><option value="">Elegí una tarifa</option>{options.data?.fulfillment.shippingZones.flatMap((zone) => zone.rates.map((rate) => <option key={rate.id} value={rate.id}>{zone.name} · {rate.name} · {formatMoney(rate.price)}</option>))}</select></label><div className="form-grid">{[['recipientName','Nombre completo'],['recipientPhone','Teléfono'],['addressLine1','Dirección'],['addressLine2','Piso/departamento (opcional)'],['city','Ciudad'],['province','Provincia'],['postalCode','Código postal']].map(([key,label]) => <label key={key}>{label}<input value={form[key as keyof typeof form]} onChange={update(key as keyof typeof form)} /></label>)}</div></>}</section>
-    <section className="checkout-section checkout-payment-section"><h2>2. Medio de pago</h2><p className="checkout-section-intro">Elegí una opción. Si seleccionás Mercado Pago, te llevaremos a su checkout seguro para completar el pago.</p><div className="payment-options">{options.data?.paymentMethods.BANK_TRANSFER && <label className={`payment-option ${paymentMethod === 'BANK_TRANSFER' ? 'selected' : ''}`}><input type="radio" checked={paymentMethod === 'BANK_TRANSFER'} onChange={() => { setPaymentMethod('BANK_TRANSFER'); resetQuote(); }} /> <span><strong>Transferencia bancaria</strong><small>Recibí los datos después de crear la orden.</small></span></label>}{options.data?.paymentMethods.MERCADO_PAGO && <label className={`payment-option ${paymentMethod === 'MERCADO_PAGO' ? 'selected' : ''}`}><input type="radio" checked={paymentMethod === 'MERCADO_PAGO'} onChange={() => { setPaymentMethod('MERCADO_PAGO'); resetQuote(); }} /> <span><strong>Mercado Pago</strong><small>Tarjetas, débito, saldo y checkout seguro del proveedor.</small></span></label>}{!options.data?.paymentMethods.MERCADO_PAGO && options.data?.paymentMethodUnavailableReasons?.MERCADO_PAGO && <p className="form-hint">Mercado Pago no está disponible temporalmente; podés continuar con transferencia.</p>}{!options.data?.paymentMethods.BANK_TRANSFER && !options.data?.paymentMethods.MERCADO_PAGO && <p className="form-hint checkout-payment-empty">No hay medios de pago disponibles en este momento. Intentá nuevamente más tarde.</p>}</div></section>
-    <section className="checkout-section loyalty-checkout"><div className="loyalty-checkout-title"><div className="loyalty-icon"><Coins size={21} /></div><div><h2>3. Usar puntos</h2><p>{account ? `${account.available} puntos disponibles` : 'Consultando saldo…'}</p></div></div>{program?.enabled ? <><div className="loyalty-redeem-control"><label htmlFor="points-to-redeem">Puntos a canjear<input id="points-to-redeem" type="number" min="0" max={estimatedMaxPoints} step="1" inputMode="numeric" value={pointsToRedeem} onChange={(event) => { const value = Number(event.target.value); setPointsToRedeem(Number.isInteger(value) && value >= 0 ? value : 0); resetQuote(); }} /></label><button type="button" disabled={estimatedMaxPoints < program.minimumRedemptionPoints} onClick={() => { setPointsToRedeem(estimatedMaxPoints); resetQuote(); }}>Usar máximo</button></div><p className="form-hint">Canje mínimo: {program.minimumRedemptionPoints} puntos. Cada punto descuenta {formatMoney(program.pointValue)} y podés cubrir hasta el {program.maximumRedemptionPercent}% de los productos. {syncingCart ? 'Actualizando precios…' : `Máximo para esta compra: ${estimatedMaxPoints} puntos.`}</p>{pointsBelowMinimum && <p className="loyalty-inline-error">Necesitás al menos {program.minimumRedemptionPoints} puntos para canjear.</p>}{pointsAboveMaximum && <p className="loyalty-inline-error">Podés usar hasta {estimatedMaxPoints} puntos en esta compra.</p>}</> : <p className="form-hint">El programa de puntos está temporalmente pausado. Tu saldo se conserva.</p>}</section>
-  </div><aside className="checkout-summary"><div className="checkout-summary-header"><div><p className="eyebrow">Revisión final</p><h2>Resumen</h2></div><span className="checkout-summary-count">{items.length} {items.length === 1 ? 'producto' : 'productos'}</span></div><div className="checkout-summary-details">{items.map((item) => <div className="summary-line" key={item.id}><span>{item.name} × {item.quantity}</span><strong>{formatMoney({ amountMinor: (BigInt(item.price.amountMinor) * BigInt(item.quantity)).toString(), currency: BASE_CURRENCY })}</strong></div>)}<div className="summary-line"><span>Subtotal</span><strong>{quote ? formatMoney(quote.subtotal) : formatMoney({ amountMinor: cartTotal(items).toString(), currency: BASE_CURRENCY })}</strong></div>{quote && BigInt(quote.discount.amountMinor) > 0n && <div className="summary-line loyalty-discount"><span>Descuento por puntos</span><strong>−{formatMoney(quote.discount)}</strong></div>}{quote && <div className="summary-line"><span>Envío</span><strong>{formatMoney(quote.shipping)}</strong></div>}</div><div className="summary-total"><span>Total USD</span><strong className={!quote ? 'summary-pending' : undefined}>{quote ? formatMoney(quote.total) : 'Validá para calcular'}</strong></div>{quote?.mercadoPago && <div className="payment-quote"><div className="summary-line"><span>Total a pagar en ARS</span><strong>{formatMoney(quote.mercadoPago.total)}</strong></div><p className="form-hint">DólarAPI blue venta: {quote.mercadoPago.rate} · obtenido {new Date(quote.mercadoPago.fetchedAt).toLocaleTimeString()} · vigente hasta {new Date(quote.mercadoPago.expiresAt).toLocaleTimeString()}</p></div>}{quote && <div className="loyalty-earn-note"><Coins size={17} /><span>Esta compra sumará <strong>{quote.loyalty.pointsToEarn} puntos</strong> cuando se acredite el pago.</span></div>}<Button disabled={!input || syncingCart || busy || pointsBelowMinimum || pointsAboveMaximum || (!options.data?.paymentMethods.BANK_TRANSFER && !options.data?.paymentMethods.MERCADO_PAGO)} onClick={quote ? submit : quoteIt}>{syncingCart ? 'Actualizando precios…' : busy ? 'Validando…' : quote ? 'Crear orden' : 'Validar total'}</Button><p className="form-hint checkout-summary-hint">El precio y el saldo mostrado son informativos hasta la validación final.</p></aside></div>;
+  return (
+    <div className={`${styles.checkoutLayout} checkout-layout`}>
+      <div className={`${styles.checkoutMain} checkout-main`}>
+        <div className={`${styles.checkoutHeading} section-heading checkout-heading`}>
+          <p className="eyebrow">Paso final · Compra segura</p>
+          <h1>Confirmá tu compra</h1>
+          <p>Revisá la entrega, elegí cómo pagar y confirmá. El total, el stock y tus puntos se validan nuevamente en el servidor.</p>
+          <div className={`${styles.checkoutProgress} checkout-progress`} aria-label="Progreso del checkout">
+            <span className={`${styles.isActive} is-active`}>1 Entrega</span>
+            <span className={`${styles.isActive} is-active`}>2 Pago</span>
+            <span>3 Confirmación</span>
+          </div>
+        </div>
+
+        {sellerOptions.length > 1 && (
+          <section className={`${styles.checkoutSection} ${styles.sellerDeliveryGroups} checkout-section checkout-delivery-section seller-delivery-groups`}>
+            <h2>1. Entrega por vendedor</h2>
+            <p className="form-hint">Elegí una opción independiente para cada vendedor. La dirección se comparte entre los envíos.</p>
+            {sellerOptions.map((seller) => {
+              const selection = sellerSelections[seller.sellerKey] ?? { delivery: seller.pickupPoints.length ? 'PICKUP' : 'SHIPMENT' };
+              return (
+                <div className={`${styles.sellerDeliveryGroup} seller-delivery-group`} key={seller.sellerKey}>
+                  <h3>{seller.seller.name}</h3>
+                  <div className={`${styles.segmented} segmented`}>
+                    <button
+                      type="button"
+                      className={selection.delivery === 'PICKUP' ? 'active' : ''}
+                      disabled={!seller.pickupPoints.length}
+                      onClick={() => {
+                        setSellerSelections((current) => ({ ...current, [seller.sellerKey]: { ...selection, delivery: 'PICKUP', pickupPointId: selection.pickupPointId ?? seller.pickupPoints[0]?.id } }));
+                        resetQuote();
+                      }}
+                    >
+                      Retiro
+                    </button>
+                    <button
+                      type="button"
+                      className={selection.delivery === 'SHIPMENT' ? 'active' : ''}
+                      disabled={!seller.shippingZones.some((zone) => zone.rates.length)}
+                      onClick={() => {
+                        setSellerSelections((current) => ({ ...current, [seller.sellerKey]: { ...selection, delivery: 'SHIPMENT', shippingRateId: selection.shippingRateId ?? seller.shippingZones[0]?.rates[0]?.id } }));
+                        resetQuote();
+                      }}
+                    >
+                      Envío
+                    </button>
+                  </div>
+                  {selection.delivery === 'PICKUP' ? (
+                    <label>
+                      Punto de retiro
+                      <select
+                        value={selection.pickupPointId ?? ''}
+                        onChange={(event) => {
+                          setSellerSelections((current) => ({ ...current, [seller.sellerKey]: { ...selection, pickupPointId: event.target.value } }));
+                          resetQuote();
+                        }}
+                      >
+                        <option value="">Elegí un punto</option>
+                        {seller.pickupPoints.map((point) => (
+                          <option key={point.id} value={point.id}>
+                            {point.name} · {point.address}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                  ) : (
+                    <label>
+                      Tarifa de envío
+                      <select
+                        value={selection.shippingRateId ?? ''}
+                        onChange={(event) => {
+                          setSellerSelections((current) => ({ ...current, [seller.sellerKey]: { ...selection, shippingRateId: event.target.value } }));
+                          resetQuote();
+                        }}
+                      >
+                        <option value="">Elegí una tarifa</option>
+                        {seller.shippingZones.flatMap((zone) =>
+                          zone.rates.map((rate) => (
+                            <option key={rate.id} value={rate.id}>
+                              {zone.name} · {rate.name} · {formatMoney(rate.price)}
+                            </option>
+                          )),
+                        )}
+                      </select>
+                    </label>
+                  )}
+                </div>
+              );
+            })}
+            <div className={`${styles.formGrid} form-grid`}>
+              {[
+                ['recipientName', 'Nombre completo'],
+                ['recipientPhone', 'Teléfono'],
+                ['addressLine1', 'Dirección'],
+                ['addressLine2', 'Piso/departamento (opcional)'],
+                ['city', 'Ciudad'],
+                ['province', 'Provincia'],
+                ['postalCode', 'Código postal'],
+              ].map(([key, label]) => (
+                <label key={key}>
+                  {label}
+                  <input value={form[key as keyof typeof form]} onChange={update(key as keyof typeof form)} />
+                </label>
+              ))}
+            </div>
+          </section>
+        )}
+
+        <section className={`${styles.checkoutSection} checkout-section checkout-delivery-section`} style={sellerOptions.length > 1 ? { display: 'none' } : undefined}>
+          <h2>1. Entrega</h2>
+          <div className={`${styles.segmented} segmented`}>
+            <button
+              type="button"
+              className={delivery === 'PICKUP' ? 'active' : ''}
+              onClick={() => {
+                setDelivery('PICKUP');
+                resetQuote();
+              }}
+            >
+              Retiro
+            </button>
+            <button
+              type="button"
+              className={delivery === 'SHIPMENT' ? 'active' : ''}
+              onClick={() => {
+                setDelivery('SHIPMENT');
+                resetQuote();
+              }}
+            >
+              Envío
+            </button>
+          </div>
+          {delivery === 'PICKUP' ? (
+            <label>
+              Punto de retiro
+              <select
+                value={pickupPointId}
+                onChange={(event) => {
+                  setPickupPointId(event.target.value);
+                  resetQuote();
+                }}
+              >
+                <option value="">Elegí un punto</option>
+                {options.data?.fulfillment.pickupPoints.map((point) => (
+                  <option key={point.id} value={point.id}>
+                    {point.name} · {point.address}
+                  </option>
+                ))}
+              </select>
+            </label>
+          ) : (
+            <>
+              <label>
+                Tarifa de envío
+                <select
+                  value={shippingRateId}
+                  onChange={(event) => {
+                    setShippingRateId(event.target.value);
+                    resetQuote();
+                  }}
+                >
+                  <option value="">Elegí una tarifa</option>
+                  {options.data?.fulfillment.shippingZones.flatMap((zone) =>
+                    zone.rates.map((rate) => (
+                      <option key={rate.id} value={rate.id}>
+                        {zone.name} · {rate.name} · {formatMoney(rate.price)}
+                      </option>
+                    )),
+                  )}
+                </select>
+              </label>
+              <div className={`${styles.formGrid} form-grid`}>
+                {[
+                  ['recipientName', 'Nombre completo'],
+                  ['recipientPhone', 'Teléfono'],
+                  ['addressLine1', 'Dirección'],
+                  ['addressLine2', 'Piso/departamento (opcional)'],
+                  ['city', 'Ciudad'],
+                  ['province', 'Provincia'],
+                  ['postalCode', 'Código postal'],
+                ].map(([key, label]) => (
+                  <label key={key}>
+                    {label}
+                    <input value={form[key as keyof typeof form]} onChange={update(key as keyof typeof form)} />
+                  </label>
+                ))}
+              </div>
+            </>
+          )}
+        </section>
+
+        <section className={`${styles.checkoutSection} checkout-section checkout-payment-section`}>
+          <h2>2. Medio de pago</h2>
+          <p className={`${styles.checkoutSectionIntro} checkout-section-intro`}>
+            Elegí una opción. Si seleccionás Mercado Pago, te llevaremos a su checkout seguro para completar el pago.
+          </p>
+          <div className={`${styles.paymentOptions} payment-options`}>
+            {options.data?.paymentMethods.BANK_TRANSFER && (
+              <label className={`${styles.paymentOption} ${paymentMethod === 'BANK_TRANSFER' ? `${styles.selected} selected` : ''} payment-option`}>
+                <input
+                  type="radio"
+                  checked={paymentMethod === 'BANK_TRANSFER'}
+                  onChange={() => {
+                    setPaymentMethod('BANK_TRANSFER');
+                    resetQuote();
+                  }}
+                />
+                <span>
+                  <strong>Transferencia bancaria</strong>
+                  <small>Recibí los datos después de crear la orden.</small>
+                </span>
+              </label>
+            )}
+            {options.data?.paymentMethods.MERCADO_PAGO && (
+              <label className={`${styles.paymentOption} ${paymentMethod === 'MERCADO_PAGO' ? `${styles.selected} selected` : ''} payment-option`}>
+                <input
+                  type="radio"
+                  checked={paymentMethod === 'MERCADO_PAGO'}
+                  onChange={() => {
+                    setPaymentMethod('MERCADO_PAGO');
+                    resetQuote();
+                  }}
+                />
+                <span>
+                  <strong>Mercado Pago</strong>
+                  <small>Tarjetas, débito, saldo y checkout seguro del proveedor.</small>
+                </span>
+              </label>
+            )}
+            {!options.data?.paymentMethods.MERCADO_PAGO && options.data?.paymentMethodUnavailableReasons?.MERCADO_PAGO && (
+              <p className="form-hint">Mercado Pago no está disponible temporalmente; podés continuar con transferencia.</p>
+            )}
+            {!options.data?.paymentMethods.BANK_TRANSFER && !options.data?.paymentMethods.MERCADO_PAGO && (
+              <p className={`${styles.checkoutPaymentEmpty} form-hint checkout-payment-empty`}>
+                No hay medios de pago disponibles en este momento. Intentá nuevamente más tarde.
+              </p>
+            )}
+          </div>
+        </section>
+
+        <section className={`${styles.checkoutSection} ${styles.loyaltyCheckout} checkout-section loyalty-checkout`}>
+          <div className={`${styles.loyaltyCheckoutTitle} loyalty-checkout-title`}>
+            <div className={`${styles.loyaltyIcon} loyalty-icon`}>
+              <Coins size={21} />
+            </div>
+            <div>
+              <h2>3. Usar puntos</h2>
+              <p>{account ? `${account.available} puntos disponibles` : 'Consultando saldo…'}</p>
+            </div>
+          </div>
+          {program?.enabled ? (
+            <>
+              <div className={`${styles.loyaltyRedeemControl} loyalty-redeem-control`}>
+                <label htmlFor="points-to-redeem">
+                  Puntos a canjear
+                  <input
+                    id="points-to-redeem"
+                    type="number"
+                    min="0"
+                    max={estimatedMaxPoints}
+                    step="1"
+                    inputMode="numeric"
+                    value={pointsToRedeem}
+                    onChange={(event) => {
+                      const value = Number(event.target.value);
+                      setPointsToRedeem(Number.isInteger(value) && value >= 0 ? value : 0);
+                      resetQuote();
+                    }}
+                  />
+                </label>
+                <button
+                  type="button"
+                  disabled={estimatedMaxPoints < program.minimumRedemptionPoints}
+                  onClick={() => {
+                    setPointsToRedeem(estimatedMaxPoints);
+                    resetQuote();
+                  }}
+                >
+                  Usar máximo
+                </button>
+              </div>
+              <p className="form-hint">
+                Canje mínimo: {program.minimumRedemptionPoints} puntos. Cada punto descuenta {formatMoney(program.pointValue)} y podés cubrir hasta el{' '}
+                {program.maximumRedemptionPercent}% de los productos.{' '}
+                {syncingCart ? 'Actualizando precios…' : `Máximo para esta compra: ${estimatedMaxPoints} puntos.`}
+              </p>
+              {pointsBelowMinimum && <p className={`${styles.loyaltyInlineError} loyalty-inline-error`}>Necesitás al menos {program.minimumRedemptionPoints} puntos para canjear.</p>}
+              {pointsAboveMaximum && <p className={`${styles.loyaltyInlineError} loyalty-inline-error`}>Podés usar hasta {estimatedMaxPoints} puntos en esta compra.</p>}
+            </>
+          ) : (
+            <p className="form-hint">El programa de puntos está temporalmente pausado. Tu saldo se conserva.</p>
+          )}
+        </section>
+      </div>
+
+      <aside className={`${styles.checkoutSummary} checkout-summary`}>
+        <div className={`${styles.checkoutSummaryHeader} checkout-summary-header`}>
+          <div>
+            <p className="eyebrow">Revisión final</p>
+            <h2>Resumen</h2>
+          </div>
+          <span className={`${styles.checkoutSummaryCount} checkout-summary-count`}>
+            {items.length} {items.length === 1 ? 'producto' : 'productos'}
+          </span>
+        </div>
+        <div className={`${styles.checkoutSummaryDetails} checkout-summary-details`}>
+          {items.map((item) => (
+            <div className="summary-line" key={item.id}>
+              <span>
+                {item.name} × {item.quantity}
+              </span>
+              <strong>{formatMoney({ amountMinor: (BigInt(item.price.amountMinor) * BigInt(item.quantity)).toString(), currency: BASE_CURRENCY })}</strong>
+            </div>
+          ))}
+          <div className="summary-line">
+            <span>Subtotal</span>
+            <strong>{quote ? formatMoney(quote.subtotal) : formatMoney({ amountMinor: cartTotal(items).toString(), currency: BASE_CURRENCY })}</strong>
+          </div>
+          {quote && BigInt(quote.discount.amountMinor) > 0n && (
+            <div className={`summary-line ${styles.loyaltyDiscount} loyalty-discount`}>
+              <span>Descuento por puntos</span>
+              <strong>−{formatMoney(quote.discount)}</strong>
+            </div>
+          )}
+          {quote && (
+            <div className="summary-line">
+              <span>Envío</span>
+              <strong>{formatMoney(quote.shipping)}</strong>
+            </div>
+          )}
+        </div>
+        <div className="summary-total">
+          <span>Total USD</span>
+          <strong className={!quote ? `${styles.summaryPending} summary-pending` : undefined}>
+            {quote ? formatMoney(quote.total) : 'Validá para calcular'}
+          </strong>
+        </div>
+        {quote?.mercadoPago && (
+          <div className={`${styles.paymentQuote} payment-quote`}>
+            <div className="summary-line">
+              <span>Total a pagar en ARS</span>
+              <strong>{formatMoney(quote.mercadoPago.total)}</strong>
+            </div>
+            <p className="form-hint">
+              DólarAPI blue venta: {quote.mercadoPago.rate} · obtenido {new Date(quote.mercadoPago.fetchedAt).toLocaleTimeString()} · vigente hasta{' '}
+              {new Date(quote.mercadoPago.expiresAt).toLocaleTimeString()}
+            </p>
+          </div>
+        )}
+        {quote && (
+          <div className={`${styles.loyaltyEarnNote} loyalty-earn-note`}>
+            <Coins size={17} />
+            <span>
+              Esta compra sumará <strong>{quote.loyalty.pointsToEarn} puntos</strong> cuando se acredite el pago.
+            </span>
+          </div>
+        )}
+        <Button
+          disabled={
+            !input ||
+            syncingCart ||
+            busy ||
+            pointsBelowMinimum ||
+            pointsAboveMaximum ||
+            (!options.data?.paymentMethods.BANK_TRANSFER && !options.data?.paymentMethods.MERCADO_PAGO)
+          }
+          onClick={quote ? submit : quoteIt}
+        >
+          {syncingCart ? 'Actualizando precios…' : busy ? 'Validando…' : quote ? 'Crear orden' : 'Validar total'}
+        </Button>
+        <p className={`${styles.checkoutSummaryHint} form-hint checkout-summary-hint`}>
+          El precio y el saldo mostrado son informativos hasta la validación final.
+        </p>
+      </aside>
+    </div>
+  );
 }

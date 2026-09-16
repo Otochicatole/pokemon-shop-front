@@ -1,0 +1,250 @@
+.loyaltyPage {
+  width: min(100%, 1040px);
+  margin: 0 auto;
+}
+
+.backLink {
+  margin-bottom: 22px;
+}
+
+.heading {
+  padding-bottom: 26px;
+  border-bottom: 2px solid var(--line);
+}
+
+.heading h1 {
+  margin: 12px 0 10px;
+  font: clamp(28px, 4vw, 48px)/1.2 var(--pixel-font);
+  text-transform: uppercase;
+  text-shadow: 4px 4px 0 #26323e;
+}
+
+.heading > div > p:last-child {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.pageLoading {
+  padding: 100px 0;
+  text-align: center;
+  color: var(--muted);
+  font: 10px var(--pixel-font);
+}
+
+.emptyFrame {
+  border: 2px dashed var(--line-strong);
+  background: rgba(16, 22, 29, .55);
+  padding: 48px 24px;
+}
+
+.loyaltyStats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 15px;
+  margin: 34px 0 18px;
+}
+
+.loyaltyStats article {
+  min-height: 150px;
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  border: 2px solid var(--line);
+  background: linear-gradient(145deg, rgba(22, 30, 39, .9), var(--surface) 62%);
+  box-shadow: 5px 5px 0 #05070a;
+  transition: transform .16s, border-color .16s;
+}
+
+.loyaltyStats article:hover {
+  transform: translate(-2px, -2px);
+  border-color: var(--line-strong);
+}
+
+.loyaltyStats article > span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.loyaltyStats article > strong {
+  margin: auto 0 5px;
+  color: var(--cyan);
+  font: 28px/1 var(--pixel-font);
+}
+
+.loyaltyStats article > small {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.loyaltyBalanceCard {
+  border-color: var(--accent) !important;
+  background: linear-gradient(145deg, rgba(255, 213, 47, .14), var(--surface) 62%) !important;
+}
+
+.loyaltyBalanceCard > span,
+.loyaltyBalanceCard > strong {
+  color: var(--accent) !important;
+}
+
+.loyaltyRuleCard {
+  margin: 28px 0;
+  padding: 26px;
+  display: grid;
+  grid-template-columns: minmax(220px, .75fr) minmax(300px, 1.25fr) auto;
+  align-items: center;
+  gap: 28px;
+  border: 2px solid var(--line-strong);
+  background: linear-gradient(120deg, #141c24, #10171d);
+  box-shadow: 5px 5px 0 #05070a;
+}
+
+.loyaltyRuleCard h2 {
+  margin: 9px 0 0;
+  font: 16px/1.55 var(--pixel-font);
+}
+
+.loyaltyRuleCard > p {
+  margin: 0;
+  color: #cad3da;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.loyaltyHistory {
+  margin-top: 42px;
+}
+
+.loyaltyHistoryHeading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.loyaltyHistoryHeading > div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.loyaltyHistoryHeading h2 {
+  margin: 0;
+  font: 14px var(--pixel-font);
+  text-transform: uppercase;
+}
+
+.loyaltyHistoryHeading > span {
+  min-width: 30px;
+  padding: 6px 8px;
+  border: 2px solid var(--line);
+  color: var(--muted);
+  text-align: center;
+  font: 8px var(--pixel-font);
+}
+
+.loyaltyTransactions {
+  border: 2px solid var(--line);
+  background: var(--surface);
+  box-shadow: 4px 4px 0 #05070a;
+}
+
+.loyaltyTransactions article {
+  min-height: 82px;
+  padding: 16px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 22px;
+  border-bottom: 1px solid var(--line);
+  transition: background .16s;
+}
+
+.loyaltyTransactions article:hover {
+  background: rgba(22, 34, 45, .55);
+}
+
+.loyaltyTransactions article:last-child {
+  border-bottom: 0;
+}
+
+.loyaltyTransactions article > div {
+  display: grid;
+  gap: 6px;
+}
+
+.loyaltyTransactions article > div:last-child {
+  justify-items: end;
+}
+
+.loyaltyTransactions strong {
+  font-size: 14px;
+}
+
+.loyaltyTransactions span,
+.loyaltyTransactions a {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.loyaltyTransactions a {
+  color: var(--cyan);
+}
+
+.isPositive > strong {
+  color: var(--green);
+}
+
+.isNegative > strong {
+  color: var(--warm);
+}
+
+.loyaltyEmpty {
+  min-height: 150px;
+  padding: 30px;
+  display: grid;
+  place-items: center;
+  gap: 8px;
+  border: 2px dashed var(--line-strong);
+  color: var(--muted);
+  text-align: center;
+}
+
+.loadMore {
+  margin-top: 16px;
+}
+
+@media (max-width: 1050px) {
+  .loyaltyRuleCard {
+    grid-template-columns: 1fr;
+  }
+
+  .loyaltyRuleCard :global(.button) {
+    justify-self: start;
+  }
+}
+
+@media (max-width: 760px) {
+  .loyaltyStats {
+    grid-template-columns: 1fr;
+  }
+
+  .loyaltyRuleCard {
+    padding: 20px;
+    gap: 18px;
+  }
+
+  .loyaltyRuleCard :global(.button),
+  .loadMore {
+    width: 100%;
+  }
+
+  .loyaltyTransactions article {
+    align-items: flex-start;
+  }
+}

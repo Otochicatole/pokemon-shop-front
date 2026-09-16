@@ -1,0 +1,25 @@
+.searchBox {
+  flex: 1;
+  max-width: 560px;
+  min-height: 48px;
+  border: 2px solid var(--line);
+  background: var(--surface);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 14px;
+  color: var(--muted);
+}
+
+.searchBox:focus-within {
+  border-color: var(--accent);
+}
+
+.searchBox input {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  background: none;
+  color: var(--ink);
+  font-size: 13px;
+}

@@ -1,0 +1,13 @@
+.uploadBox {
+  margin-top: 18px;
+  padding: 15px;
+  display: grid;
+  gap: 8px;
+  border: 2px dashed var(--cyan);
+  color: var(--cyan);
+  font: 9px var(--pixel-font);
+}
+
+.uploadBox input {
+  font: 11px var(--font-geist), Arial, sans-serif;
+}

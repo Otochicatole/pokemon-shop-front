@@ -9,38 +9,118 @@ import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { clearUserSessionCache } from '../application/session-cache';
 import { publishSessionSync } from '@/shared/auth/session-sync';
 import { getMe, logout } from '../infrastructure/api';
+import styles from './session-menu.module.css';
 
 const subscribeToHydration = () => () => undefined;
 const getClientHydrationSnapshot = () => true;
 const getServerHydrationSnapshot = () => false;
 
 export function SessionMenu() {
-  const router = useRouter(); const queryClient = useQueryClient();
+  const router = useRouter();
+  const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const mounted = useSyncExternalStore(subscribeToHydration, getClientHydrationSnapshot, getServerHydrationSnapshot);
   const menuRef = useRef<HTMLDivElement>(null);
   const query = useQuery({ queryKey: ['me'], queryFn: getMe, retry: false });
+
   useEffect(() => {
     if (!open) return;
     const closeOnOutsideClick = (event: PointerEvent) => {
       if (!menuRef.current?.contains(event.target as Node)) setOpen(false);
     };
-    const closeOnEscape = (event: KeyboardEvent) => { if (event.key === 'Escape') setOpen(false); };
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setOpen(false);
+    };
     document.addEventListener('pointerdown', closeOnOutsideClick);
     document.addEventListener('keydown', closeOnEscape);
-    return () => { document.removeEventListener('pointerdown', closeOnOutsideClick); document.removeEventListener('keydown', closeOnEscape); };
+    return () => {
+      document.removeEventListener('pointerdown', closeOnOutsideClick);
+      document.removeEventListener('keydown', closeOnEscape);
+    };
   }, [open]);
+
   const handleLogout = async () => {
-    try { await logout(); clearUserSessionCache(queryClient); publishSessionSync('user', 'ended'); router.replace('/'); router.refresh(); }
-    catch (error) { toast.error(error instanceof Error ? error.message : 'No se pudo cerrar la sesión'); }
+    try {
+      await logout();
+      clearUserSessionCache(queryClient);
+      publishSessionSync('user', 'ended');
+      router.replace('/');
+      router.refresh();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'No se pudo cerrar la sesión');
+    }
   };
-  // Keep the server render and the first client render identical. The account
-  // query can have a different loading state on each side of hydration, so it
-  // must not decide whether the button has a `disabled` attribute until after
-  // the client has mounted.
-  if (!mounted) return <div className="session-menu"><button className="session-trigger" type="button" aria-label="Cuenta"><UserRound size={18} /></button></div>;
-  if (query.isLoading) return <div className="session-menu"><button className="session-trigger" type="button" disabled aria-label="Cargando cuenta"><UserRound size={18} /></button></div>;
-  if (!query.data) return <div className="session-menu" ref={menuRef}><button className="session-trigger" type="button" aria-label="Abrir menú de cuenta" aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen((value) => !value)}><UserRound size={18} /></button>{open && <div className="session-dropdown" role="menu"><p className="session-dropdown-name">Visitante</p><Link className="session-dropdown-login" href="/auth/login" role="menuitem" onClick={() => setOpen(false)}>Iniciar sesión</Link></div>}</div>;
+
+  // Keep the server render and the first client render identical.
+  if (!mounted) {
+    return (
+      <div className={`${styles.sessionMenu} session-menu`}>
+        <button className={`${styles.sessionTrigger} session-trigger`} type="button" aria-label="Cuenta">
+          <UserRound size={18} />
+        </button>
+      </div>
+    );
+  }
+
+  if (query.isLoading) {
+    return (
+      <div className={`${styles.sessionMenu} session-menu`}>
+        <button className={`${styles.sessionTrigger} session-trigger`} type="button" disabled aria-label="Cargando cuenta">
+          <UserRound size={18} />
+        </button>
+      </div>
+    );
+  }
+
+  if (!query.data) {
+    return (
+      <div className={`${styles.sessionMenu} session-menu`} ref={menuRef}>
+        <button
+          className={`${styles.sessionTrigger} session-trigger`}
+          type="button"
+          aria-label="Abrir menú de cuenta"
+          aria-haspopup="menu"
+          aria-expanded={open}
+          onClick={() => setOpen((value) => !value)}
+        >
+          <UserRound size={18} />
+        </button>
+        {open && (
+          <div className={`${styles.sessionDropdown} session-dropdown`} role="menu">
+            <p className={`${styles.sessionDropdownName} session-dropdown-name`}>Visitante</p>
+            <Link className={`${styles.sessionDropdownLogin} session-dropdown-login`} href="/auth/login" role="menuitem" onClick={() => setOpen(false)}>
+              Iniciar sesión
+            </Link>
+          </div>
+        )}
+      </div>
+    );
+  }
+
   const displayName = query.data.name?.trim() || query.data.email.split('@')[0] || 'coleccionista';
-  return <div className="session-menu" ref={menuRef}><button className="session-trigger" type="button" aria-label="Abrir menú de cuenta" aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen((value) => !value)}><UserRound size={18} /></button>{open && <div className="session-dropdown" role="menu"><p className="session-dropdown-name">{displayName}</p><Link href="/account" role="menuitem" onClick={() => setOpen(false)}>Mi cuenta</Link><button type="button" role="menuitem" onClick={() => void handleLogout()}>Cerrar sesión</button></div>}</div>;
+  return (
+    <div className={`${styles.sessionMenu} session-menu`} ref={menuRef}>
+      <button
+        className={`${styles.sessionTrigger} session-trigger`}
+        type="button"
+        aria-label="Abrir menú de cuenta"
+        aria-haspopup="menu"
+        aria-expanded={open}
+        onClick={() => setOpen((value) => !value)}
+      >
+        <UserRound size={18} />
+      </button>
+      {open && (
+        <div className={`${styles.sessionDropdown} session-dropdown`} role="menu">
+          <p className={`${styles.sessionDropdownName} session-dropdown-name`}>{displayName}</p>
+          <Link href="/account" role="menuitem" onClick={() => setOpen(false)}>
+            Mi cuenta
+          </Link>
+          <button type="button" role="menuitem" onClick={() => void handleLogout()}>
+            Cerrar sesión
+          </button>
+        </div>
+      )}
+    </div>
+  );
 }

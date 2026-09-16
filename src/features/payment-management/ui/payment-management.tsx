@@ -8,6 +8,7 @@ import { AdminDataTable, AdminPageHeader, AdminTabPanel, AdminTabs, Button, Curs
 import { listAdminOrders } from '@/features/order-management';
 import { adminErrorMessage } from '@/shared/admin/client';
 import { adminDate, AdminBadge, adminMoney } from '@/shared/admin/format';
+import styles from './payment-management.module.css';
 
 type Queue = 'TRANSFER_REVIEW' | 'MERCADO_PAGO_REVIEW' | 'ALL';
 

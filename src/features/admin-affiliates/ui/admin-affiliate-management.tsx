@@ -10,6 +10,7 @@ import type { AdminCustomer } from '@/features/customer-management/domain/contra
 import { listAdminCustomers } from '@/features/customer-management/infrastructure/api';
 import { adminFetch, adminErrorMessage } from '@/shared/admin/client';
 import { AffiliateAdminNavigation } from './affiliate-admin-navigation';
+import styles from './admin-affiliate-management.module.css';
 
 type AffiliateAdminTab = 'affiliates' | 'listings';
 type AffiliateRow = { id: string; publicName: string; status: 'ACTIVE' | 'SUSPENDED'; version: number; user?: { id: string; email: string; name: string | null }; counts?: { listings: number; sellerOrders: number } };

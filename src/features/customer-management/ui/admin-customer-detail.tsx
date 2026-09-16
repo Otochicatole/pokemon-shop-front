@@ -8,6 +8,7 @@ import { AdminDataTable, AdminPageHeader, CursorPagination } from '@/components'
 import { adminErrorMessage } from '@/shared/admin/client';
 import { adminDate, AdminBadge, adminMoney } from '@/shared/admin/format';
 import { getAdminCustomer, listAdminCustomerOrders } from '../infrastructure/api';
+import styles from './admin-customer-detail.module.css';
 
 export function AdminCustomerDetailView({ id }: { id: string }) {
   const [cursor, setCursor] = useState<string>();

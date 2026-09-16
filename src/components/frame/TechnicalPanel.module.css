@@ -1,0 +1,5 @@
+.technicalPanel {
+  border: 2px solid var(--line-strong);
+  background: var(--surface-2);
+  box-shadow: 5px 5px 0 #05070a;
+}

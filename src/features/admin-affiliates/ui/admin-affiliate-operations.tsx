@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import { AdminPageHeader, Button, Dialog, TextareaField, TextField } from '@/components';
 import { adminErrorMessage, adminFetch } from '@/shared/admin/client';
 import { AffiliateAdminNavigation, type AffiliateAdminSection } from './affiliate-admin-navigation';
+import styles from './admin-affiliate-operations.module.css';
 
 type Section = AffiliateAdminSection;
 type Page<T> = { items: T[]; page: number; pageSize: number; total: number; totalPages: number };

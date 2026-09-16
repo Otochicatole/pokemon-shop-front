@@ -11,6 +11,7 @@ import { adminErrorMessage } from '@/shared/admin/client';
 import { adminDate, AdminBadge } from '@/shared/admin/format';
 import { changeSupplierStatus, editSupplier, listSupplierDirectory, registerSupplier } from '../application';
 import { supplierFormSchema, type Supplier, type SupplierFormValues } from '../domain/contracts';
+import styles from './supplier-management.module.css';
 
 const emptyValues: SupplierFormValues = { name: '', contactName: '', email: '', phone: '', address: '', notes: '' };
 

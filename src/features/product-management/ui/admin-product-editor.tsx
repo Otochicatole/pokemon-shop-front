@@ -15,6 +15,7 @@ import { adminErrorMessage } from '@/shared/admin/client';
 import { adminDate, AdminBadge } from '@/shared/admin/format';
 import { archiveAdminProduct, createAdminProduct, deleteAdminProduct, getAdminProduct, getTcgdexCard, importTcgdexImage, publishAdminProduct, removeProductImage, reorderProductImages, searchTcgdexCards, updateAdminProduct, updateProductImage, uploadProductImages } from '../infrastructure/api';
 import { productEditorSchema, type ProductEditorValues, type TcgDexCard, type TcgDexCardSummary } from '../domain/contracts';
+import styles from './admin-product-editor.module.css';
 
 const defaults: ProductEditorValues = { sku: '', slug: '', name: '', description: '', kind: 'SINGLE_CARD', stockMode: 'UNIQUE', price: '0', initialStock: 0, pokemonType: 'COLORLESS', setName: '', setCode: '', cardNumber: '', rarity: '', language: 'Español', condition: 'NM', finish: '', edition: '', gradingCompany: '', grade: '', certificationNumber: '' };
 const pokemonTypes = ['COLORLESS', 'DARKNESS', 'DRAGON', 'FAIRY', 'FIGHTING', 'FIRE', 'GRASS', 'LIGHTNING', 'METAL', 'PSYCHIC', 'WATER'] as const;

@@ -2,6 +2,8 @@ import { X } from 'lucide-react';
 import type { CatalogFilters } from '@/shared/api/contracts';
 import { conditionLabels, pokemonTypeLabels, productKindLabels, type CatalogArrayFilterKey, type CatalogFilterState } from '../domain/catalog-filters';
 
+import styles from './catalog-active-filters.module.css';
+
 interface CatalogActiveFiltersProps {
   filters: CatalogFilterState;
   facets?: CatalogFilters;
@@ -49,11 +51,21 @@ export function CatalogActiveFilters({ filters, facets, onChange, onClear }: Cat
   if (chips.length === 0) return null;
 
   return (
-    <div className="catalog-active-filters" aria-label="Filtros aplicados">
+    <div className={`${styles.catalogActiveFilters} catalog-active-filters`} aria-label="Filtros aplicados">
       <span>Filtros activos</span>
       <div>
-        {chips.map((chip) => <button type="button" key={chip.id} onClick={chip.remove}>{chip.text}<X size={12} aria-hidden="true" /><span className="sr-only">Quitar filtro</span></button>)}
-        {chips.length > 1 && <button type="button" className="catalog-clear-all" onClick={onClear}>Limpiar todo</button>}
+        {chips.map((chip) => (
+          <button type="button" key={chip.id} onClick={chip.remove}>
+            {chip.text}
+            <X size={12} aria-hidden="true" />
+            <span className="sr-only">Quitar filtro</span>
+          </button>
+        ))}
+        {chips.length > 1 && (
+          <button type="button" className={`${styles.catalogClearAll} catalog-clear-all`} onClick={onClear}>
+            Limpiar todo
+          </button>
+        )}
       </div>
     </div>
   );

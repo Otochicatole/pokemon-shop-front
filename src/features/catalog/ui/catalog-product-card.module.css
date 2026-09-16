@@ -1,0 +1,71 @@
+.productCard {
+  box-shadow: 4px 4px 0 #05070a;
+}
+
+.productCard:hover {
+  box-shadow: 5px 5px 0 #05070a;
+}
+
+.productCardSingle {
+  border-color: #3b4f60;
+  background: linear-gradient(180deg, #121b24, var(--surface));
+}
+
+.productCardSingle:hover {
+  border-color: var(--accent);
+}
+
+.productCardSingle :global(.product-image) {
+  aspect-ratio: 5 / 7;
+  padding: 8px;
+  border-bottom-color: var(--line-strong);
+  background:
+    radial-gradient(circle at 50% 38%, rgba(83, 190, 229, .2), transparent 46%),
+    linear-gradient(145deg, #1a303d, #0b1117);
+}
+
+.productCardSingle :global(.product-image)::after {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  pointer-events: none;
+  border: 1px solid rgba(147, 160, 173, .22);
+}
+
+.productCardSingle :global(.product-image) img {
+  padding: 4px;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 9px rgba(0, 0, 0, .36));
+}
+
+.productCardSingle :global(.product-kind) {
+  top: 16px;
+  left: 16px;
+  z-index: 2;
+  box-shadow: 3px 3px 0 #05070a;
+}
+
+.productCardSingle :global(.product-card-body) {
+  padding: 17px 16px 16px;
+}
+
+.productCardDetails {
+  min-height: 31px;
+  margin: -5px 0 13px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 7px;
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.productCardDetails :global(.pixel-badge) {
+  padding: 4px 6px;
+  font-size: 5px;
+}
+
+.productCardSeller {
+  color: var(--muted);
+  font-size: 10px;
+}

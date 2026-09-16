@@ -1,0 +1,79 @@
+.newsToolbar {
+  display: grid;
+  grid-template-columns: minmax(260px, 2fr) minmax(180px, .75fr);
+  align-items: end;
+}
+
+.newsToolbar :global(.component-field),
+.newsToolbar :global(.admin-search-field) {
+  width: 100%;
+  min-width: 0;
+  flex: initial;
+}
+
+.newsToolbar select {
+  width: 100%;
+  min-width: 0;
+}
+
+.newsTablePrimary {
+  min-width: 260px;
+}
+
+.newsWindow {
+  display: grid;
+  gap: 4px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.newsWindow span:first-child {
+  color: var(--ink);
+}
+
+.newsToggle.isActive,
+.newsToggle:global(.is-active) {
+  color: var(--warm);
+}
+
+.newsToggle.isInactive,
+.newsToggle:global(.is-inactive) {
+  color: var(--green);
+}
+
+.newsToggle:hover {
+  border-color: currentColor;
+}
+
+.newsDelete:hover {
+  border-color: var(--warm);
+  color: var(--warm);
+}
+
+.newsDialogForm {
+  margin-top: 8px;
+}
+
+.newsFormGrid {
+  gap: 16px;
+}
+
+.newsSwitchField {
+  min-width: 0;
+  display: flex;
+  align-items: stretch;
+}
+
+.newsSwitchField :global(.admin-switch) {
+  width: 100%;
+}
+
+@media (max-width: 760px) {
+  .newsToolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .newsFormGrid {
+    grid-template-columns: 1fr;
+  }
+}

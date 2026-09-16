@@ -11,6 +11,7 @@ import { adminErrorMessage } from '@/shared/admin/client';
 import { adminDate, AdminBadge, adminLabel, adminMoney } from '@/shared/admin/format';
 import type { AdminOrder } from '../domain/contracts';
 import { cancelAdminOrder, fulfillLatePayment, getAdminOrder, recordFullRefund, reviewTransfer, transitionAdminOrder, transitionAdminSellerOrder } from '../infrastructure/api';
+import styles from './admin-order-detail.module.css';
 
 type SellerOrder = AdminOrder['sellerOrders'][number];
 type PendingAction = { kind: 'transition'; status: string } | { kind: 'seller-transition'; sellerOrderId: string; expectedVersion: number; status: SellerOrder['status']; sellerName: string } | { kind: 'cancel' } | { kind: 'receipt'; receiptId: string; decision: 'approve' | 'reject' } | { kind: 'late' } | { kind: 'refund' };

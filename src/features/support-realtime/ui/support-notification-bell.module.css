@@ -1,0 +1,38 @@
+.supportNotificationLink {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.supportNotificationLinkStore {
+  width: 42px;
+  min-height: 42px;
+}
+
+.supportNotificationLinkStore:hover,
+.supportNotificationLinkStore:focus-visible,
+.supportNotificationLinkStore.hasUnread,
+.supportNotificationLinkStore:global(.has-unread) {
+  border-color: var(--purple);
+  color: var(--purple);
+}
+
+.supportNotificationLinkStore span {
+  min-width: 18px;
+  height: 18px;
+  position: absolute;
+  top: -8px;
+  right: -7px;
+  display: grid;
+  place-items: center;
+  padding: 0 4px;
+  border: 2px solid #070a0f;
+  background: var(--warm);
+  color: #fff;
+  font: 6px var(--pixel-font);
+}

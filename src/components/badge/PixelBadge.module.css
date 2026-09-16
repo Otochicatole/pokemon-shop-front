@@ -1,0 +1,32 @@
+.pixelBadge {
+  display: inline-block;
+  padding: 6px 8px;
+  border: 2px solid currentColor;
+  font: 7px var(--pixel-font);
+  text-transform: uppercase;
+}
+
+.yellow {
+  color: var(--accent);
+  background: rgba(255, 213, 47, .1);
+}
+
+.red {
+  color: var(--warm);
+  background: rgba(255, 91, 85, .1);
+}
+
+.cyan {
+  color: var(--cyan);
+  background: rgba(83, 190, 229, .1);
+}
+
+.green {
+  color: var(--green);
+  background: rgba(121, 201, 107, .1);
+}
+
+.purple {
+  color: var(--purple);
+  background: rgba(183, 123, 225, .1);
+}

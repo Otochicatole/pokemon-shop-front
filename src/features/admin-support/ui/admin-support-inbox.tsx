@@ -19,6 +19,7 @@ import {
   listAdminSupportConversations,
 } from '../infrastructure/api';
 import { SupportStatusBadge } from './support-status';
+import styles from './admin-support-inbox.module.css';
 
 type StatusFilter = SupportConversationStatus | '';
 

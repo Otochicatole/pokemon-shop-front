@@ -13,6 +13,8 @@ import {
   type CatalogFilterState,
 } from '../domain/catalog-filters';
 
+import styles from './catalog-filter-panel.module.css';
+
 interface CatalogFilterPanelProps {
   filters: CatalogFilterState;
   facets?: CatalogFilters;
@@ -46,20 +48,20 @@ function FacetGroup({ label, filterKey, options, selected, onToggle, labels, typ
   if (options.length === 0 && selected.length === 0) return null;
 
   return (
-    <details className="catalog-filter-group" open={initiallyOpen || selected.length > 0}>
+    <details className={`${styles.catalogFilterGroup} catalog-filter-group`} open={initiallyOpen || selected.length > 0}>
       <summary>{label}<span>{selected.length || ''}</span></summary>
       <fieldset>
         <legend className="sr-only">{label}</legend>
         {includeSelected(options, selected).map((option) => (
           <button
             type="button"
-            className="catalog-filter-option"
+            className={`${styles.catalogFilterOption} catalog-filter-option`}
             aria-pressed={selected.includes(option.value)}
             key={option.value}
             onClick={() => onToggle(filterKey, option.value)}
           >
-            <span className="catalog-filter-marker" aria-hidden="true">{selected.includes(option.value) ? '◆' : '◇'}</span>
-            {typeDots && <i className={`catalog-type-dot type-${option.value.toLowerCase()}`} aria-hidden="true" />}
+            <span className={`${styles.catalogFilterMarker} catalog-filter-marker`} aria-hidden="true">{selected.includes(option.value) ? '◆' : '◇'}</span>
+            {typeDots && <i className={`${styles.catalogTypeDot} type-${option.value.toLowerCase()} catalog-type-dot`} aria-hidden="true" />}
             <span>{labels?.[option.value] ?? option.value}</span>
             {(option.count > 0 || options.some((item) => item.count > 0)) && <small>{option.count}</small>}
           </button>
@@ -73,10 +75,10 @@ export function CatalogFilterPanel({ filters, facets, onToggle, onChange, onClea
   const id = useId();
 
   return (
-    <div className="catalog-filter-panel" aria-labelledby={labelledBy}>
-      <div className="catalog-filter-panel-heading">
+    <div className={`${styles.catalogFilterPanel} catalog-filter-panel`} aria-labelledby={labelledBy}>
+      <div className={`${styles.catalogFilterPanelHeading} catalog-filter-panel-heading`}>
         <div><span aria-hidden="true">◆</span><strong>Filtros</strong></div>
-        <button type="button" className="catalog-clear" onClick={onClear}><RotateCcw size={13} /> Limpiar</button>
+        <button type="button" className={`${styles.catalogClear} catalog-clear`} onClick={onClear}><RotateCcw size={13} /> Limpiar</button>
       </div>
 
       <FacetGroup label="Producto" filterKey="kinds" options={facets?.kinds ?? fallbackKinds} selected={filters.kinds} onToggle={onToggle} labels={productKindLabels} initiallyOpen />
@@ -89,12 +91,12 @@ export function CatalogFilterPanel({ filters, facets, onToggle, onChange, onClea
       <FacetGroup label="Edición" filterKey="editions" options={facets?.editions ?? []} selected={filters.editions} onToggle={onToggle} />
       <FacetGroup label="Empresa de grading" filterKey="gradingCompanies" options={facets?.gradingCompanies ?? []} selected={filters.gradingCompanies} onToggle={onToggle} />
 
-      <details className="catalog-filter-group" open={filters.setCode !== ''}>
+      <details className={`${styles.catalogFilterGroup} catalog-filter-group`} open={filters.setCode !== ''}>
         <summary>Código de set<span>{filters.setCode ? '1' : ''}</span></summary>
         <SetCodeField key={filters.setCode} id={id} value={filters.setCode} onApply={(setCode) => onChange({ ...filters, setCode })} />
       </details>
 
-      <details className="catalog-filter-group" open={filters.minPrice !== '' || filters.maxPrice !== ''}>
+      <details className={`${styles.catalogFilterGroup} catalog-filter-group`} open={filters.minPrice !== '' || filters.maxPrice !== ''}>
         <summary>Precio USD<span>{filters.minPrice || filters.maxPrice ? '●' : ''}</span></summary>
         <PriceRangeFields
           key={`${filters.minPrice}-${filters.maxPrice}`}
@@ -107,7 +109,7 @@ export function CatalogFilterPanel({ filters, facets, onToggle, onChange, onClea
         />
       </details>
 
-      <div className="catalog-quick-filters">
+      <div className={`${styles.catalogQuickFilters} catalog-quick-filters`}>
         <BinaryFilter
           label="Disponibilidad"
           value={filters.inStock}
@@ -130,8 +132,8 @@ export function CatalogFilterPanel({ filters, facets, onToggle, onChange, onClea
 function SetCodeField({ id, value, onApply }: { id: string; value: string; onApply: (value: string) => void }) {
   const [draft, setDraft] = useState(value);
   return (
-    <form className="catalog-inline-form" onSubmit={(event) => { event.preventDefault(); onApply(draft.trim().slice(0, 40)); }}>
-      <label className="catalog-inline-field" htmlFor={`${id}-set-code`}>
+    <form className={`${styles.catalogInlineForm} catalog-inline-form`} onSubmit={(event) => { event.preventDefault(); onApply(draft.trim().slice(0, 40)); }}>
+      <label className={`${styles.catalogInlineField} catalog-inline-field`} htmlFor={`${id}-set-code`}>
         <span className="sr-only">Código del set</span>
         <input id={`${id}-set-code`} value={draft} maxLength={40} placeholder="Ej. SV4" onChange={(event) => setDraft(event.target.value)} />
       </label>
@@ -158,12 +160,12 @@ function BinaryFilter({ label, value, trueLabel, falseLabel, onChange }: {
       {options.map((option) => (
         <button
           type="button"
-          className="catalog-filter-option"
+          className={`${styles.catalogFilterOption} catalog-filter-option`}
           aria-pressed={value === option.value}
           key={String(option.value)}
           onClick={() => onChange(option.value)}
         >
-          <span className="catalog-filter-marker" aria-hidden="true">{value === option.value ? '◆' : '◇'}</span>
+          <span className={`${styles.catalogFilterMarker} catalog-filter-marker`} aria-hidden="true">{value === option.value ? '◆' : '◇'}</span>
           <span>{option.label}</span>
         </button>
       ))}
@@ -192,11 +194,11 @@ function PriceRangeFields({ id, min, max, minPlaceholder, maxPlaceholder, onAppl
     onApply(result.minPrice, result.maxPrice);
   };
   return (
-    <fieldset className="catalog-price-fields">
+    <fieldset className={`${styles.catalogPriceFields} catalog-price-fields`}>
       <legend className="sr-only">Rango de precio en USD</legend>
       <label htmlFor={`${id}-min-price`}><span>Mínimo</span><input id={`${id}-min-price`} inputMode="decimal" value={minPrice} placeholder={minPlaceholder || '0'} aria-invalid={Boolean(error)} aria-describedby={error ? `${id}-price-error` : undefined} onChange={(event) => setMinPrice(event.target.value)} /></label>
       <label htmlFor={`${id}-max-price`}><span>Máximo</span><input id={`${id}-max-price`} inputMode="decimal" value={maxPrice} placeholder={maxPlaceholder || 'Sin límite'} aria-invalid={Boolean(error)} aria-describedby={error ? `${id}-price-error` : undefined} onChange={(event) => setMaxPrice(event.target.value)} /></label>
-      {error && <p className="catalog-price-error" id={`${id}-price-error`} role="alert">{error}</p>}
+      {error && <p className={`${styles.catalogPriceError} catalog-price-error`} id={`${id}-price-error`} role="alert">{error}</p>}
       <Button type="button" variant="secondary" onClick={apply}>Aplicar precio</Button>
     </fieldset>
   );

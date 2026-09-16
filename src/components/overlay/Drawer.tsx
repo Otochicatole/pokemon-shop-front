@@ -3,6 +3,8 @@
 import { useEffect, useId, useRef, type KeyboardEvent, type ReactNode } from 'react';
 import { X } from 'lucide-react';
 
+import styles from './Drawer.module.css';
+
 interface DrawerProps {
   open: boolean;
   title: string;
@@ -56,9 +58,9 @@ export function Drawer({ open, title, onClose, children, className = '' }: Drawe
   };
 
   return (
-    <div className="drawer-backdrop" onMouseDown={(event) => { if (event.currentTarget === event.target) onClose(); }}>
-      <aside ref={drawerRef} className={`drawer ${className}`} role="dialog" aria-modal="true" aria-labelledby={titleId} onKeyDown={trapFocus}>
-        <div className="drawer-header">
+    <div className={`${styles.backdrop} drawer-backdrop`} onMouseDown={(event) => { if (event.currentTarget === event.target) onClose(); }}>
+      <aside ref={drawerRef} className={`${styles.drawer} drawer ${className}`.trim()} role="dialog" aria-modal="true" aria-labelledby={titleId} onKeyDown={trapFocus}>
+        <div className={`${styles.header} drawer-header`}>
           <h2 id={titleId}>{title}</h2>
           <button ref={closeButtonRef} type="button" className="icon-button" aria-label="Cerrar" onClick={onClose}><X size={18} /></button>
         </div>
@@ -67,3 +69,4 @@ export function Drawer({ open, title, onClose, children, className = '' }: Drawe
     </div>
   );
 }
+

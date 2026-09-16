@@ -1,0 +1,27 @@
+.emptyState {
+  min-height: 260px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 10px;
+  text-align: center;
+  color: var(--muted);
+}
+
+.emptyState h1,
+.emptyState h2 {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--pixel-font);
+  font-size: 20px;
+  line-height: 1.5;
+}
+
+.emptyIcon {
+  color: var(--accent);
+  font-size: 38px;
+}
+
+.emptyState :global(.button) {
+  margin-top: 13px;
+}

@@ -1,0 +1,154 @@
+.authPage {
+  min-height: calc(100vh - 118px);
+  display: grid;
+  grid-template-columns: .75fr 1fr;
+}
+
+.authAside {
+  padding: 60px clamp(28px, 7vw, 100px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-right: 2px solid var(--line);
+  background: #0a0e14;
+  color: white;
+}
+
+.authAside :global(.brand-mark) {
+  background: var(--accent);
+}
+
+.authAside > p {
+  max-width: 380px;
+  color: #d6dce2;
+  font: 25px/1.55 var(--pixel-font);
+  text-transform: uppercase;
+}
+
+.authAsideHero {
+  position: relative;
+  overflow: hidden;
+  padding: 0;
+  display: block;
+  min-height: 700px;
+}
+
+.authAsideHero > :global(.brand) {
+  position: absolute;
+  top: 60px;
+  left: clamp(28px, 7vw, 100px);
+  z-index: 8;
+}
+
+.authAsideHero > :global(.battle-scene) {
+  width: 100%;
+  height: 100%;
+  min-height: 610px;
+  border: 0;
+  box-shadow: none;
+}
+
+.authAsideHero > :global(.hero-art.legendary-scene) {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 700px;
+  border: 0;
+  box-shadow: none;
+}
+
+.authPanel {
+  display: grid;
+  place-items: center;
+  padding: 50px 24px;
+}
+
+.authCard {
+  width: min(100%, 420px);
+  padding: 30px;
+  border: 2px solid var(--line-strong);
+  background: var(--surface);
+  box-shadow: 8px 8px 0 #05070a;
+}
+
+.authCard h1 {
+  margin: 18px 0 30px;
+  font-size: 25px;
+  line-height: 1.5;
+  font-family: var(--pixel-font);
+}
+
+@media (max-width: 1100px) {
+  .authPage {
+    display: flex;
+    flex-direction: column;
+    min-height: auto;
+    overflow: hidden;
+  }
+  .authPanel {
+    order: 1;
+    padding: 48px 24px 76px;
+  }
+  .authAsideHero {
+    order: 2;
+    min-height: clamp(460px, 58vw, 620px);
+    height: clamp(460px, 58vw, 620px);
+    border-right: 0;
+    border-bottom: 2px solid var(--line);
+  }
+  .authAsideHero > :global(.brand) {
+    top: 30px;
+    left: clamp(24px, 6vw, 80px);
+  }
+  .authAsideHero > :global(.hero-art.legendary-scene) {
+    position: relative;
+    inset: auto;
+    min-height: 100%;
+    height: 100%;
+  }
+}
+
+@media (max-width: 760px) {
+  .authPage {
+    display: block;
+  }
+  .authAside {
+    min-height: 190px;
+    padding: 30px 24px;
+    border-right: 0;
+    border-bottom: 2px solid var(--line);
+  }
+  .authAside > p {
+    margin: 38px 0 0;
+    font-size: 17px;
+  }
+  .authAsideHero {
+    min-height: 520px;
+    height: 520px;
+    padding: 0;
+  }
+  .authAsideHero > :global(.brand) {
+    top: 22px;
+    left: 24px;
+  }
+  .authAsideHero > :global(.battle-scene),
+  .authAsideHero > :global(.legendary-scene),
+  .authAsideHero > :global(.hero-art.legendary-scene) {
+    min-height: 520px;
+    height: 520px;
+    position: relative;
+    inset: auto;
+  }
+  .authPanel {
+    padding: 34px 16px 60px;
+  }
+  .authCard {
+    width: min(100%, 430px);
+    padding: 22px 18px;
+  }
+  .authCard h1 {
+    margin-bottom: 24px;
+    font-size: 21px;
+  }
+}

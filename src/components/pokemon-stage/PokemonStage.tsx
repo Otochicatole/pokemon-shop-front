@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import type { CSSProperties } from 'react';
+import styles from './PokemonStage.module.css';
 
 export type PokemonStageVariant = 'route' | 'legendary';
 
@@ -12,17 +13,20 @@ export interface PokemonStageProps {
   className?: string;
 }
 
+
 type StageStyle = CSSProperties & { '--pokemon-ground-offset': string };
 
 export function PokemonStage({ spriteUrl, alt, variant, groundOffset = '0%', priority = false, className = '' }: PokemonStageProps) {
   const style: StageStyle = { '--pokemon-ground-offset': groundOffset };
+  const variantClass = styles[variant] || '';
 
   return (
-    <div className={`pokemon-stage pokemon-stage-${variant} ${className}`.trim()} data-pokemon-stage={variant}>
-      <div className="pokemon-stage-sprite" style={style} data-pokemon-sprite>
+    <div className={`${styles.pokemonStage} ${variantClass} pokemon-stage pokemon-stage-${variant} ${className}`.trim()} data-pokemon-stage={variant}>
+      <div className={`${styles.pokemonStageSprite} pokemon-stage-sprite`} style={style} data-pokemon-sprite>
         <Image src={spriteUrl} alt={alt} width={430} height={430} unoptimized priority={priority} />
       </div>
-      <div className="pokemon-stage-platform" aria-hidden="true" data-pokemon-platform />
+      <div className={`${styles.pokemonStagePlatform} pokemon-stage-platform`} aria-hidden="true" data-pokemon-platform />
     </div>
   );
 }
+

@@ -1,0 +1,80 @@
+.pokemonStage {
+  --pokemon-stage-bottom: 115px;
+  --pokemon-platform-height: 64px;
+  --pokemon-contact-line: 30px;
+  position: absolute;
+  left: 50%;
+  bottom: var(--pokemon-stage-bottom);
+  z-index: 2;
+  width: min(64%, 540px);
+  aspect-ratio: 1;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.pokemonStageSprite {
+  position: absolute;
+  left: 50%;
+  bottom: var(--pokemon-contact-line);
+  z-index: 2;
+  width: min(430px, 100%);
+  aspect-ratio: 1;
+  transform: translateX(-50%) translateY(var(--pokemon-ground-offset));
+  transform-origin: center bottom;
+}
+
+.pokemonStageSprite img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center bottom;
+  image-rendering: pixelated;
+  transform-origin: center bottom;
+  animation: pokemon-grounded-idle 1.4s steps(2, end) infinite;
+}
+
+.pokemonStagePlatform {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  z-index: 1;
+  width: 100%;
+  height: var(--pokemon-platform-height);
+  border: 3px solid var(--line-strong);
+  border-radius: 50%;
+  background: repeating-linear-gradient(90deg, rgba(255, 255, 255, .25) 0 14px, transparent 14px 27px);
+  transform: translateX(-50%) skew(-10deg);
+}
+
+.route .pokemonStageSprite img {
+  filter: drop-shadow(12px 13px rgba(0, 0, 0, .4));
+}
+
+.legendary .pokemonStageSprite img {
+  filter: drop-shadow(14px 15px rgba(0, 0, 0, .55));
+}
+
+.legendary .pokemonStagePlatform {
+  border-color: rgba(83, 190, 229, .85);
+  background: repeating-linear-gradient(90deg, rgba(183, 123, 225, .3) 0 14px, transparent 14px 27px);
+  box-shadow: 0 0 30px rgba(83, 190, 229, .25);
+}
+
+@keyframes pokemon-grounded-idle {
+  0%, 100% {
+    transform: scaleY(1);
+  }
+  50% {
+    transform: scaleY(.985);
+  }
+}
+
+@media (max-width: 760px) {
+  .pokemonStage {
+    --pokemon-stage-bottom: 218px;
+    --pokemon-platform-height: 56px;
+    --pokemon-contact-line: 26px;
+    width: min(78%, 420px);
+  }
+}

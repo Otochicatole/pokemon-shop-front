@@ -1,5 +1,6 @@
 import type { Money } from '@/shared/api/contracts';
 import { formatMoney } from '@/shared/lib/format';
+import styles from './format.module.css';
 
 const labels: Record<string, string> = {
   DRAFT: 'Borrador', PUBLISHED: 'Publicado', ARCHIVED: 'Archivado',

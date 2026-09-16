@@ -12,7 +12,7 @@ import { ApiError } from '@/shared/api/client';
 import { PendingClientMessageId, supportPayloadFingerprint } from '@/shared/lib/pending-client-message-id';
 import { supportStatusLabels } from '../domain/contracts';
 import { getSupportConversation, markSupportConversationRead, sendSupportMessage } from '../infrastructure/api';
-import styles from './support.module.css';
+import styles from './support-conversation.module.css';
 
 function formatMessageDate(value: string) {
   return new Intl.DateTimeFormat('es-AR', { dateStyle: 'short', timeStyle: 'short' }).format(new Date(value));

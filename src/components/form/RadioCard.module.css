@@ -1,0 +1,30 @@
+.radioCard {
+  display: flex;
+  align-items: start;
+  gap: 12px;
+  padding: 16px;
+  border: 2px solid var(--line);
+  background: var(--surface);
+  cursor: pointer;
+}
+
+.radioCard input {
+  margin-top: 4px;
+}
+
+.radioCard span {
+  display: grid;
+  gap: 4px;
+}
+
+.radioCard strong {
+  color: var(--ink);
+  font: 11px var(--pixel-font);
+  text-transform: uppercase;
+}
+
+.radioCard small {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}

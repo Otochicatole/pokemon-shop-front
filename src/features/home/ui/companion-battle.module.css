@@ -1,0 +1,316 @@
+.battleScene {
+  position: relative;
+  min-height: min(78vh, 720px);
+  height: 100%;
+  display: grid;
+  place-items: center;
+  background:
+    linear-gradient(180deg, rgba(7, 10, 15, .12), rgba(7, 10, 15, .42)),
+    linear-gradient(rgba(8, 13, 18, .05), rgba(8, 13, 18, .22)),
+    url('https://pocket-pixel-design-system.t3rry327.chatgpt.site/world/kanto-route.png') center / cover;
+  overflow: hidden;
+}
+
+.battleScene::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: .18;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, .12) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, .12) 1px, transparent 1px);
+  background-size: 16px 16px;
+  pointer-events: none;
+}
+
+.battleScene::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 42%, rgba(5, 7, 10, .45) 100%);
+}
+
+.routeLabel {
+  position: absolute;
+  top: 20px;
+  left: 22px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: calc(100% - 260px);
+  padding: 8px 10px;
+  border: 2px solid rgba(244, 246, 247, .18);
+  background: rgba(7, 10, 15, .72);
+  color: #fff;
+  font: 7px var(--pixel-font);
+  text-transform: uppercase;
+  backdrop-filter: blur(4px);
+}
+
+.routeLabel span {
+  width: 36px;
+  height: 2px;
+  flex: 0 0 36px;
+  background: var(--accent);
+}
+
+.battleHud {
+  position: absolute;
+  top: 22px;
+  right: 22px;
+  z-index: 5;
+  width: 220px;
+  padding: 12px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  border: 3px solid var(--ink);
+  background: rgba(7, 10, 15, .9);
+  box-shadow: 5px 5px 0 #05070a;
+}
+
+.battleHud span,
+.battleHud b {
+  font: 8px var(--pixel-font);
+}
+
+.battleHud div {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 2px;
+  height: 10px;
+  margin: 8px 0 4px;
+  padding: 2px;
+  background: #05070a;
+}
+
+.battleHud div i {
+  flex: 1;
+  background: var(--green);
+  box-shadow: 0 0 8px rgba(121, 201, 107, .35);
+}
+
+.battleHud small {
+  grid-column: 1 / -1;
+  text-align: right;
+  font: 6px var(--pixel-font);
+  color: #c8d2da;
+}
+
+.dialogue {
+  position: absolute;
+  left: 5%;
+  bottom: 25px;
+  z-index: 6;
+  width: min(62%, 520px);
+  min-height: 108px;
+  padding: 18px 20px;
+  gap: 13px;
+  display: flex;
+  border: 4px solid #dbe4ea;
+  background: rgba(11, 14, 18, .94);
+  box-shadow:
+    inset 0 0 0 4px #0b0e12,
+    inset 0 0 0 7px #e6edf2,
+    5px 5px 0 rgba(5, 6, 9, .65);
+}
+
+.dialogue > span {
+  padding-top: 1px;
+  color: #aab5bf;
+  animation: dialogue-caret-blink 1s steps(1, end) infinite;
+}
+
+.dialogue b,
+.dialogue span,
+.dialogue small {
+  display: block;
+}
+
+.dialogue b {
+  margin-bottom: 9px;
+  font-size: 9px;
+  font-family: var(--pixel-font);
+  color: var(--accent);
+}
+
+.dialogue > div > span {
+  margin-bottom: 4px;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.dialogue small {
+  color: #d4dde4;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.companionSelector {
+  position: absolute;
+  right: 3%;
+  bottom: 25px;
+  z-index: 7;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 148px;
+}
+
+.companionOption {
+  width: 148px;
+  height: 56px;
+  gap: 4px;
+  padding: 0 8px 0 2px;
+  border: 2px solid #d9e2e8;
+  background: rgba(17, 22, 28, .9);
+  box-shadow: 3px 3px 0 #050609;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  font: 6px var(--pixel-font);
+  text-align: left;
+  transition: transform .14s steps(2, end), background .14s, border-color .14s, box-shadow .14s;
+}
+
+.companionOption img {
+  width: 52px;
+  height: 52px;
+  flex: 0 0 52px;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+.companionOption span {
+  overflow: hidden;
+  font: 6px/1.35 var(--pixel-font);
+  text-overflow: ellipsis;
+}
+
+.companionOption:not(.active) {
+  opacity: .92;
+}
+
+.companionOption.active {
+  border-color: #f4f6f7;
+  background: var(--accent);
+  color: #080a0e;
+  transform: translateX(-7px);
+  box-shadow: 5px 5px 0 #050609;
+}
+
+.companionOption:hover:not(.active) {
+  border-color: var(--accent);
+  background: rgba(31, 39, 49, .96);
+  transform: translateX(-3px);
+}
+
+.companionOption:focus-visible {
+  position: relative;
+  z-index: 2;
+}
+
+@keyframes dialogue-caret-blink {
+  0%, 45% { opacity: 1; }
+  46%, 100% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dialogue > span {
+    animation: none;
+  }
+
+  .companionOption,
+  .companionOption.active,
+  .companionOption:hover:not(.active) {
+    transition: none;
+    transform: none;
+  }
+}
+
+@media (max-width: 1100px) {
+  .battleScene {
+    min-height: 640px;
+  }
+}
+
+@media (max-width: 900px) {
+  .battleScene {
+    min-height: 560px;
+  }
+}
+
+@media (max-width: 760px) {
+  .battleScene {
+    min-height: 620px;
+  }
+
+  .routeLabel {
+    left: 12px;
+    right: 12px;
+    top: 14px;
+    max-width: none;
+    font-size: 6px;
+  }
+
+  .battleHud {
+    top: 58px;
+    right: 12px;
+    width: 168px;
+    padding: 8px;
+  }
+
+  .dialogue {
+    left: 12px;
+    right: 12px;
+    bottom: 108px;
+    width: auto;
+    min-height: 102px;
+    padding: 16px 16px;
+  }
+
+  .dialogue small {
+    font-size: 11px;
+  }
+
+  .companionSelector {
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    width: auto;
+    flex-direction: row;
+    gap: 6px;
+  }
+
+  .companionOption {
+    min-width: 0;
+    width: auto;
+    height: 76px;
+    flex: 1;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0;
+    padding: 2px;
+  }
+
+  .companionOption img {
+    width: 48px;
+    height: 48px;
+    flex-basis: 48px;
+  }
+
+  .companionOption span {
+    font-size: 5px;
+  }
+
+  .companionOption.active {
+    transform: translateY(-5px);
+  }
+
+  .companionOption:hover:not(.active) {
+    transform: translateY(-2px);
+  }
+}

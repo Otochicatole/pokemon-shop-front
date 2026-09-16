@@ -1,4 +1,5 @@
 import type { SupportConversationStatus } from '../domain/contracts';
+import styles from './support-status.module.css';
 
 const labels: Record<SupportConversationStatus, string> = {
   OPEN: 'Abierta',

@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { ArrowRight, Banknote, Coins, History } from 'lucide-react';
 import { AdminPageHeader } from '@/components';
+import styles from './configuration-home.module.css';
 
 const configurationItems = [
   {

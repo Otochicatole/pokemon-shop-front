@@ -8,6 +8,7 @@ import { AdminDataTable, AdminPageHeader, Button, CursorPagination, SelectField,
 import { adminErrorMessage } from '@/shared/admin/client';
 import { adminDate, AdminBadge, adminMoney } from '@/shared/admin/format';
 import { listAdminCustomers } from '../infrastructure/api';
+import styles from './admin-customer-list.module.css';
 
 export function AdminCustomerListView() {
   const [filters, setFilters] = useState({ search: '', status: '', verified: '' }); const [cursor, setCursor] = useState<string>(); const [history, setHistory] = useState<Array<string | undefined>>([]);

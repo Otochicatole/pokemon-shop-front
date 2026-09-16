@@ -3,19 +3,158 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  Bell,
+  Coins,
+  Compass,
+  Headphones,
+  LogOut,
+  Package,
+  UserRound,
+} from 'lucide-react';
 import { toast } from 'sonner';
-import { getMe, logout } from '@/features/auth/infrastructure/api';
 import { Button } from '@/components/button';
+import { EmptyState, Notice } from '@/components/feedback';
+import { SectionHeading } from '@/components/heading';
+import { getMe, logout } from '@/features/auth/infrastructure/api';
 import { getLoyaltyAccount } from '@/features/loyalty';
 import { clearUserSessionCache } from '@/features/auth/application/session-cache';
 import { publishSessionSync } from '@/shared/auth/session-sync';
+import styles from './account-home.module.css';
+
+const tiles = [
+  {
+    href: '/account/points',
+    title: 'Mis puntos',
+    description: 'Revisá tu saldo, la regla vigente y cada movimiento.',
+    icon: Coins,
+    tone: 'points' as const,
+    dynamic: true,
+  },
+  {
+    href: '/account/orders',
+    title: 'Mis órdenes',
+    description: 'Consultá estados, pagos y comprobantes.',
+    icon: Package,
+    tone: 'orders' as const,
+  },
+  {
+    href: '/account/notifications',
+    title: 'Notificaciones',
+    description: 'Novedades de tus órdenes y soporte.',
+    icon: Bell,
+    tone: 'alerts' as const,
+  },
+  {
+    href: '/account/support',
+    title: 'Soporte',
+    description: 'Abrí una consulta y conversá con el equipo.',
+    icon: Headphones,
+    tone: 'support' as const,
+  },
+  {
+    href: '/account/profile',
+    title: 'Mi perfil',
+    description: 'Cambiá tu nombre y contraseña.',
+    icon: UserRound,
+    tone: 'profile' as const,
+  },
+  {
+    href: '/catalog',
+    title: 'Seguir explorando',
+    description: 'Encontrá tu próxima pieza en el catálogo.',
+    icon: Compass,
+    tone: 'catalog' as const,
+  },
+] as const;
 
 export function AccountHome() {
-  const router = useRouter(); const queryClient = useQueryClient();
+  const router = useRouter();
+  const queryClient = useQueryClient();
   const query = useQuery({ queryKey: ['me'], queryFn: getMe, retry: false });
-  const loyalty = useQuery({ queryKey: ['loyalty-account', 'summary'], queryFn: () => getLoyaltyAccount(), enabled: Boolean(query.data), retry: false });
-  const handleLogout = async () => { try { await logout(); clearUserSessionCache(queryClient); publishSessionSync('user', 'ended'); router.replace('/'); router.refresh(); } catch (error) { toast.error(error instanceof Error ? error.message : 'No se pudo cerrar la sesión'); } };
+  const loyalty = useQuery({
+    queryKey: ['loyalty-account', 'summary'],
+    queryFn: () => getLoyaltyAccount(),
+    enabled: Boolean(query.data),
+    retry: false,
+  });
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      clearUserSessionCache(queryClient);
+      publishSessionSync('user', 'ended');
+      router.replace('/');
+      router.refresh();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'No se pudo cerrar la sesión');
+    }
+  };
+
   if (query.isLoading) return <div className="page-loading">Cargando cuenta…</div>;
-  if (!query.data) return <div className="empty-state"><h1>Tu cuenta</h1><p>Ingresá para ver tus órdenes y gestionar tu acceso.</p><Link href="/auth/login?returnTo=/account" className="button button-primary">Ingresar</Link></div>;
-  return <div className="account-home"><div className="section-heading"><p className="eyebrow">Cuenta personal</p><h1>Hola, {query.data.name ?? 'coleccionista'}</h1><p>{query.data.email}</p>{!query.data.emailVerified && <div className="notice">Tu email todavía no está verificado. <Link href="/auth/verify-email">Verificar ahora</Link></div>}</div><div className="account-cards"><Link href="/account/points" className="account-points-card"><span>◎</span><strong>{loyalty.data ? `${loyalty.data.account.available} puntos disponibles` : 'Mis puntos'}</strong><small>Revisá tu saldo, la regla vigente y cada movimiento.</small></Link><Link href="/account/orders"><span>↗</span><strong>Mis órdenes</strong><small>Consultá estados, pagos y comprobantes.</small></Link><Link href="/account/notifications" className="account-notifications-card"><span>♢</span><strong>Notificaciones</strong><small>Revisá novedades de tus órdenes y soporte.</small></Link><Link href="/account/support" className="account-support-card"><span>?</span><strong>Soporte</strong><small>Abrí una consulta y conversá con nuestro equipo.</small></Link><Link href="/account/profile" className="account-profile-card"><span>◇</span><strong>Mi perfil</strong><small>Cambiá tu nombre y contraseña.</small></Link><Link href="/catalog"><span>◈</span><strong>Seguir explorando</strong><small>Encontrá tu próxima pieza.</small></Link></div><div className="account-actions"><a className="button button-secondary" href="/api/v2/auth/google">Vincular Google</a><Button variant="ghost" onClick={() => void handleLogout()}>Cerrar sesión</Button></div></div>;
+  if (!query.data) {
+    return (
+      <EmptyState
+        title="Tu cuenta"
+        description="Ingresá para ver tus órdenes y gestionar tu acceso."
+        icon={<UserRound size={36} aria-hidden="true" />}
+      >
+        <Link href="/auth/login?returnTo=/account" className="button button-primary">
+          Ingresar
+        </Link>
+      </EmptyState>
+    );
+  }
+
+  return (
+    <div className={styles.accountHome}>
+      <SectionHeading
+        level="h1"
+        eyebrow="Cuenta personal"
+        title={`Hola, ${query.data.name ?? 'coleccionista'}`}
+        description={query.data.email}
+        className={styles.heading}
+      />
+
+      {!query.data.emailVerified && (
+        <Notice className={styles.verifyNotice}>
+          Tu email todavía no está verificado.{' '}
+          <Link href="/auth/verify-email">Verificar ahora</Link>
+        </Notice>
+      )}
+
+      <div className={styles.accountCards}>
+        {tiles.map((tile) => {
+          const Icon = tile.icon;
+          const title =
+            'dynamic' in tile && tile.dynamic && loyalty.data
+              ? `${loyalty.data.account.available} puntos disponibles`
+              : tile.title;
+          return (
+            <Link
+              key={tile.href}
+              href={tile.href}
+              className={`${styles.card} ${styles[tile.tone]}`}
+            >
+              <span className={styles.cardIcon} aria-hidden="true">
+                <Icon size={20} />
+              </span>
+              <strong>{title}</strong>
+              <small>{tile.description}</small>
+            </Link>
+          );
+        })}
+      </div>
+
+      <div className={styles.accountActions}>
+        <a className="button button-secondary" href="/api/v2/auth/google">
+          Vincular Google
+        </a>
+        <Button variant="ghost" onClick={() => void handleLogout()}>
+          <LogOut size={14} aria-hidden="true" />
+          Cerrar sesión
+        </Button>
+      </div>
+    </div>
+  );
 }

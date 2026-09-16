@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useMemo, useRef, useState, type R
 import { usePathname, useRouter } from 'next/navigation';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import styles from './support-realtime-provider.module.css';
 import { getMe } from '@/features/auth/infrastructure/api';
 import { markUserSessionEnded, refreshUserSessionFromCookie } from '@/features/auth/application/session-cache';
 import { getAdminMe } from '@/features/admin-auth/infrastructure/api';
@@ -210,10 +211,11 @@ export function SupportRealtimeProvider({ children }: { children: ReactNode }) {
           const message = typeof payload?.message === 'string' ? payload.message : 'Tenés una novedad para revisar.';
           toast.custom((id) => <button
             type="button"
-            className="realtime-notification-toast"
+            className={`${styles.realtimeNotificationToast} realtime-notification-toast`}
             aria-label={`Abrir notificación: ${title}`}
             onClick={() => { toast.dismiss(id); router.push(href); }}
           >
+
             <strong>{title}</strong>
             <span>{message}</span>
           </button>);

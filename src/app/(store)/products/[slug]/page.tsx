@@ -6,6 +6,9 @@ import { getProduct, pokemonTypeLabels } from '@/features/catalog';
 import { AddToCartButton } from '@/features/cart/ui/add-to-cart-button';
 import { formatMoney } from '@/shared/lib/format';
 
+import styles from './page.module.css';
+
+
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const product = await getProduct(slug).catch(() => null);
@@ -21,34 +24,34 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   const availabilityLabel = product.available > 0 ? `${product.available} unidades disponibles` : 'Sin stock disponible';
 
   return (
-    <section className="page-container product-detail">
-      <Link href="/catalog" className="back-link">← Volver al catálogo</Link>
-      <div className="detail-grid">
-        <div className="detail-gallery">
-          <div className="detail-gallery-header"><span>PIEZA // {product.sku}</span><span>{product.images.length ? `${product.images.length} ${product.images.length === 1 ? 'vista' : 'vistas'}` : 'Vista única'}</span></div>
-          <figure className="detail-main-image">
-            <span className="detail-image-corner detail-image-corner-tl" aria-hidden="true" />
-            <span className="detail-image-corner detail-image-corner-br" aria-hidden="true" />
+    <section className={`${styles.productDetail} page-container product-detail`}>
+      <Link href="/catalog" className={`${styles.backLink} back-link`}>← Volver al catálogo</Link>
+      <div className={`${styles.detailGrid} detail-grid`}>
+        <div className={`${styles.detailGallery} detail-gallery`}>
+          <div className={`${styles.detailGalleryHeader} detail-gallery-header`}><span>PIEZA // {product.sku}</span><span>{product.images.length ? `${product.images.length} ${product.images.length === 1 ? 'vista' : 'vistas'}` : 'Vista única'}</span></div>
+          <figure className={`${styles.detailMainImage} detail-main-image`}>
+            <span className={`${styles.detailImageCorner} ${styles.detailImageCornerTl} detail-image-corner detail-image-corner-tl`} aria-hidden="true" />
+            <span className={`${styles.detailImageCorner} ${styles.detailImageCornerBr} detail-image-corner detail-image-corner-br`} aria-hidden="true" />
             {image ? <Image src={image.url} alt={image.altText || product.name} fill priority sizes="(max-width: 900px) 100vw, 56vw" /> : <div className="image-placeholder large"><span>◈</span></div>}
           </figure>
-          {product.images.length > 1 && <div className="detail-thumbnails" aria-label="Vistas del producto">{product.images.map((item, index) => <div className={`detail-thumbnail ${index === 0 ? 'is-active' : ''}`} key={item.id}><Image src={item.url} alt={item.altText || `${product.name}, vista ${index + 1}`} fill sizes="80px" /></div>)}</div>}
+          {product.images.length > 1 && <div className={`${styles.detailThumbnails} detail-thumbnails`} aria-label="Vistas del producto">{product.images.map((item, index) => <div className={`${styles.detailThumbnail} ${index === 0 ? `${styles.isActive} is-active` : ''} detail-thumbnail`} key={item.id}><Image src={item.url} alt={item.altText || `${product.name}, vista ${index + 1}`} fill sizes="80px" /></div>)}</div>}
         </div>
-        <div className="detail-copy">
-          <div className="detail-kicker"><span className="pixel-badge pixel-badge-yellow">{kindLabel}</span><span className="detail-code">SKU {product.sku}</span></div>
+        <div className={`${styles.detailCopy} detail-copy`}>
+          <div className={`${styles.detailKicker} detail-kicker`}><span className="pixel-badge pixel-badge-yellow">{kindLabel}</span><span className={`${styles.detailCode} detail-code`}>SKU {product.sku}</span></div>
           <h1>{product.name}</h1>
-          <p className="product-seller-line">Vendido por <strong>{product.seller.name}</strong></p>
-          <div className="detail-price-row"><p className="detail-price">{formatMoney(product.price)}</p><span className={product.available > 0 ? 'detail-stock-chip is-available' : 'detail-stock-chip is-empty'}>{product.available > 0 ? 'Disponible' : 'Agotado'}</span></div>
-          <section className="detail-description-block" aria-labelledby="product-description-title">
-            <span className="detail-section-label" id="product-description-title">Descripción</span>
-            <p className="detail-description">{product.description}</p>
+          <p className={`${styles.productSellerLine} product-seller-line`}>Vendido por <strong>{product.seller.name}</strong></p>
+          <div className={`${styles.detailPriceRow} detail-price-row`}><p className={`${styles.detailPrice} detail-price`}>{formatMoney(product.price)}</p><span className={`${styles.detailStockChip} ${product.available > 0 ? `${styles.isAvailable} is-available` : `${styles.isEmpty} is-empty`} detail-stock-chip`}>{product.available > 0 ? 'Disponible' : 'Agotado'}</span></div>
+          <section className={`${styles.detailDescriptionBlock} detail-description-block`} aria-labelledby="product-description-title">
+            <span className={`${styles.detailSectionLabel} detail-section-label`} id="product-description-title">Descripción</span>
+            <p className={`${styles.detailDescription} detail-description`}>{product.description}</p>
           </section>
           {product.pokemonCard && (
-            <section className="detail-specs-section" aria-labelledby="product-specs-title">
-              <div className="detail-specs-heading">
+            <section className={`${styles.detailSpecsSection} detail-specs-section`} aria-labelledby="product-specs-title">
+              <div className={`${styles.detailSpecsHeading} detail-specs-heading`}>
                 <span id="product-specs-title">Especificaciones</span>
                 <span>Detalles de la carta</span>
               </div>
-              <dl className="specs">
+              <dl className={`${styles.specs} specs`}>
                 {product.pokemonCard.pokemonType && <div><dt>Tipo / atributo</dt><dd>{pokemonTypeLabels[product.pokemonCard.pokemonType]}</dd></div>}
                 <div><dt>Set</dt><dd>{product.pokemonCard.setName}{product.pokemonCard.setCode ? ` · ${product.pokemonCard.setCode}` : ''}</dd></div>
                 <div><dt>Número</dt><dd>{product.pokemonCard.cardNumber}</dd></div>
@@ -61,17 +64,18 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
               </dl>
             </section>
           )}
-          <div className="detail-purchase-card">
-            <div className="detail-purchase-top"><span>DISPONIBILIDAD</span><strong>{availabilityLabel}</strong></div>
-            <div className="detail-stock-track" aria-hidden="true"><span style={{ width: `${Math.min(100, Math.max(8, product.available * 5))}%` }} /></div>
-            <div className="detail-cta">
+          <div className={`${styles.detailPurchaseCard} detail-purchase-card`}>
+            <div className={`${styles.detailPurchaseTop} detail-purchase-top`}><span>DISPONIBILIDAD</span><strong>{availabilityLabel}</strong></div>
+            <div className={`${styles.detailStockTrack} detail-stock-track`} aria-hidden="true"><span style={{ width: `${Math.min(100, Math.max(8, product.available * 5))}%` }} /></div>
+            <div className={`${styles.detailCta} detail-cta`}>
             <AddToCartButton product={product} />
               <p>{product.available > 0 ? 'Stock verificado al confirmar la compra.' : 'Este producto no está disponible en este momento.'}</p>
             </div>
           </div>
-          <div className="detail-trust-row"><span><b>✓</b> Compra protegida</span><span><b>◇</b> Envíos a todo el país</span></div>
+          <div className={`${styles.detailTrustRow} detail-trust-row`}><span><b>✓</b> Compra protegida</span><span><b>◇</b> Envíos a todo el país</span></div>
         </div>
       </div>
     </section>
   );
 }
+

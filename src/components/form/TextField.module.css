@@ -1,0 +1,25 @@
+.componentField {
+  display: grid;
+  gap: 7px;
+  color: var(--muted);
+  font: 9px var(--pixel-font);
+  text-transform: uppercase;
+}
+
+.componentField input {
+  min-height: 43px;
+  border: 2px solid var(--line);
+  border-radius: 0;
+  background: var(--surface);
+  color: var(--ink);
+  padding: 0 12px;
+  outline: 0;
+}
+
+.componentField input:focus {
+  border-color: var(--accent);
+}
+
+.componentField .formError {
+  margin: 0;
+}

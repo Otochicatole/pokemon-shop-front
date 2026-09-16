@@ -1,0 +1,30 @@
+.adminSwitch {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  min-width: 0;
+}
+
+.adminSwitch > span {
+  min-width: 0;
+}
+
+.adminSwitch strong,
+.adminSwitch small {
+  display: block;
+}
+
+.adminSwitch strong {
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.adminSwitch small {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+

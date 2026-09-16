@@ -1,0 +1,73 @@
+.authForm {
+  display: grid;
+  gap: 17px;
+}
+
+.authForm label {
+  display: grid;
+  gap: 7px;
+  color: var(--ink);
+  font: 9px var(--pixel-font);
+  text-transform: uppercase;
+}
+
+.authForm input {
+  min-height: 43px;
+  border: 2px solid var(--line);
+  border-radius: 0;
+  background: var(--surface);
+  color: var(--ink);
+  padding: 0 12px;
+  outline: 0;
+  font-family: inherit;
+}
+
+.authForm input:focus {
+  border-color: var(--accent);
+}
+
+.authForm :global(.button) {
+  width: 100%;
+  margin-top: 7px;
+}
+
+.formError {
+  margin: 0;
+  padding: 11px;
+  border-left: 4px solid var(--warm);
+  background: rgba(255,91,85,.12);
+  color: #ffaaa6;
+  font-size: 12px;
+}
+
+.googleButton {
+  min-height: 46px;
+  border: 2px solid var(--line);
+  display: grid;
+  place-items: center;
+  font: 9px var(--pixel-font);
+  color: var(--ink);
+  text-decoration: none;
+  background: var(--surface);
+}
+
+.googleButton:hover {
+  border-color: var(--accent);
+}
+
+.formLink {
+  text-align: center;
+  color: var(--muted);
+  font-size: 12px;
+  text-decoration: underline;
+}
+
+.formLink:hover {
+  color: var(--accent);
+}
+
+.formHint {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.5;
+}

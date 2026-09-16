@@ -1,0 +1,49 @@
+.pointsLink {
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  gap: 8px;
+  padding: 0 11px;
+  font: 8px var(--pixel-font);
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+.pointsLink span {
+  min-width: 22px;
+  padding: 5px 4px;
+  text-align: center;
+  background: var(--cyan);
+  color: #080a0e;
+}
+
+.pointsLink:hover,
+.pointsLink:focus-visible {
+  border-color: var(--cyan);
+  color: var(--cyan);
+}
+
+@media (max-width: 760px) {
+  .pointsLink {
+    width: 42px;
+    padding: 0;
+    position: relative;
+    gap: 0;
+  }
+  .pointsLink span {
+    min-width: 18px;
+    height: 18px;
+    position: absolute;
+    top: -7px;
+    right: -6px;
+    display: grid;
+    place-items: center;
+    padding: 0 3px;
+    border: 2px solid var(--paper);
+    font-size: 6px;
+  }
+}

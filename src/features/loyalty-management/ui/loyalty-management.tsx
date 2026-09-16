@@ -9,6 +9,7 @@ import { adminErrorMessage } from '@/shared/admin/client';
 import { adminMoney } from '@/shared/admin/format';
 import type { AdminLoyaltyProgram } from '../domain/contracts';
 import { getAdminLoyaltyProgram, updateAdminLoyaltyProgram } from '../infrastructure/api';
+import styles from './loyalty-management.module.css';
 
 function decimalFromMinor(value: string) {
   const minor = BigInt(value);

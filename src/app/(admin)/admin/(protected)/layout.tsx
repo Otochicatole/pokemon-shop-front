@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation';
 import { AdminAppShell, getAdminServerSession } from '@/features/admin-auth';
+import styles from './layout.module.css';
 
 export const dynamic = 'force-dynamic';
 

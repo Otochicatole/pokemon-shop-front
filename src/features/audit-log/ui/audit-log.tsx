@@ -8,6 +8,7 @@ import { adminErrorMessage } from '@/shared/admin/client';
 import { adminDate } from '@/shared/admin/format';
 import type { AuditEntry } from '../domain/contracts';
 import { listAuditEntries } from '../infrastructure/api';
+import styles from './audit-log.module.css';
 
 export function AuditLogView() {
   const [filters, setFilters] = useState({ actorId: '', action: '', entityType: '', requestId: '', from: '', to: '' }); const [cursor, setCursor] = useState<string>(); const [history, setHistory] = useState<Array<string | undefined>>([]); const [selected, setSelected] = useState<AuditEntry | null>(null);

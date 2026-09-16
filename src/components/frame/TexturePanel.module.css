@@ -1,0 +1,6 @@
+.texturePanel {
+  border: 2px solid var(--line);
+  background-color: var(--surface);
+  background-image: radial-gradient(#2c3c4b 1px, transparent 1px);
+  background-size: 14px 14px;
+}

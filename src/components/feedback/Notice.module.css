@@ -1,0 +1,13 @@
+.notice {
+  margin-top: 18px;
+  padding: 13px;
+  border-left: 4px solid var(--accent);
+  background: rgba(255, 213, 47, .1);
+  color: #f7df7b;
+  font-size: 12px;
+}
+
+.notice a {
+  text-decoration: underline;
+  font-weight: 700;
+}

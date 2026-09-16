@@ -8,6 +8,7 @@ import { AdminDataTable, AdminPageHeader, Button, CursorPagination, SelectField,
 import { adminErrorMessage } from '@/shared/admin/client';
 import { adminDate, AdminBadge, adminMoney } from '@/shared/admin/format';
 import { listAdminOrders } from '../infrastructure/api';
+import styles from './admin-order-list.module.css';
 
 export function AdminOrderListView() {
   const [filters, setFilters] = useState({ search: '', status: '', paymentMethod: '', paymentStatus: '', fulfillmentType: '', from: '', to: '' });

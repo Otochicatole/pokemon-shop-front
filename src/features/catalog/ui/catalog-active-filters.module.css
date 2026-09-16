@@ -1,0 +1,67 @@
+.catalogActiveFilters {
+  margin-top: 16px;
+  display: flex;
+  align-items: start;
+  gap: 12px;
+}
+
+.catalogActiveFilters > span {
+  flex: 0 0 auto;
+  padding-top: 8px;
+  color: var(--muted);
+  font: 7px var(--pixel-font);
+  text-transform: uppercase;
+}
+
+.catalogActiveFilters > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.catalogActiveFilters button {
+  min-height: 34px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 10px;
+  border: 2px solid var(--line);
+  background: rgba(83, 190, 229, .06);
+  color: var(--ink);
+  font-size: 12px;
+  line-height: 1.2;
+  cursor: pointer;
+  transition: border-color .14s, color .14s, background .14s;
+}
+
+.catalogActiveFilters button:hover {
+  border-color: var(--cyan);
+  background: rgba(83, 190, 229, .12);
+  color: #fff;
+}
+
+.catalogClearAll {
+  border-color: transparent !important;
+  background: transparent !important;
+  color: var(--accent) !important;
+  font: 7px var(--pixel-font) !important;
+  text-transform: uppercase;
+  box-shadow: none !important;
+}
+
+.catalogClearAll:hover {
+  border-color: transparent !important;
+  background: transparent !important;
+  color: #fff !important;
+}
+
+@media (max-width: 760px) {
+  .catalogActiveFilters {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .catalogActiveFilters > span {
+    padding-top: 0;
+  }
+}

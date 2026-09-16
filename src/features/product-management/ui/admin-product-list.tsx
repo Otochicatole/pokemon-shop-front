@@ -11,6 +11,7 @@ import { adminErrorMessage } from '@/shared/admin/client';
 import { adminMoney, AdminBadge } from '@/shared/admin/format';
 import type { AdminProduct } from '../domain/contracts';
 import { deleteAdminProduct, listAdminProducts } from '../infrastructure/api';
+import styles from './admin-product-list.module.css';
 
 export function AdminProductListView() {
   const [filters, setFilters] = useState({ search: '', status: '', kind: '', stock: '', pokemonType: '', setName: '' });

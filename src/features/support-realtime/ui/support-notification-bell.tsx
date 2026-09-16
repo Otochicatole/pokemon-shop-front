@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { Bell, BellRing } from 'lucide-react';
 import { useSupportRealtime } from './support-realtime-provider';
 
+import styles from './support-notification-bell.module.css';
+
 export function SupportNotificationBell({ variant = 'store' }: { variant?: 'store' | 'admin' }) {
   const { authenticated, unreadCount, connectionState, role } = useSupportRealtime();
   if (!authenticated) return null;
@@ -13,9 +15,10 @@ export function SupportNotificationBell({ variant = 'store' }: { variant?: 'stor
     ? `Soporte: ${unreadCount} ${unreadCount === 1 ? 'mensaje sin leer' : 'mensajes sin leer'}`
     : 'Soporte: sin mensajes nuevos';
   const Icon = unreadCount > 0 ? BellRing : Bell;
+  const variantClass = variant === 'store' ? styles.supportNotificationLinkStore : '';
   return <Link
     href={href}
-    className={`support-notification-link support-notification-link-${variant} ${unreadCount > 0 ? 'has-unread' : ''}`}
+    className={`${styles.supportNotificationLink} ${variantClass} support-notification-link support-notification-link-${variant} ${unreadCount > 0 ? `${styles.hasUnread} has-unread` : ''}`}
     aria-label={label}
     title={connectionState === 'reconnecting' ? `${label}. Reconectando…` : label}
   >
@@ -23,3 +26,4 @@ export function SupportNotificationBell({ variant = 'store' }: { variant?: 'stor
     {unreadCount > 0 && <span aria-hidden="true">{countLabel}</span>}
   </Link>;
 }
+

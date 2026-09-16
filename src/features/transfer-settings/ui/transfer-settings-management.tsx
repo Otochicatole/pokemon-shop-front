@@ -8,6 +8,7 @@ import { AdminPageHeader, Button, SwitchField, TextField } from '@/components';
 import { adminErrorMessage } from '@/shared/admin/client';
 import type { AdminTransferSettings } from '../domain/contracts';
 import { getAdminTransferSettings, updateAdminTransferSettings } from '../infrastructure/api';
+import styles from './transfer-settings-management.module.css';
 
 function TransferSettingsEditor({ settings }: { settings: AdminTransferSettings }) {
   const queryClient = useQueryClient();

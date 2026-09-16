@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation';
+import { ShieldCheck } from 'lucide-react';
 import { AdminLoginForm, getAdminServerSession } from '@/features/admin-auth';
 
 export const metadata = { title: 'Acceso administrativo' };
@@ -8,5 +9,29 @@ export default async function AdminLoginPage({ searchParams }: { searchParams: P
   const admin = await getAdminServerSession();
   if (admin) redirect('/admin');
   const query = await searchParams;
-  return <main className="admin-login-page"><section className="admin-login-intro"><div className="admin-brand"><span className="admin-brand-mark">CS</span><span>Card Shop<small>Centro de operaciones</small></span></div><div><h1>Controlá la <span>colección.</span></h1><p>Productos, stock, órdenes y pagos en una superficie de trabajo segura.</p></div><span className="admin-login-signal">Sistema preparado</span></section><div className="admin-login-panel"><AdminLoginForm returnTo={query.returnTo} /></div></main>;
+  return (
+    <main className="admin-login-page">
+      <section className="admin-login-intro">
+        <div className="admin-brand">
+          <span className="admin-brand-mark">
+            <ShieldCheck size={21} aria-hidden="true" />
+          </span>
+          <span>
+            Card Shop
+            <small>Control central</small>
+          </span>
+        </div>
+        <div>
+          <h1>
+            Controlá la <span>colección.</span>
+          </h1>
+          <p>Productos, stock, órdenes y pagos en una superficie de trabajo segura.</p>
+        </div>
+        <span className="admin-login-signal">Sistema preparado</span>
+      </section>
+      <div className="admin-login-panel">
+        <AdminLoginForm returnTo={query.returnTo} />
+      </div>
+    </main>
+  );
 }

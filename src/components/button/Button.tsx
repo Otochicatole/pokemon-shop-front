@@ -1,4 +1,5 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
+import styles from './Button.module.css';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
 
@@ -8,5 +9,7 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 export function Button({ className = '', variant = 'primary', children, ...props }: ButtonProps) {
-  return <button className={`button button-${variant} ${className}`} {...props}>{children}</button>;
+  const variantClass = styles[variant] || '';
+  return <button className={`${styles.button} ${variantClass} button button-${variant} ${className}`.trim()} {...props}>{children}</button>;
 }
+

@@ -1,7 +1,16 @@
 import type { InputHTMLAttributes, ReactNode } from 'react';
+import styles from './TextField.module.css';
 
 export interface TextFieldProps extends InputHTMLAttributes<HTMLInputElement> { label: string; hint?: ReactNode; error?: string; }
 export function TextField({ label, hint, error, id, className = '', ...props }: TextFieldProps) {
   const inputId = id ?? `field-${label.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
-  return <label className={`component-field ${className}`} htmlFor={inputId}><span>{label}</span><input id={inputId} aria-invalid={Boolean(error)} aria-describedby={error ? `${inputId}-error` : hint ? `${inputId}-hint` : undefined} {...props} />{error && <small id={`${inputId}-error`} className="form-error">{error}</small>}{hint && !error && <small id={`${inputId}-hint`} className="form-hint">{hint}</small>}</label>;
+  return (
+    <label className={`${styles.componentField} component-field ${className}`.trim()} htmlFor={inputId}>
+      <span>{label}</span>
+      <input id={inputId} aria-invalid={Boolean(error)} aria-describedby={error ? `${inputId}-error` : hint ? `${inputId}-hint` : undefined} {...props} />
+      {error && <small id={`${inputId}-error`} className={`${styles.formError} form-error`}>{error}</small>}
+      {hint && !error && <small id={`${inputId}-hint`} className="form-hint">{hint}</small>}
+    </label>
+  );
 }
+

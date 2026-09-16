@@ -1,0 +1,38 @@
+.sectionHeading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.sectionHeading h1,
+.sectionHeading h2,
+.sectionHeading h3 {
+  margin: 13px 0 10px;
+  line-height: 1.28;
+  letter-spacing: .02em;
+  font-family: var(--pixel-font);
+  font-weight: 400;
+  text-transform: uppercase;
+}
+
+.sectionHeading h1 {
+  font-size: clamp(29px, 4vw, 48px);
+}
+
+.sectionHeading h2 {
+  font-size: clamp(25px, 3vw, 38px);
+}
+
+.sectionHeading div > p:last-child {
+  color: var(--muted);
+  margin: 0;
+  line-height: 1.6;
+}
+
+@media (max-width: 760px) {
+  .sectionHeading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

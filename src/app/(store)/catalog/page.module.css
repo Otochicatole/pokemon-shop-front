@@ -1,0 +1,96 @@
+.pageContainer {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 56px 4.2vw 100px;
+}
+
+.pageIntro {
+  margin-bottom: 8px;
+  padding-bottom: 28px;
+  border-bottom: 2px solid var(--line);
+  background:
+    linear-gradient(180deg, rgba(22, 34, 45, .28), transparent 70%);
+}
+
+.pageHeading :global(h1) {
+  text-shadow: 4px 4px 0 #26323e;
+}
+
+.pageHeading :global(p:last-child) {
+  max-width: 42rem;
+}
+
+.shortcuts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.shortcut {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 40px;
+  padding: 0 14px;
+  border: 2px solid var(--line);
+  background: rgba(16, 22, 29, .88);
+  color: var(--ink);
+  font: 7px var(--pixel-font);
+  text-transform: uppercase;
+  text-decoration: none;
+  box-shadow: 3px 3px 0 #05070a;
+  transition: border-color .16s, color .16s, transform .16s;
+}
+
+.shortcut:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 #05070a;
+}
+
+.shortcut svg {
+  flex: 0 0 auto;
+}
+
+.shortcutYellow:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.shortcutRed:hover {
+  border-color: var(--warm);
+  color: var(--warm);
+}
+
+.shortcutCyan:hover {
+  border-color: var(--cyan);
+  color: var(--cyan);
+}
+
+.pageLoading {
+  margin-top: 40px;
+  color: var(--muted);
+  font: 8px var(--pixel-font);
+  text-transform: uppercase;
+}
+
+@media (max-width: 760px) {
+  .pageContainer {
+    padding: 36px 4vw 70px;
+  }
+
+  .pageIntro {
+    padding-bottom: 20px;
+  }
+
+  .shortcuts {
+    margin-top: 18px;
+  }
+
+  .shortcut {
+    flex: 1 1 auto;
+    justify-content: center;
+    min-width: calc(50% - 5px);
+  }
+}

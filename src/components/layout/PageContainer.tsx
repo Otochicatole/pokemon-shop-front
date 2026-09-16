@@ -1,2 +1,7 @@
 import type { HTMLAttributes } from 'react';
-export function PageContainer({ className = '', children, ...props }: HTMLAttributes<HTMLElement>) { return <div className={`page-container ${className}`} {...props}>{children}</div>; }
+import styles from './PageContainer.module.css';
+
+export function PageContainer({ className = '', children, ...props }: HTMLAttributes<HTMLElement>) {
+  return <div className={`${styles.pageContainer} page-container ${className}`.trim()} {...props}>{children}</div>;
+}
+

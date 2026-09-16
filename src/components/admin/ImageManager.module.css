@@ -1,0 +1,26 @@
+.adminImageGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 16px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.adminImagePreview {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  border: 2px solid var(--line);
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.adminImageEmpty {
+  display: grid;
+  place-items: center;
+  gap: 12px;
+  padding: 40px 20px;
+  border: 2px dashed var(--line);
+  color: var(--muted);
+  text-align: center;
+}

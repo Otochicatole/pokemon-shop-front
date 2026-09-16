@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { AdminPageHeader, Button } from '@/components';
+import styles from './error.module.css';
 
 export default function AdminError({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
   useEffect(() => { console.error(error); }, [error]);

@@ -1,0 +1,8 @@
+/* Sticky must live on this wrapper: a sticky child cannot stick
+   past a parent that only wraps the header height. */
+.storeHeader {
+  width: 100%;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}

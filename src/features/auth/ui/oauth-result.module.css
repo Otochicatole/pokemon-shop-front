@@ -1,0 +1,40 @@
+.authPage {
+  min-height: calc(100vh - 118px);
+  display: grid;
+  grid-template-columns: 1fr;
+}
+
+.authPanel {
+  display: grid;
+  place-items: center;
+  padding: 50px 24px;
+}
+
+.full {
+  grid-column: 1 / -1;
+}
+
+.authCard {
+  width: min(100%, 420px);
+  padding: 30px;
+  border: 2px solid var(--line-strong);
+  background: var(--surface);
+  box-shadow: 8px 8px 0 #05070a;
+}
+
+.authCard h1 {
+  margin: 18px 0 30px;
+  font-size: 25px;
+  line-height: 1.5;
+  font-family: var(--pixel-font);
+}
+
+.authCard p {
+  line-height: 1.6;
+  color: var(--muted);
+  margin-bottom: 20px;
+}
+
+.authCard :global(.button) {
+  width: 100%;
+}

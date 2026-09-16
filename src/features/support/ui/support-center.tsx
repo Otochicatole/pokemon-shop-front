@@ -15,7 +15,7 @@ import { ApiError } from '@/shared/api/client';
 import { PendingClientMessageId, supportPayloadFingerprint } from '@/shared/lib/pending-client-message-id';
 import { type CreateSupportConversationInput, type SupportConversationStatus, supportStatusLabels } from '../domain/contracts';
 import { createSupportConversation, listSupportConversations } from '../infrastructure/api';
-import styles from './support.module.css';
+import styles from './support-center.module.css';
 
 type StatusFilter = SupportConversationStatus | 'ALL';
 

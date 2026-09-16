@@ -1,0 +1,31 @@
+.adminDataTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.adminTableWrap {
+  width: 100%;
+  overflow-x: auto;
+  border: 2px solid var(--line);
+  background: rgba(12, 18, 25, .97);
+  box-shadow: 5px 5px 0 #05070a;
+}
+
+.adminTableEmpty {
+  min-height: 200px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 10px;
+  padding: 40px 28px;
+  border: 2px dashed var(--line-strong);
+  background: rgba(16, 22, 29, .45);
+  color: var(--muted);
+  text-align: center;
+}
+
+.adminTableEmpty::before {
+  content: '◈';
+  color: var(--accent);
+  font: 24px var(--pixel-font);
+}

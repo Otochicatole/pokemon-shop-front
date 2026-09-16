@@ -1,0 +1,5 @@
+.pixelFrame {
+  border: 2px solid var(--line-strong);
+  background: var(--surface);
+  box-shadow: 6px 6px 0 #05070a;
+}

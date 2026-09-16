@@ -9,6 +9,7 @@ import { adminDate, adminMoney, AdminBadge } from '@/shared/admin/format';
 import { adminErrorMessage } from '@/shared/admin/client';
 import { getAdminDashboard } from '../infrastructure/api';
 import type { DashboardRange } from '../domain/contracts';
+import styles from './admin-dashboard.module.css';
 
 const ranges: Array<{ value: DashboardRange; label: string }> = [{ value: 'TODAY', label: 'Hoy' }, { value: '7D', label: '7 días' }, { value: '30D', label: '30 días' }];
 

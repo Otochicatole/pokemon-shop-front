@@ -1,0 +1,4 @@
+.productPrice {
+  color: var(--accent);
+  font: 13px var(--pixel-font);
+}

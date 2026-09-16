@@ -2,6 +2,8 @@
 import type { ReactNode } from 'react';
 import { useEffect, useId, useRef } from 'react';
 
+import styles from './Dialog.module.css';
+
 const focusableSelector = 'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 export function Dialog({ open, title, onClose, children, className = '', description }: { open: boolean; title: string; onClose: () => void; children: ReactNode; className?: string; description?: string }) {
@@ -54,5 +56,15 @@ export function Dialog({ open, title, onClose, children, className = '', descrip
   }, [open]);
 
   if (!open) return null;
-  return <div className="dialog-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}><section ref={dialogRef} tabIndex={-1} className={`dialog ${className}`} role="dialog" aria-modal="true" aria-labelledby={titleId} aria-describedby={description ? descriptionId : undefined}><button type="button" className="dialog-close" onClick={onClose} aria-label="Cerrar">×</button><h2 id={titleId}>{title}</h2>{description && <p id={descriptionId}>{description}</p>}{children}</section></div>;
+  return (
+    <div className={`${styles.backdrop} dialog-backdrop`} role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}>
+      <section ref={dialogRef} tabIndex={-1} className={`${styles.dialog} dialog ${className}`.trim()} role="dialog" aria-modal="true" aria-labelledby={titleId} aria-describedby={description ? descriptionId : undefined}>
+        <button type="button" className={`${styles.close} dialog-close`} onClick={onClose} aria-label="Cerrar">×</button>
+        <h2 id={titleId}>{title}</h2>
+        {description && <p id={descriptionId}>{description}</p>}
+        {children}
+      </section>
+    </div>
+  );
 }
+

@@ -1,0 +1,23 @@
+.errorState {
+  min-height: 260px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 10px;
+  text-align: center;
+  color: var(--muted);
+}
+
+.errorState h1,
+.errorState h2 {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--pixel-font);
+  font-size: 20px;
+  line-height: 1.5;
+}
+
+.errorIcon {
+  color: var(--warm);
+  font-size: 38px;
+}

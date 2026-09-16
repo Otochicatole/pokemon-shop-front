@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import styles from './affiliate-admin-navigation.module.css';
 
 export type AffiliateAdminSection = 'overview' | 'sellers' | 'listings' | 'orders' | 'issues' | 'cancellations' | 'payouts' | 'settings';
 

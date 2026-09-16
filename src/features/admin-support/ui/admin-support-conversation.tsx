@@ -18,6 +18,7 @@ import {
   updateAdminSupportConversationStatus,
 } from '../infrastructure/api';
 import { SupportStatusBadge, supportStatusLabel } from './support-status';
+import styles from './admin-support-conversation.module.css';
 
 function MessageBubble({ message }: { message: AdminSupportMessage }) {
   const own = message.senderType === 'ADMIN';

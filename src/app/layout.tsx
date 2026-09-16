@@ -7,6 +7,7 @@ import '@fontsource/nunito/800.css';
 import '@fontsource/nunito/900.css';
 import './globals.css';
 import { Providers } from './providers';
+import styles from './layout.module.css';
 
 const geistSans = Geist({ variable: '--font-geist', subsets: ['latin'] });
 

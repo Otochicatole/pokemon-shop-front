@@ -1,0 +1,33 @@
+.productGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 36px;
+}
+
+.skeletonCard {
+  aspect-ratio: 4 / 5;
+  border: 2px solid var(--line);
+  background: linear-gradient(110deg, #10161d 30%, #253442 45%, #10161d 60%);
+  background-size: 200% 100%;
+  animation: shine 1.3s infinite;
+}
+
+@keyframes shine {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@media (max-width: 1050px) {
+  .productGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .productGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 15px 10px;
+  }
+}

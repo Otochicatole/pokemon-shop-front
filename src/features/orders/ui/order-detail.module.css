@@ -1,0 +1,390 @@
+.orderPage {
+  width: min(100%, 1040px);
+  margin: 0 auto;
+}
+
+.backLink {
+  margin-bottom: 22px;
+}
+
+.heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  padding-bottom: 26px;
+  border-bottom: 2px solid var(--line);
+}
+
+.heading h1 {
+  margin: 12px 0 10px;
+  font: clamp(28px, 4vw, 46px)/1.2 var(--pixel-font);
+  text-transform: uppercase;
+  text-shadow: 4px 4px 0 #26323e;
+}
+
+.heading > div > p:last-child {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.orderColumns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 28px;
+}
+
+.orderCard {
+  position: relative;
+  padding: 26px;
+  border: 2px solid var(--line);
+  background: linear-gradient(145deg, rgba(22, 30, 39, .9), var(--surface) 62%);
+  box-shadow: 5px 5px 0 #05070a;
+}
+
+.cardLabel {
+  margin-bottom: 14px;
+  color: var(--accent);
+  font: 8px var(--pixel-font);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+.orderCard h2 {
+  margin: 0 0 18px;
+  font: 13px var(--pixel-font);
+  text-transform: uppercase;
+}
+
+.mt {
+  margin-top: 30px !important;
+}
+
+.orderCard > p {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.summaryLine,
+.summaryTotal {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 13px 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.summaryLine strong {
+  color: var(--ink);
+  text-align: right;
+}
+
+.loyaltyDiscount,
+.loyaltyDiscount strong {
+  color: var(--green);
+}
+
+.summaryTotal {
+  padding-top: 17px;
+  border-top: 2px solid var(--line);
+  color: var(--ink);
+  font: 11px var(--pixel-font);
+}
+
+.summaryTotal strong {
+  color: var(--accent);
+  font-size: 14px;
+}
+
+.bankDetails {
+  display: grid;
+  gap: 5px;
+  margin-top: 18px;
+  padding: 14px;
+  border-left: 4px solid var(--accent);
+  background: rgba(255, 213, 47, .09);
+  color: #f7df7b;
+  font-size: 12px;
+}
+
+.uploadBox {
+  margin-top: 18px;
+  padding: 15px;
+  display: grid;
+  gap: 8px;
+  border: 2px dashed var(--cyan);
+  color: var(--cyan);
+  font: 9px var(--pixel-font);
+  cursor: pointer;
+  transition: border-color .16s, background-color .16s, color .16s;
+}
+
+.uploadBox:hover,
+.uploadBox:focus-within {
+  border-color: var(--accent);
+  background: rgba(255, 213, 47, .08);
+  color: var(--accent);
+}
+
+.uploadBox input {
+  font: 11px var(--font-geist), Arial, sans-serif;
+  cursor: pointer;
+}
+
+.uploadBox input:disabled {
+  cursor: not-allowed;
+}
+
+.cancelButton {
+  margin-top: 22px;
+  color: var(--warm);
+}
+
+.formHint {
+  margin-top: 14px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.formHint p {
+  margin: 0 0 8px;
+}
+
+.orderTimelineCard {
+  grid-column: 1 / -1;
+}
+
+.orderTimeline {
+  margin: 0;
+  padding: 0 0 0 20px;
+  border-left: 2px solid var(--line);
+  list-style: none;
+}
+
+.orderTimeline li {
+  position: relative;
+  display: flex;
+  gap: 14px;
+  min-height: 62px;
+  padding: 0 0 22px 18px;
+}
+
+.orderTimeline li:last-child {
+  min-height: 0;
+  padding-bottom: 0;
+}
+
+.orderTimelineMarker {
+  width: 10px;
+  height: 10px;
+  position: absolute;
+  left: -26px;
+  top: 4px;
+  border: 2px solid #070a0f;
+  background: var(--line-strong);
+  box-shadow: 0 0 0 2px var(--line-strong);
+}
+
+.isCurrent .orderTimelineMarker {
+  background: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent), 0 0 12px rgba(255, 213, 47, .42);
+}
+
+.orderTimeline strong,
+.orderTimeline span {
+  display: block;
+}
+
+.orderTimeline strong {
+  font: 11px var(--pixel-font);
+  text-transform: uppercase;
+}
+
+.orderTimeline span:not(.orderTimelineMarker) {
+  margin-top: 7px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.orderLoyalty {
+  display: flex;
+  gap: 12px;
+  margin-top: 18px;
+  padding: 14px;
+  border: 2px solid rgba(255, 213, 47, .45);
+  background: rgba(255, 213, 47, .07);
+  color: var(--accent);
+}
+
+.orderLoyalty p {
+  margin: 0 0 6px;
+  color: #cbd3d9;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.orderLoyalty p:last-child {
+  margin-bottom: 0;
+}
+
+.orderLoyalty strong {
+  color: var(--ink);
+}
+
+.orderSellerOrders {
+  margin-top: 24px;
+}
+
+.sellerIntro {
+  margin-bottom: 8px;
+}
+
+.sellerIntro h2 {
+  margin: 10px 0 8px;
+  font: 16px/1.4 var(--pixel-font);
+  text-transform: uppercase;
+}
+
+.sellerIntro > p:last-child {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.sellerOrderCards {
+  display: grid;
+  gap: 16px;
+  margin-top: 18px;
+}
+
+.sellerOrderCard {
+  padding: 20px;
+  border: 2px solid var(--line);
+  background: rgba(10, 15, 20, .72);
+  box-shadow: 4px 4px 0 #05070a;
+}
+
+.sellerOrderCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 15px;
+  margin-bottom: 16px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--line);
+}
+
+.sellerOrderCardHeader h3 {
+  margin: 8px 0 6px;
+  font: 13px/1.4 var(--pixel-font);
+  text-transform: uppercase;
+}
+
+.sellerOrderCardHeader p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.sellerOrderCardContent {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 18px;
+}
+
+.sellerOrderCardContent h4 {
+  margin: 0 0 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font: 11px var(--pixel-font);
+  text-transform: uppercase;
+}
+
+.sellerOrderCardContent p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.sellerOrderTimeline {
+  margin-top: 18px;
+  margin-bottom: 18px;
+}
+
+.sellerActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.orderDialogActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.issueForm {
+  display: grid;
+  gap: 14px;
+  padding-top: 8px;
+}
+
+.issueField {
+  display: grid;
+  gap: 8px;
+  color: var(--muted);
+  font: 8px var(--pixel-font);
+  text-transform: uppercase;
+}
+
+.issueField textarea {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid var(--line);
+  background: #0a0f14;
+  color: var(--ink);
+  resize: vertical;
+  line-height: 1.55;
+}
+
+.issueField textarea:focus {
+  border-color: var(--accent);
+  outline: 0;
+}
+
+@media (max-width: 1050px) {
+  .orderColumns {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .orderTimelineCard {
+    grid-column: auto;
+  }
+
+  .sellerOrderCardContent {
+    grid-template-columns: 1fr;
+  }
+
+  .orderDialogActions,
+  .sellerActions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

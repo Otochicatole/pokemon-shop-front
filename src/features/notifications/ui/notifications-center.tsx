@@ -20,7 +20,7 @@ import {
   markAllNotificationsRead,
   markNotificationRead,
 } from '../infrastructure/api';
-import styles from './notifications.module.css';
+import styles from './notifications-center.module.css';
 
 type Role = 'user' | 'admin';
 type Filter = 'ALL' | 'UNREAD';
@@ -114,10 +114,21 @@ export function NotificationsCenter({ role }: { role: Role }) {
   };
 
   return <div className={styles.center}>
-    <Link href={basePath} className="back-link">← Volver a {role === 'admin' ? 'dashboard' : 'mi cuenta'}</Link>
+    <Link href={basePath} className={`back-link ${styles.backLink}`}>← Volver a {role === 'admin' ? 'dashboard' : 'mi cuenta'}</Link>
     <header className={styles.heading}>
-      <div><p className="eyebrow">Centro de avisos</p><h1><Bell size={27} aria-hidden="true" />Notificaciones</h1><p>Todo lo importante sobre tus órdenes y conversaciones aparece acá.</p></div>
-      <div className={styles.actions}><Button variant="ghost" onClick={() => void query.refetch()} disabled={query.isFetching}><RefreshCw size={16} aria-hidden="true" />Actualizar</Button><Button variant="secondary" onClick={() => markAll.mutate()} disabled={markAll.isPending || !items.some((item) => !item.readAt)}><CheckCheck size={16} aria-hidden="true" />Marcar todas como leídas</Button></div>
+      <div>
+        <p className="eyebrow">Centro de avisos</p>
+        <h1><Bell size={28} aria-hidden="true" />Notificaciones</h1>
+        <p>Todo lo importante sobre tus órdenes y conversaciones aparece acá.</p>
+      </div>
+      <div className={styles.actions}>
+        <Button variant="ghost" onClick={() => void query.refetch()} disabled={query.isFetching}>
+          <RefreshCw size={16} aria-hidden="true" />Actualizar
+        </Button>
+        <Button variant="secondary" onClick={() => markAll.mutate()} disabled={markAll.isPending || !items.some((item) => !item.readAt)}>
+          <CheckCheck size={16} aria-hidden="true" />Marcar todas como leídas
+        </Button>
+      </div>
     </header>
     <div className={styles.toolbar} role="tablist" aria-label="Filtro de notificaciones">
       <button type="button" role="tab" aria-selected={filter === 'ALL'} className={filter === 'ALL' ? styles.activeTab : ''} onClick={() => setFilter('ALL')}>Todas</button>

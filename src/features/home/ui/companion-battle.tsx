@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import { useState } from 'react';
 import { PokemonStage } from '@/components/pokemon-stage';
+import styles from './companion-battle.module.css';
 import { companions, type Companion } from '../domain/companion';
 
 const groundOffsets: Record<Companion['id'], string> = {
@@ -16,10 +17,10 @@ export function CompanionBattle() {
   const selected = companions.find((companion) => companion.id === selectedId) ?? companions[0];
 
   return (
-    <div className="hero-art battle-scene" aria-label="Elegí tu compañero Pokémon">
-      <div className="route-label" aria-hidden="true">RUTA 10 <span /> CENTRAL POKÉMON DE ENTRENADORES</div>
+    <div className={`${styles.battleScene} hero-art battle-scene`} aria-label="Elegí tu compañero Pokémon">
+      <div className={`${styles.routeLabel} route-label`} aria-hidden="true">RUTA 10 <span /> CENTRAL POKÉMON DE ENTRENADORES</div>
 
-      <div className="battle-hud" aria-label={`${selected.name}, nivel ${selected.level}, ${selected.hp} puntos de salud`}>
+      <div className={`${styles.battleHud} battle-hud`} aria-label={`${selected.name}, nivel ${selected.level}, ${selected.hp} puntos de salud`}>
         <span>{selected.name}</span>
         <b>Lv. {selected.level}</b>
         <div aria-hidden="true"><i /><i /><i /><i /></div>
@@ -35,7 +36,7 @@ export function CompanionBattle() {
         priority
       />
 
-      <div className="dialogue" aria-live="polite" aria-atomic="true">
+      <div className={`${styles.dialogue} dialogue`} aria-live="polite" aria-atomic="true">
         <span aria-hidden="true">▶</span>
         <div>
           <b>{selected.name}</b>
@@ -44,14 +45,14 @@ export function CompanionBattle() {
         </div>
       </div>
 
-      <div className="companion-selector" role="group" aria-label="Elegir compañero">
+      <div className={`${styles.companionSelector} companion-selector`} role="group" aria-label="Elegir compañero">
         {companions.map((companion) => {
           const active = companion.id === selected.id;
           return (
             <button
               key={companion.id}
               type="button"
-              className={`companion-option companion-${companion.type} ${active ? 'active' : ''}`}
+              className={`${styles.companionOption} ${active ? styles.active : ''} companion-option companion-${companion.type} ${active ? 'active' : ''}`}
               aria-pressed={active}
               onClick={() => setSelectedId(companion.id)}
             >

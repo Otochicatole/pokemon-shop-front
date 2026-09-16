@@ -1,0 +1,130 @@
+.trainerClub {
+  max-width: none;
+  margin: 0;
+  padding: clamp(72px, 9vw, 108px) 4.2vw;
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(280px, .95fr);
+  align-items: center;
+  gap: clamp(28px, 5vw, 72px);
+  border-top: 2px solid var(--line);
+  border-bottom: 2px solid var(--line);
+  background:
+    linear-gradient(135deg, rgba(255, 213, 47, .06), transparent 38%),
+    linear-gradient(180deg, #121820, #0e1419);
+}
+
+.clubCard h2 {
+  margin: 22px 0 18px;
+  font: clamp(24px, 3vw, 40px)/1.28 var(--pixel-font);
+  text-transform: uppercase;
+  text-shadow: 3px 3px 0 #26323e;
+}
+
+.clubCard p {
+  max-width: 520px;
+  margin: 0 0 28px;
+  color: #c8d0d7;
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.clubLevel {
+  display: inline-block;
+  padding: 8px 10px;
+  border: 2px solid var(--accent);
+  background: rgba(255, 213, 47, .1);
+  color: var(--accent);
+  font: 7px var(--pixel-font);
+  letter-spacing: .04em;
+}
+
+.xpBox {
+  padding: 26px;
+  border: 2px solid var(--line-strong);
+  background: linear-gradient(145deg, rgba(22, 30, 39, .95), var(--surface) 60%);
+  box-shadow: 7px 7px 0 #05070a;
+}
+
+.loyaltyPromoRules {
+  display: grid;
+  gap: 12px;
+}
+
+.xpTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  font: 7px var(--pixel-font);
+  padding-bottom: 15px;
+  border-bottom: 2px solid var(--line);
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+.xpTop b {
+  color: var(--accent);
+}
+
+.loyaltyPromoRule {
+  min-height: 76px;
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  align-items: center;
+  gap: 15px;
+  padding: 12px;
+  border: 2px solid var(--line);
+  background: #0b1015;
+  transition: border-color .16s, background .16s;
+}
+
+.loyaltyPromoRule:hover {
+  border-color: var(--line-strong);
+  background: #10161d;
+}
+
+.loyaltyPromoRule > span {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border: 2px solid var(--line-strong);
+  background: rgba(255, 213, 47, .12);
+  color: var(--accent);
+}
+
+.loyaltyPromoRule div {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+}
+
+.loyaltyPromoRule small {
+  color: var(--muted);
+  font: 7px var(--pixel-font);
+}
+
+.loyaltyPromoRule strong {
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+@media (max-width: 900px) {
+  .trainerClub {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .trainerClub {
+    padding: 64px 4.2vw;
+  }
+
+  .xpBox {
+    margin-top: 4px;
+  }
+
+  .clubCard :global(.button) {
+    width: 100%;
+  }
+}

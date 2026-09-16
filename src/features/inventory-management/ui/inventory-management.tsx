@@ -10,6 +10,7 @@ import { adminErrorMessage } from '@/shared/admin/client';
 import { adminDate, AdminBadge } from '@/shared/admin/format';
 import type { InventoryProduct } from '../domain/contracts';
 import { adjustInventory, getInventoryHistory, listInventory } from '../infrastructure/api';
+import styles from './inventory-management.module.css';
 
 export function InventoryManagementView({ initialStock = '' }: { initialStock?: string }) {
   const queryClient = useQueryClient();

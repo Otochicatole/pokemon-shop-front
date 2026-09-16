@@ -9,6 +9,7 @@ import { adminErrorMessage } from '@/shared/admin/client';
 import { adminMoney } from '@/shared/admin/format';
 import type { PickupPoint, ShippingZone } from '../domain/contracts';
 import { getFulfillmentConfiguration, savePickupPoint, saveShippingZone, setPickupPointActive, setShippingZoneActive } from '../infrastructure/api';
+import styles from './fulfillment-management.module.css';
 
 function minorFromDecimal(value: string) { const [whole = '0', decimals = ''] = value.replace(',', '.').split('.'); return (BigInt(whole || '0') * 100n + BigInt((decimals + '00').slice(0, 2))).toString(); }
 function decimalFromMinor(value: string) { return (Number(BigInt(value)) / 100).toFixed(2); }

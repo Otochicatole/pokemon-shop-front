@@ -1,0 +1,16 @@
+.productCardBody {
+  padding: 15px;
+}
+
+.productCardBody h3 {
+  margin: 9px 0 15px;
+  font: 13px/1.55 var(--pixel-font);
+  text-transform: uppercase;
+}
+
+.productCardFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}

@@ -1,0 +1,12 @@
+.pageContainer {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 72px 4.2vw 100px;
+}
+
+@media (max-width: 760px) {
+  .pageContainer {
+    padding: 45px 4vw 70px;
+  }
+}
