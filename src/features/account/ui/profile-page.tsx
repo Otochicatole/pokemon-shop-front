@@ -57,12 +57,10 @@ export function ProfilePage() {
     <section className="profile-page">
       <div className="profile-heading">
         <Link className="back-link" href="/account">← Volver a mi cuenta</Link>
-        <div className="profile-title-row">
-          <div>
-            <p className="eyebrow">Cuenta personal</p>
-            <h1>Mi perfil</h1>
-            <p>Actualizá tus datos y mantené segura tu cuenta.</p>
-          </div>
+        <div>
+          <p className="eyebrow">Cuenta personal</p>
+          <h1>Mi perfil</h1>
+          <p>Actualizá tus datos y mantené segura tu cuenta.</p>
         </div>
       </div>
 
