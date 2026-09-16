@@ -2,7 +2,8 @@
   display: grid;
   gap: 7px;
   color: var(--muted);
-  font: 9px var(--pixel-font);
+  font: 700 12px/1.4 'Nunito', var(--font-geist), Arial, sans-serif;
+  letter-spacing: .04em;
   text-transform: uppercase;
 }
 

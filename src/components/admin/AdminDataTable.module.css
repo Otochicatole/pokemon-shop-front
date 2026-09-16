@@ -27,5 +27,5 @@
 .adminTableEmpty::before {
   content: '◈';
   color: var(--accent);
-  font: 24px var(--pixel-font);
+  font: 28px 'Nunito', var(--font-geist), Arial, sans-serif;
 }
