@@ -14,7 +14,27 @@ import styles from './admin-affiliate-operations.module.css';
 type Section = AffiliateAdminSection;
 type Page<T> = { items: T[]; page: number; pageSize: number; total: number; totalPages: number };
 type Seller = { id: string; publicName: string; status: 'ACTIVE' | 'SUSPENDED'; version: number; commissionBpsOverride?: number | null; user?: { id: string; email: string; name: string | null }; counts?: { listings: number; sellerOrders: number; issues?: number; payoutRequests?: number } };
-type Listing = { id: string; status: string; reviewNote: string | null; product: { id: string; name: string; description: string; priceMinor: string; version: number; status: string; images: Array<{ id: string; url: string; altText: string | null }>; inventory?: { available: number } | null }; affiliate: { id: string; publicName: string; status?: string } };
+type Listing = {
+  id: string;
+  status: string;
+  reviewNote: string | null;
+  submittedAt?: string | null;
+  reviewedAt?: string | null;
+  product: {
+    id: string;
+    name: string;
+    description: string;
+    kind?: string;
+    priceMinor: string;
+    version: number;
+    status: string;
+    images: Array<{ id: string; url: string; altText: string | null; sortOrder?: number }>;
+    inventory?: { available: number } | null;
+  };
+  affiliate: { id: string; publicName: string; status?: string };
+};
+type ReviewDecision = 'APPROVED' | 'CHANGES_REQUESTED' | 'REJECTED';
+
 type SellerOrder = { id: string; number: string; sellerName: string; sellerType?: 'STORE' | 'AFFILIATE'; affiliate?: { id: string; publicName: string } | null; status: string; version: number; fulfillmentType?: 'SHIPMENT' | 'PICKUP'; subtotalMinor: string; shippingMinor: string; sellerNetMinor: string; allowedActions?: string[]; carrier?: string | null; trackingCode?: string | null; recipientName?: string | null; recipientPhone?: string | null; addressLine1?: string | null; addressLine2?: string | null; city?: string | null; province?: string | null; postalCode?: string | null; pickupPointAddress?: string | null; statusHistory?: Array<{ id: string; fromStatus: string | null; toStatus: string; note?: string | null; createdAt: string }>; parentOrder?: { id: string; number: string; status: string; paymentStatus: string | null }; order?: { number: string; userId?: string; paymentId?: string | null }; items?: Array<{ id?: string; productName?: string; name?: string; quantity: number; lineTotalMinor: string }> };
 type RefundInput = { amountMinor: string; reason: string; externalReference: string; restock: boolean };
 type Issue = { id: string; status: string; reason: string; resolutionNote?: string | null; createdAt: string; version?: number; affiliate: { id: string; publicName: string }; sellerOrder: SellerOrder };
@@ -33,6 +53,12 @@ function payload<T>(value: T | { data: T }): T { return value && typeof value ==
 function money(value: string | null | undefined) { if (!value) return '—'; return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'USD' }).format(Number(BigInt(value)) / 100); }
 function label(value: string) { return value.replaceAll('_', ' ').toLowerCase().replace(/(^| )\w/g, (letter) => letter.toUpperCase()); }
 function date(value: string) { return new Intl.DateTimeFormat('es-AR', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value)); }
+function listingKindLabel(kind?: string) {
+  return ({ SINGLE_CARD: 'Carta suelta', SEALED_PRODUCT: 'Producto sellado', ACCESSORY: 'Accesorio' } as Record<string, string>)[kind ?? ''] ?? (kind ? label(kind) : 'Sin tipo');
+}
+function listingStatusClass(status: string) {
+  return `admin-listing-status is-${status.toLowerCase().replaceAll('_', '-')}`;
+}
 function queryPage<T>(path: string) { return adminFetch<Page<T> | T[]>(path).then((result) => { const value = payload(result); return Array.isArray(value) ? { items: value, page: 1, pageSize: value.length, total: value.length, totalPages: 1 } : value; }); }
 function payoutStatusClass(status: string) { return `admin-payout-status is-${status.toLowerCase()}`; }
 function ledgerBucket(value: string) { return ({ AVAILABLE: 'Disponible', RESERVED: 'Reservado', PENDING: 'Pendiente', PAID: 'Pagado' } as Record<string, string>)[value] ?? label(value); }
@@ -79,28 +105,434 @@ function SellerDetail({ query }: { query: QueryState<{ affiliate: Seller; balanc
 }
 
 function Listings({ id }: { id?: string }) {
-  const [status, setStatus] = useState(''); const [preview, setPreview] = useState<Listing | null>(null); const client = useQueryClient();
-  const query = useQuery({ queryKey: ['admin', 'affiliate-listings-all', status], queryFn: () => queryPage<Listing>(`/admin/affiliates/listings?pageSize=50${status ? `&status=${status}` : ''}`) });
-  const detail = useQuery({ queryKey: ['admin', 'affiliate-listing', id], queryFn: () => adminFetch<{ listing: Listing }>(`/admin/affiliates/listings/${id}`).then(payload), enabled: Boolean(id) });
+  const [status, setStatus] = useState('');
+  const [preview, setPreview] = useState<Listing | null>(null);
+  const client = useQueryClient();
+  const query = useQuery({
+    queryKey: ['admin', 'affiliate-listings-all', status],
+    queryFn: () => queryPage<Listing>(`/admin/affiliates/listings?pageSize=50${status ? `&status=${status}` : ''}`),
+  });
+  const detail = useQuery({
+    queryKey: ['admin', 'affiliate-listing', id],
+    queryFn: () => adminFetch<{ listing: Listing }>(`/admin/affiliates/listings/${id}`).then(payload),
+    enabled: Boolean(id),
+  });
   const review = useMutation({
-    mutationFn: ({ row, decision }: { row: Listing; decision: 'APPROVED' | 'CHANGES_REQUESTED' | 'REJECTED' }) => adminFetch(`/admin/affiliates/listings/${row.id}/review`, { method: 'POST', body: JSON.stringify({ expectedVersion: row.product.version, decision, note: decision === 'APPROVED' ? undefined : 'Revisá la información y las imágenes de la publicación.' }) }),
+    mutationFn: ({ row, decision, note }: { row: Listing; decision: ReviewDecision; note?: string }) =>
+      adminFetch(`/admin/affiliates/listings/${row.id}/review`, {
+        method: 'POST',
+        body: JSON.stringify({
+          expectedVersion: row.product.version,
+          decision,
+          ...(decision === 'APPROVED' ? {} : { note: note?.trim() || 'Revisá la información y las imágenes de la publicación.' }),
+        }),
+      }),
     onSuccess: (result, variables) => {
-      const response = result as { status?: string; productStatus?: string; version?: number };
+      const response = result as { status?: string; productStatus?: string; version?: number; reviewNote?: string | null; reviewedAt?: string | null };
       client.setQueryData<Page<Listing>>(['admin', 'affiliate-listings-all', status], (current) => {
         if (!current) return current;
-        if (status === 'PENDING_REVIEW') return { ...current, items: current.items.filter((row) => row.id !== variables.row.id), total: Math.max(0, current.total - 1) };
-        return { ...current, items: current.items.map((row) => row.id === variables.row.id ? { ...row, status: response.status ?? variables.decision, product: { ...row.product, status: response.productStatus ?? row.product.status, version: response.version ?? row.product.version } } : row) };
+        if (status === 'PENDING_REVIEW') {
+          return { ...current, items: current.items.filter((row) => row.id !== variables.row.id), total: Math.max(0, current.total - 1) };
+        }
+        return {
+          ...current,
+          items: current.items.map((row) =>
+            row.id === variables.row.id
+              ? {
+                  ...row,
+                  status: response.status ?? variables.decision,
+                  reviewNote: response.reviewNote ?? (variables.decision === 'APPROVED' ? null : variables.note ?? row.reviewNote),
+                  reviewedAt: response.reviewedAt ?? row.reviewedAt,
+                  product: {
+                    ...row.product,
+                    status: response.productStatus ?? row.product.status,
+                    version: response.version ?? row.product.version,
+                  },
+                }
+              : row,
+          ),
+        };
       });
-      toast.success('Publicación actualizada');
+      client.setQueryData<{ listing: Listing }>(['admin', 'affiliate-listing', variables.row.id], (current) => {
+        if (!current) return current;
+        return {
+          listing: {
+            ...current.listing,
+            status: response.status ?? variables.decision,
+            reviewNote: response.reviewNote ?? (variables.decision === 'APPROVED' ? null : variables.note ?? current.listing.reviewNote),
+            reviewedAt: response.reviewedAt ?? current.listing.reviewedAt,
+            product: {
+              ...current.listing.product,
+              status: response.productStatus ?? current.listing.product.status,
+              version: response.version ?? current.listing.product.version,
+            },
+          },
+        };
+      });
+      toast.success(
+        variables.decision === 'APPROVED'
+          ? 'Publicación aprobada'
+          : variables.decision === 'REJECTED'
+            ? 'Publicación rechazada'
+            : 'Se pidieron cambios al afiliado',
+      );
       void client.invalidateQueries({ queryKey: ['admin', 'affiliate-listings-all'] });
+      void client.invalidateQueries({ queryKey: ['admin', 'affiliate-listing', variables.row.id] });
     },
     onError: (error) => toast.error(adminErrorMessage(error)),
   });
-  if (id) return <ListingDetail query={detail} />;
-  return <Shell active="listings" title="Publicaciones" description="Todas las publicaciones y estados editoriales, con preview y acciones directas." action={<Button variant="secondary" onClick={() => void query.refetch()} disabled={query.isFetching}><RefreshCw size={16} />Actualizar</Button>}><section className="admin-panel"><div className="admin-panel-header"><h2>Control editorial</h2><select aria-label="Filtrar por estado" value={status} onChange={(event) => setStatus(event.target.value)}><option value="">Todos los estados</option>{['DRAFT', 'PENDING_REVIEW', 'CHANGES_REQUESTED', 'REJECTED', 'APPROVED'].map((value) => <option key={value} value={value}>{label(value)}</option>)}</select></div>{query.isLoading ? <Feedback>Cargando publicaciones…</Feedback> : query.isError ? <Feedback error>{adminErrorMessage(query.error)}</Feedback> : <div className="admin-panel-body"><ul className="admin-list affiliate-admin-publications-list">{query.data.items.map((row) => <li key={row.id}><div className="admin-list-row affiliate-admin-row"><div><button type="button" className="affiliate-admin-publication-name" onClick={() => setPreview(row)}><strong>{row.product.name}</strong><span>{row.affiliate.publicName} · {label(row.status)} · {row.product.images.length} imágenes</span></button></div><div className="admin-row-actions"><Button variant="ghost" onClick={() => setPreview(row)}><Eye size={15} />Preview</Button>{row.status === 'PENDING_REVIEW' && <><Button variant="secondary" onClick={() => review.mutate({ row, decision: 'APPROVED' })} disabled={review.isPending}><Check size={15} />Aprobar</Button><Button variant="ghost" onClick={() => review.mutate({ row, decision: 'CHANGES_REQUESTED' })} disabled={review.isPending}><X size={15} />Pedir cambios</Button></>}</div></div></li>)}</ul>{query.data.items.length === 0 && <p className="admin-empty-copy">No hay publicaciones para este filtro.</p>}</div>}</section><Dialog open={Boolean(preview)} title={preview?.product.name ?? 'Preview'} description={preview ? `Publicación de ${preview.affiliate.publicName}` : undefined} onClose={() => setPreview(null)} className="admin-wide-dialog">{preview && <div className="affiliate-admin-preview"><div className="affiliate-admin-preview-media"><div className="affiliate-admin-preview-image">{preview.product.images[0] ? <Image src={preview.product.images[0].url} alt={preview.product.images[0].altText ?? preview.product.name} width={640} height={380} unoptimized /> : <span>Sin imágenes</span>}</div></div><div className="affiliate-admin-preview-details"><h3>{preview.product.name}</h3><p>{preview.product.description || 'Sin descripción.'}</p><strong>{money(preview.product.priceMinor)}</strong><span>Stock disponible: {preview.product.inventory?.available ?? 0}</span></div></div>}</Dialog></Shell>;
+
+  if (id) {
+    return (
+      <ListingDetail
+        query={detail}
+        reviewPending={review.isPending}
+        onReview={(decision, note) => {
+          if (!detail.data) return;
+          review.mutate({ row: detail.data.listing, decision, note });
+        }}
+      />
+    );
+  }
+
+  return (
+    <Shell
+      active="listings"
+      title="Publicaciones"
+      description="Todas las publicaciones y estados editoriales, con preview y acciones directas."
+      action={<Button variant="secondary" onClick={() => void query.refetch()} disabled={query.isFetching}><RefreshCw size={16} />Actualizar</Button>}
+    >
+      <section className="admin-panel">
+        <div className="admin-panel-header">
+          <h2>Control editorial</h2>
+          <select aria-label="Filtrar por estado" value={status} onChange={(event) => setStatus(event.target.value)}>
+            <option value="">Todos los estados</option>
+            {['DRAFT', 'PENDING_REVIEW', 'CHANGES_REQUESTED', 'REJECTED', 'APPROVED'].map((value) => (
+              <option key={value} value={value}>{label(value)}</option>
+            ))}
+          </select>
+        </div>
+        {query.isLoading ? <Feedback>Cargando publicaciones…</Feedback> : query.isError ? <Feedback error>{adminErrorMessage(query.error)}</Feedback> : (
+          <div className="admin-panel-body">
+            <ul className="admin-list affiliate-admin-publications-list">
+              {query.data.items.map((row) => (
+                <li key={row.id}>
+                  <div className="admin-list-row affiliate-admin-row">
+                    <div>
+                      <Link className="affiliate-admin-publication-name" href={`/admin/affiliates/listings/${row.id}`}>
+                        <strong>{row.product.name}</strong>
+                        <span>{row.affiliate.publicName} · {label(row.status)} · {row.product.images.length} imágenes</span>
+                      </Link>
+                    </div>
+                    <div className="admin-row-actions">
+                      <Button variant="ghost" onClick={() => setPreview(row)}><Eye size={15} />Preview</Button>
+                      <Link className="button button-ghost" href={`/admin/affiliates/listings/${row.id}`}>Revisar</Link>
+                      {row.status === 'PENDING_REVIEW' && (
+                        <>
+                          <Button variant="secondary" onClick={() => review.mutate({ row, decision: 'APPROVED' })} disabled={review.isPending}>
+                            <Check size={15} />Aprobar
+                          </Button>
+                          <Button variant="ghost" onClick={() => review.mutate({ row, decision: 'CHANGES_REQUESTED' })} disabled={review.isPending}>
+                            <X size={15} />Pedir cambios
+                          </Button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+            {query.data.items.length === 0 && <p className="admin-empty-copy">No hay publicaciones para este filtro.</p>}
+          </div>
+        )}
+      </section>
+      <Dialog
+        open={Boolean(preview)}
+        title={preview?.product.name ?? 'Preview'}
+        description={preview ? `Publicación de ${preview.affiliate.publicName}` : undefined}
+        onClose={() => setPreview(null)}
+        className="admin-wide-dialog"
+      >
+        {preview && (
+          <div className="affiliate-admin-preview">
+            <div className="affiliate-admin-preview-media">
+              <div className="affiliate-admin-preview-image">
+                {preview.product.images[0]
+                  ? <Image src={preview.product.images[0].url} alt={preview.product.images[0].altText ?? preview.product.name} width={640} height={380} unoptimized />
+                  : <span>Sin imágenes</span>}
+              </div>
+            </div>
+            <div className="affiliate-admin-preview-details">
+              <h3>{preview.product.name}</h3>
+              <p>{preview.product.description || 'Sin descripción.'}</p>
+              <strong>{money(preview.product.priceMinor)}</strong>
+              <span>Stock disponible: {preview.product.inventory?.available ?? 0}</span>
+              <div className="admin-dialog-actions">
+                <Link className="button button-primary" href={`/admin/affiliates/listings/${preview.id}`}>Abrir ficha completa</Link>
+              </div>
+            </div>
+          </div>
+        )}
+      </Dialog>
+    </Shell>
+  );
 }
 
-function ListingDetail({ query }: { query: QueryState<{ listing: Listing }> }) { if (query.isLoading) return <Shell active="listings" title="Publicación" description="Cargando…"><Feedback>Cargando…</Feedback></Shell>; if (query.isError || !query.data) return <Shell active="listings" title="Publicación no encontrada" description="La publicación no está disponible."><Feedback error>{query.error ? adminErrorMessage(query.error) : 'No encontrada'}</Feedback></Shell>; const item = query.data.listing; return <Shell active="listings" title={item.product.name} description={`Publicación de ${item.affiliate.publicName} · estado ${label(item.status)}`} action={<Link className="button button-secondary" href="/admin/affiliates/listings"><ArrowLeft size={16} />Volver</Link>}><section className="admin-panel"><div className="admin-panel-body"><div className="affiliate-admin-preview"><div className="affiliate-admin-preview-media"><div className="affiliate-admin-preview-image">{item.product.images[0] ? <Image src={item.product.images[0].url} alt={item.product.images[0].altText ?? item.product.name} width={640} height={380} unoptimized /> : <span>Sin imágenes</span>}</div></div><div className="affiliate-admin-preview-details"><h2>{item.product.name}</h2><p>{item.product.description || 'Sin descripción.'}</p><strong>{money(item.product.priceMinor)}</strong><span>Stock: {item.product.inventory?.available ?? 0}</span>{item.reviewNote && <p className="form-hint">Nota: {item.reviewNote}</p>}</div></div></div></section></Shell>; }
+function ListingDetail({
+  query,
+  reviewPending,
+  onReview,
+}: {
+  query: QueryState<{ listing: Listing }> & { refetch?: () => void };
+  reviewPending: boolean;
+  onReview: (decision: ReviewDecision, note?: string) => void;
+}) {
+  const [imageId, setImageId] = useState<string | null>(null);
+  const [reviewDecision, setReviewDecision] = useState<Exclude<ReviewDecision, 'APPROVED'> | null>(null);
+  const [reviewNote, setReviewNote] = useState('');
+
+  useEffect(() => {
+    if (!query.data?.listing) return;
+    setImageId(query.data.listing.product.images[0]?.id ?? null);
+  }, [query.data?.listing]);
+
+  if (query.isLoading) {
+    return <Shell active="listings" title="Publicación" description="Cargando…"><Feedback>Cargando…</Feedback></Shell>;
+  }
+  if (query.isError || !query.data) {
+    return (
+      <Shell active="listings" title="Publicación no encontrada" description="La publicación no está disponible.">
+        <Feedback error>{query.error ? adminErrorMessage(query.error) : 'No encontrada'}</Feedback>
+      </Shell>
+    );
+  }
+
+  const item = query.data.listing;
+  const images = item.product.images;
+  const activeImage = images.find((image) => image.id === imageId) ?? images[0] ?? null;
+  const canReview = item.status === 'PENDING_REVIEW';
+  const closeReviewDialog = () => {
+    if (reviewPending) return;
+    setReviewDecision(null);
+    setReviewNote('');
+  };
+
+  return (
+    <Shell
+      active="listings"
+      title={item.product.name}
+      description={`Publicación de ${item.affiliate.publicName} · control editorial`}
+      action={<Link className="button button-secondary" href="/admin/affiliates/listings"><ArrowLeft size={16} />Volver</Link>}
+    >
+      <div className="admin-listing-detail">
+        <section className="admin-listing-hero">
+          <div className="admin-listing-hero-top">
+            <span className="admin-listing-kicker">Revisión editorial</span>
+            <span className={listingStatusClass(item.status)}>{label(item.status)}</span>
+          </div>
+          <div className="admin-listing-hero-copy">
+            <div>
+              <h2>{item.product.name}</h2>
+              <p>
+                Vende{' '}
+                <Link href={`/admin/affiliates/sellers/${item.affiliate.id}`}>{item.affiliate.publicName}</Link>
+                {item.submittedAt ? ` · Enviada ${date(item.submittedAt)}` : ''}
+              </p>
+            </div>
+            <div className="admin-listing-price">
+              <span>Precio</span>
+              <strong>{money(item.product.priceMinor)}</strong>
+            </div>
+          </div>
+        </section>
+
+        <div className="admin-listing-summary">
+          <article className="admin-listing-summary-card">
+            <span>Tipo</span>
+            <strong>{listingKindLabel(item.product.kind)}</strong>
+          </article>
+          <article className="admin-listing-summary-card">
+            <span>Stock disponible</span>
+            <strong>{item.product.inventory?.available ?? 0}</strong>
+          </article>
+          <article className="admin-listing-summary-card">
+            <span>Imágenes</span>
+            <strong>{images.length}</strong>
+          </article>
+          <article className="admin-listing-summary-card">
+            <span>Versión</span>
+            <strong>{item.product.version}</strong>
+          </article>
+        </div>
+
+        <div className="admin-listing-columns">
+          <div className="admin-listing-primary">
+            <section className="admin-panel">
+              <div className="admin-panel-header">
+                <div>
+                  <span className="admin-panel-kicker">Vista previa</span>
+                  <h2>Contenido de la publicación</h2>
+                </div>
+              </div>
+              <div className="admin-panel-body">
+                <div className="affiliate-admin-preview" style={{ marginTop: 0 }}>
+                  <div className="affiliate-admin-preview-media">
+                    <div className="affiliate-admin-preview-image">
+                      {activeImage
+                        ? <Image src={activeImage.url} alt={activeImage.altText ?? item.product.name} width={640} height={640} unoptimized />
+                        : <span>Sin imágenes</span>}
+                    </div>
+                    {images.length > 1 && (
+                      <div className="affiliate-admin-preview-thumbnails" aria-label="Imágenes de la publicación">
+                        {images.map((image, index) => (
+                          <button
+                            key={image.id}
+                            type="button"
+                            className={image.id === activeImage?.id ? 'is-active' : ''}
+                            onClick={() => setImageId(image.id)}
+                            aria-label={`Ver imagen ${index + 1}`}
+                          >
+                            <Image src={image.url} alt={image.altText ?? ''} width={72} height={72} unoptimized />
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  <div className="affiliate-admin-preview-details">
+                    <div>
+                      <span className="admin-panel-kicker">Descripción</span>
+                      <p className="affiliate-admin-preview-description" style={{ margin: 0 }}>
+                        <span style={{ display: 'block', marginTop: 8, color: '#c5cfd7', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
+                          {item.product.description.trim() || 'El afiliado no agregó una descripción.'}
+                        </span>
+                      </p>
+                    </div>
+                    <dl className="affiliate-admin-preview-data">
+                      <div><dt>Precio</dt><dd className="affiliate-admin-preview-price">{money(item.product.priceMinor)}</dd></div>
+                      <div><dt>Stock</dt><dd>{item.product.inventory?.available ?? 0} unidades</dd></div>
+                      <div><dt>Tipo</dt><dd>{listingKindLabel(item.product.kind)}</dd></div>
+                      <div><dt>Estado producto</dt><dd>{label(item.product.status)}</dd></div>
+                    </dl>
+                    {item.reviewNote && (
+                      <div className="admin-listing-note">
+                        <span className="admin-panel-kicker">Nota de revisión</span>
+                        <p>{item.reviewNote}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </section>
+          </div>
+
+          <aside className="admin-listing-aside">
+            <section className="admin-panel">
+              <div className="admin-panel-header">
+                <div>
+                  <span className="admin-panel-kicker">Decisión</span>
+                  <h2>Acciones</h2>
+                </div>
+              </div>
+              <div className="admin-panel-body admin-listing-actions">
+                {canReview ? (
+                  <>
+                    <p className="form-hint">Esta publicación está pendiente. Podés aprobarla, pedir cambios o rechazarla.</p>
+                    <Button
+                      onClick={() => onReview('APPROVED')}
+                      disabled={reviewPending}
+                    >
+                      <Check size={16} />
+                      {reviewPending ? 'Guardando…' : 'Aprobar publicación'}
+                    </Button>
+                    <Button
+                      variant="secondary"
+                      onClick={() => setReviewDecision('CHANGES_REQUESTED')}
+                      disabled={reviewPending}
+                    >
+                      <X size={16} />
+                      Pedir cambios
+                    </Button>
+                    <Button
+                      variant="danger"
+                      onClick={() => setReviewDecision('REJECTED')}
+                      disabled={reviewPending}
+                    >
+                      Rechazar
+                    </Button>
+                  </>
+                ) : (
+                  <div className="admin-listing-complete">
+                    <Check size={16} />
+                    <div>
+                      <strong>Sin acción pendiente</strong>
+                      <p>Estado actual: {label(item.status)}{item.reviewedAt ? ` · Revisada ${date(item.reviewedAt)}` : ''}.</p>
+                    </div>
+                  </div>
+                )}
+                <Link className="button button-ghost" href={`/admin/affiliates/sellers/${item.affiliate.id}`}>
+                  Ver ficha del afiliado
+                </Link>
+              </div>
+            </section>
+          </aside>
+        </div>
+      </div>
+
+      <Dialog
+        open={Boolean(reviewDecision)}
+        title={reviewDecision === 'REJECTED' ? 'Rechazar publicación' : 'Pedir cambios'}
+        description={
+          reviewDecision === 'REJECTED'
+            ? 'Indicá el motivo del rechazo. El afiliado va a ver esta nota.'
+            : 'Dejá una indicación concreta para que el afiliado pueda corregir la publicación.'
+        }
+        onClose={closeReviewDialog}
+      >
+        <form
+          className="admin-form"
+          onSubmit={(event) => {
+            event.preventDefault();
+            if (!reviewDecision || reviewNote.trim().length < 3) return;
+            onReview(reviewDecision, reviewNote.trim());
+            setReviewDecision(null);
+            setReviewNote('');
+          }}
+        >
+          <TextareaField
+            label="Motivo"
+            value={reviewNote}
+            onChange={(event) => setReviewNote(event.target.value)}
+            minLength={3}
+            maxLength={500}
+            rows={5}
+            placeholder={
+              reviewDecision === 'REJECTED'
+                ? 'Ej. El producto no cumple las políticas de la tienda.'
+                : 'Ej. Agregá una foto del frente y aclará el idioma del producto.'
+            }
+            required
+          />
+          <div className="admin-dialog-actions">
+            <Button type="button" variant="secondary" onClick={closeReviewDialog} disabled={reviewPending}>
+              Cancelar
+            </Button>
+            <Button
+              type="submit"
+              variant={reviewDecision === 'REJECTED' ? 'danger' : 'primary'}
+              disabled={reviewPending || reviewNote.trim().length < 3}
+            >
+              {reviewPending
+                ? 'Guardando…'
+                : reviewDecision === 'REJECTED'
+                  ? 'Confirmar rechazo'
+                  : 'Solicitar cambios'}
+            </Button>
+          </div>
+        </form>
+      </Dialog>
+    </Shell>
+  );
+}
 
 function Orders({ id }: { id?: string }) {
   const [status, setStatus] = useState(''); const [search, setSearch] = useState(''); const [submitted, setSubmitted] = useState(''); const client = useQueryClient();
