@@ -1,6 +1,6 @@
 .newsToolbar {
   display: grid;
-  grid-template-columns: minmax(260px, 2fr) minmax(180px, .75fr);
+  grid-template-columns: minmax(0, 2fr) minmax(0, .75fr);
   align-items: end;
 }
 
@@ -17,7 +17,7 @@
 }
 
 .newsTablePrimary {
-  min-width: 260px;
+  min-width: 0;
 }
 
 .newsWindow {
@@ -68,7 +68,7 @@
   width: 100%;
 }
 
-@media (max-width: 760px) {
+@media (max-width: 680px) {
   .newsToolbar {
     grid-template-columns: 1fr;
   }

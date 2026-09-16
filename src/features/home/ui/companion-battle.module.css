@@ -239,37 +239,62 @@
 
 @media (max-width: 900px) {
   .battleScene {
-    min-height: 560px;
+    min-height: 520px;
+  }
+
+  .routeLabel {
+    max-width: calc(100% - 200px);
+  }
+
+  .battleHud {
+    width: 180px;
   }
 }
 
 @media (max-width: 760px) {
   .battleScene {
-    min-height: 620px;
+    min-height: 480px;
   }
 
   .routeLabel {
     left: 12px;
-    right: 12px;
-    top: 14px;
-    max-width: none;
+    top: 12px;
+    right: auto;
+    max-width: min(52%, 180px);
+    gap: 6px;
+    padding: 6px 8px;
     font-size: 6px;
   }
 
+  .routeLabel span {
+    width: 20px;
+    flex-basis: 20px;
+  }
+
   .battleHud {
-    top: 58px;
+    top: 12px;
     right: 12px;
-    width: 168px;
+    width: min(46%, 156px);
     padding: 8px;
+  }
+
+  .battleHud span,
+  .battleHud b {
+    font-size: 7px;
   }
 
   .dialogue {
     left: 12px;
     right: 12px;
-    bottom: 108px;
+    bottom: 96px;
     width: auto;
-    min-height: 102px;
-    padding: 16px 16px;
+    min-height: 88px;
+    padding: 12px 14px;
+    gap: 10px;
+  }
+
+  .dialogue > div > span {
+    font-size: 13px;
   }
 
   .dialogue small {
@@ -288,29 +313,54 @@
   .companionOption {
     min-width: 0;
     width: auto;
-    height: 76px;
+    min-height: 44px;
+    height: 68px;
     flex: 1;
     flex-direction: column;
     justify-content: center;
-    gap: 0;
-    padding: 2px;
+    gap: 2px;
+    padding: 4px 2px;
   }
 
   .companionOption img {
-    width: 48px;
-    height: 48px;
-    flex-basis: 48px;
+    width: 40px;
+    height: 40px;
+    flex-basis: 40px;
   }
 
   .companionOption span {
-    font-size: 5px;
+    font-size: 6px;
+    max-width: 100%;
+    text-align: center;
   }
 
   .companionOption.active {
-    transform: translateY(-5px);
+    transform: translateY(-4px);
   }
 
   .companionOption:hover:not(.active) {
     transform: translateY(-2px);
+  }
+}
+
+@media (max-width: 420px) {
+  .battleScene {
+    min-height: 440px;
+  }
+
+  .dialogue {
+    bottom: 88px;
+    min-height: 80px;
+    padding: 10px 12px;
+  }
+
+  .companionOption {
+    height: 60px;
+  }
+
+  .companionOption img {
+    width: 34px;
+    height: 34px;
+    flex-basis: 34px;
   }
 }

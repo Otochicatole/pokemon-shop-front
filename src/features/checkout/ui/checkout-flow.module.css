@@ -1,6 +1,6 @@
 .checkoutLayout {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(310px, 360px);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 360px);
   gap: clamp(28px, 4vw, 58px);
   align-items: start;
 }
@@ -433,6 +433,9 @@
   color: var(--ink);
   text-align: right;
   white-space: nowrap;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .loyaltyDiscount strong {
@@ -563,6 +566,13 @@
   .checkoutSummary {
     padding: 20px 17px;
   }
+  .checkoutSummary :global(.summary-line) {
+    flex-wrap: wrap;
+  }
+  .checkoutSummary :global(.summary-line) strong,
+  .checkoutSummary :global(.summary-total) > span {
+    white-space: normal;
+  }
 }
 
 @media (max-width: 420px) {
@@ -573,5 +583,8 @@
   }
   .checkoutSummaryCount {
     font-size: 10px;
+  }
+  .checkoutSummary :global(.summary-line) span {
+    max-width: 100%;
   }
 }

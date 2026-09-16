@@ -1,6 +1,6 @@
 .adminImageGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
   gap: 16px;
   list-style: none;
   padding: 0;
@@ -23,4 +23,11 @@
   border: 2px dashed var(--line);
   color: var(--muted);
   text-align: center;
+}
+
+@media (max-width: 520px) {
+  .adminImageGrid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 12px;
+  }
 }

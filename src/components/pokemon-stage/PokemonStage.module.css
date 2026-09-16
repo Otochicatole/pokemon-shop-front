@@ -72,9 +72,16 @@
 
 @media (max-width: 760px) {
   .pokemonStage {
-    --pokemon-stage-bottom: 218px;
-    --pokemon-platform-height: 56px;
-    --pokemon-contact-line: 26px;
-    width: min(78%, 420px);
+    --pokemon-stage-bottom: 176px;
+    --pokemon-platform-height: 48px;
+    --pokemon-contact-line: 22px;
+    width: min(72%, 360px);
+  }
+}
+
+@media (max-width: 420px) {
+  .pokemonStage {
+    --pokemon-stage-bottom: 160px;
+    width: min(70%, 300px);
   }
 }

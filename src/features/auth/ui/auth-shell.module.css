@@ -84,7 +84,7 @@
     display: flex;
     flex-direction: column;
     min-height: auto;
-    overflow: hidden;
+    overflow-x: hidden;
   }
   .authPanel {
     order: 1;
@@ -92,8 +92,8 @@
   }
   .authAsideHero {
     order: 2;
-    min-height: clamp(460px, 58vw, 620px);
-    height: clamp(460px, 58vw, 620px);
+    min-height: clamp(360px, 48vw, 520px);
+    height: clamp(360px, 48vw, 520px);
     border-right: 0;
     border-bottom: 2px solid var(--line);
   }
@@ -124,8 +124,8 @@
     font-size: 17px;
   }
   .authAsideHero {
-    min-height: 520px;
-    height: 520px;
+    min-height: 420px;
+    height: 420px;
     padding: 0;
   }
   .authAsideHero > :global(.brand) {
@@ -135,8 +135,8 @@
   .authAsideHero > :global(.battle-scene),
   .authAsideHero > :global(.legendary-scene),
   .authAsideHero > :global(.hero-art.legendary-scene) {
-    min-height: 520px;
-    height: 520px;
+    min-height: 420px;
+    height: 420px;
     position: relative;
     inset: auto;
   }

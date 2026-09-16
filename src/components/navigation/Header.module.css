@@ -85,6 +85,8 @@
   display: flex;
   align-items: center;
   gap: 10px;
+  min-width: 0;
+  flex-shrink: 0;
 }
 
 .iconLink {
@@ -107,6 +109,10 @@
   cursor: pointer;
 }
 
+.navBackdrop {
+  display: none;
+}
+
 @media (max-width: 1050px) {
   .mainNav {
     gap: 16px;
@@ -119,7 +125,25 @@
   }
 
   .headerInner {
-    padding: 0 18px;
+    gap: 10px;
+    padding: 0 14px;
+  }
+
+  .brand {
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+
+  .brand > span:last-child {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .brandMark {
+    width: 34px;
+    height: 34px;
+    flex-shrink: 0;
   }
 
   .brand small,
@@ -127,8 +151,22 @@
     display: none;
   }
 
+  .headerActions {
+    gap: 6px;
+  }
+
   .menuToggle {
     display: flex;
+  }
+
+  .navBackdrop {
+    display: block;
+    position: fixed;
+    inset: 70px 0 0;
+    z-index: 40;
+    border: 0;
+    background: rgba(0, 0, 0, .55);
+    cursor: pointer;
   }
 
   .mainNav {
@@ -137,14 +175,33 @@
     top: 70px;
     left: 0;
     right: 0;
+    z-index: 50;
     padding: 20px;
     flex-direction: column;
-    align-items: start;
+    align-items: stretch;
+    gap: 4px;
     background: var(--surface);
     border-bottom: 2px solid var(--line);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, .35);
+  }
+
+  .mainNav a {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
   }
 
   .mainNav.isOpen {
     display: flex;
+  }
+}
+
+@media (max-width: 420px) {
+  .headerInner {
+    padding: 0 10px;
+  }
+
+  .headerActions {
+    gap: 4px;
   }
 }

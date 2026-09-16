@@ -95,7 +95,7 @@
   margin: 28px 0;
   padding: 26px;
   display: grid;
-  grid-template-columns: minmax(220px, .75fr) minmax(300px, 1.25fr) auto;
+  grid-template-columns: minmax(0, .75fr) minmax(0, 1.25fr) auto;
   align-items: center;
   gap: 28px;
   border: 2px solid var(--line-strong);

@@ -542,6 +542,10 @@
 }
 
 @media (max-width: 760px) {
+  .conversationPage {
+    min-height: 0;
+  }
+
   .heading,
   .titleRow,
   .closedNotice {
@@ -589,6 +593,7 @@
 
   .composerRow button {
     width: 100%;
+    min-width: 0;
   }
 
   .composerMeta {

@@ -1,18 +1,12 @@
+/* Layout (display/grid/sidebar position/content padding) lives in admin.css so media queries win. */
 .adminShell {
   min-height: 100vh;
-  display: grid;
-  grid-template-columns: 268px minmax(0, 1fr);
   background-image: radial-gradient(#1c2732 1px, transparent 1px);
   background-size: 18px 18px;
 }
 
 .adminSidebar {
-  position: sticky;
-  top: 0;
-  height: 100vh;
   z-index: 35;
-  display: flex;
-  flex-direction: column;
   border-right: 2px solid var(--line-strong);
   background: rgba(7, 10, 15, .98);
   box-shadow: 8px 0 0 rgba(0, 0, 0, .22);
@@ -25,7 +19,5 @@
 .adminContent {
   width: 100%;
   max-width: 1660px;
-  min-height: calc(100vh - 64px);
   margin: 0 auto;
-  padding: 32px clamp(20px, 3vw, 48px) 72px;
 }

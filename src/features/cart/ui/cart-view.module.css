@@ -1,6 +1,6 @@
 .cartLayout {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) clamp(300px, 26vw, 360px);
+  grid-template-columns: minmax(0, 1fr) minmax(0, clamp(260px, 26vw, 360px));
   gap: clamp(30px, 5vw, 72px);
   align-items: start;
 }
@@ -194,6 +194,9 @@
   font: 14px var(--pixel-font);
   letter-spacing: .02em;
   white-space: nowrap;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .cartRemoveButton {
@@ -361,10 +364,15 @@
     font-size: 12px;
   }
   .cartItemTotal {
-    grid-column: 2;
+    grid-column: 1 / -1;
     min-width: 0;
     flex-direction: row;
     align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .cartItemTotal > strong {
+    white-space: normal;
   }
   .cartItemTotal .cartRemoveButton {
     width: 34px;

@@ -205,35 +205,37 @@
 
 @media (max-width: 760px) {
   .legendaryScene {
-    min-height: 520px;
-    height: 520px;
+    min-height: 420px;
+    height: 420px;
   }
   .legendaryLabel {
     font-size: 6px;
-    left: 13px;
+    left: 12px;
+    top: 12px;
+    max-width: min(48%, 160px);
   }
   .legendaryHud {
-    top: 20px;
+    top: 12px;
     right: 12px;
-    width: 172px;
+    width: min(46%, 156px);
     padding: 8px;
   }
   .legendaryDialogue {
-    left: 14px;
-    right: 14px;
-    bottom: 105px;
+    left: 12px;
+    right: 12px;
+    bottom: 88px;
     width: auto;
-    min-height: 102px;
-    padding: 17px 18px;
+    min-height: 84px;
+    padding: 12px 14px;
   }
   .legendaryDialogue small {
     display: block;
     font-size: 10px;
   }
   .legendarySelector {
-    left: 14px;
-    right: 14px;
-    bottom: 14px;
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
     width: auto;
     flex-direction: row;
     gap: 6px;
@@ -241,23 +243,25 @@
   .legendaryOption {
     min-width: 0;
     width: auto;
-    height: 76px;
+    min-height: 44px;
+    height: 64px;
     flex: 1;
     flex-direction: column;
     justify-content: center;
-    gap: 0;
-    padding: 2px;
+    gap: 2px;
+    padding: 4px 2px;
   }
   .legendaryOption img {
-    width: 48px;
-    height: 48px;
-    flex-basis: 48px;
+    width: 36px;
+    height: 36px;
+    flex-basis: 36px;
   }
   .legendaryOption span {
-    font-size: 5px;
+    font-size: 6px;
+    text-align: center;
   }
   .legendaryOption.active {
-    transform: translateY(-5px);
+    transform: translateY(-4px);
   }
   .legendaryOption:hover:not(.active) {
     transform: translateY(-2px);
