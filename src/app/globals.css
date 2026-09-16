@@ -658,6 +658,9 @@ button:disabled { cursor: not-allowed; opacity: .5; }
 .account-cards .account-points-card span { width: 38px; height: 38px; display: grid; place-items: center; border: 2px solid var(--accent); border-radius: 50%; }
 .account-cards .account-support-card { border-color: rgba(83, 190, 229, .52); background: linear-gradient(145deg, rgba(83, 190, 229, .11), var(--surface) 58%); }
 .account-cards .account-support-card span { color: var(--cyan); }
+.account-actions { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.account-actions .button { margin: 0; }
+.account-actions .button-secondary { text-decoration: none; }
 
 .loyalty-promo-rules { display: grid; gap: 13px; }
 .loyalty-promo-rules .xp-top { padding-bottom: 15px; border-bottom: 2px solid var(--line); }

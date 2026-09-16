@@ -103,7 +103,19 @@ export async function apiFetch<T>(path: string, init: RequestInit = {}, schema?:
   const headers = new Headers(init.headers);
   if (init.body && !(init.body instanceof FormData)) headers.set('Content-Type', 'application/json');
   if (csrfToken && method !== 'GET' && method !== 'HEAD') headers.set('X-CSRF-Token', csrfToken);
-  const requestInit = { ...init, headers, credentials: 'include', ...(typeof window === 'undefined' ? { next: { revalidate: 15 } } : {}) } as RequestInit;
+  // Authentication state must always be read from the server. A conditional
+  // browser request can receive a 304 without a JSON body, which would leave
+  // the header showing the anonymous state until a full page reload (notably
+  // right after the Google OAuth callback).
+  const authRequest = path.startsWith('/auth/');
+  const requestInit = {
+    ...init,
+    headers,
+    credentials: 'include',
+    ...(authRequest
+      ? { cache: 'no-store' as const }
+      : typeof window === 'undefined' ? { next: { revalidate: 15 } } : {}),
+  } as RequestInit;
   const url = userApiUrl(path);
   let response = await fetch(url, requestInit);
   if (!response.ok || !authTransition) assertCurrentUserSession(requestSessionGeneration);
