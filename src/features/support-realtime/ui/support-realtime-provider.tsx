@@ -23,6 +23,7 @@ import {
 } from '../domain/events';
 import { playSupportNotificationSound, unlockSupportNotificationSound } from '../infrastructure/notification-sound';
 import { getNotificationUnreadCount, getAdminNotificationUnreadCount } from '@/features/notifications/infrastructure/api';
+import { apiRequestUrl } from '@/shared/config/env';
 
 interface SupportRealtimeContextValue {
   role: SupportRealtimeRole;
@@ -41,7 +42,7 @@ const SupportRealtimeContext = createContext<SupportRealtimeContextValue>({
 });
 
 function websocketUrl(role: SupportRealtimeRole) {
-  const url = new URL('/api/v2/notifications/ws', window.location.origin);
+  const url = new URL(apiRequestUrl('/notifications/ws'));
   url.protocol = url.protocol === 'https:' ? 'wss:' : 'ws:';
   url.searchParams.set('role', role);
   return url.toString();

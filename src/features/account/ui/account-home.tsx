@@ -20,6 +20,7 @@ import { getMe, logout } from '@/features/auth/infrastructure/api';
 import { getLoyaltyAccount } from '@/features/loyalty';
 import { clearUserSessionCache } from '@/features/auth/application/session-cache';
 import { publishSessionSync } from '@/shared/auth/session-sync';
+import { googleAuthUrl } from '@/shared/config/env';
 import styles from './account-home.module.css';
 
 const tiles = [
@@ -147,7 +148,7 @@ export function AccountHome() {
       </div>
 
       <div className={styles.accountActions}>
-        <a className="button button-secondary" href="/api/v2/auth/google">
+        <a className="button button-secondary" href={googleAuthUrl()}>
           Vincular Google
         </a>
         <Button variant="ghost" onClick={() => void handleLogout()}>

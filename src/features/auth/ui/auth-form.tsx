@@ -7,6 +7,7 @@ import { clearUserPrivateCache } from '../application/session-cache';
 import { publishSessionSync } from '@/shared/auth/session-sync';
 import { login, register } from '../infrastructure/api';
 import { Button } from '@/components/button';
+import { googleAuthUrl } from '@/shared/config/env';
 import styles from './auth-form.module.css';
 
 export function AuthForm({ mode }: { mode: 'login' | 'register' }) {
@@ -70,7 +71,7 @@ export function AuthForm({ mode }: { mode: 'login' | 'register' }) {
       <Button disabled={busy}>{busy ? 'Un momento…' : mode === 'login' ? 'Ingresar' : 'Crear cuenta'}</Button>
       {mode === 'login' && (
         <>
-          <a className={`${styles.googleButton} google-button`} href="/api/v2/auth/google">
+          <a className={`${styles.googleButton} google-button`} href={googleAuthUrl()}>
             Continuar con Google
           </a>
           <Link href="/auth/forgot-password" className={`${styles.formLink} form-link`}>

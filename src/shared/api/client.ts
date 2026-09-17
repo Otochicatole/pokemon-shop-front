@@ -1,4 +1,4 @@
-import { config } from '@/shared/config/env';
+import { apiRequestUrl } from '@/shared/config/env';
 import { getSessionSyncGeneration, isCurrentSessionRequest } from '@/shared/auth/session-sync';
 import { problemSchema } from './contracts';
 
@@ -31,8 +31,7 @@ function assertCurrentUserSession(requestGeneration: number) {
 }
 
 function userApiUrl(path: string) {
-  const base = typeof window === 'undefined' ? config.backendUrl : '';
-  return path.startsWith('http') ? path : `${base}${config.apiBase}${path}`;
+  return path.startsWith('http') ? path : apiRequestUrl(path);
 }
 
 function actorId(payload: unknown, key: 'user' | 'admin') {
