@@ -3,7 +3,19 @@ import { getSessionSyncGeneration, isCurrentSessionRequest } from '@/shared/auth
 import { problemSchema } from './contracts';
 
 export class ApiError extends Error {
-  constructor(public readonly problem: { code: string; status: number; title: string; details?: unknown }) { super(problem.title); }
+  constructor(public readonly problem: {
+    code: string;
+    status: number;
+    title: string;
+    detail?: string;
+    details?: unknown;
+    issues?: Array<{ path: Array<string | number>; message: string }>;
+  }) {
+    const issuePath = problem.issues?.[0]?.path?.join('.') ?? '';
+    const issueHint = issuePath ? ` (${issuePath})` : '';
+    const base = problem.detail ?? problem.title;
+    super(problem.code === 'VALIDATION_ERROR' && !/revisá/i.test(base) ? `${base}${issueHint}` : base);
+  }
 }
 
 let csrfToken: string | null = null;

@@ -172,5 +172,13 @@ const orderPaymentSchema = z.object({
 }).passthrough();
 export const orderSchema = z.object({ id: z.string(), number: z.string(), status: z.string(), paymentMethod: z.string(), fulfillmentType: z.string(), totals: z.object({ subtotal: moneySchema, discount: moneySchema, shipping: moneySchema, total: moneySchema }), loyalty: orderLoyaltySchema, expiresAt: z.string().nullable().optional(), items: z.array(z.object({ productId: z.string().nullable(), sku: z.string(), name: z.string(), quantity: z.number(), unitPrice: moneySchema, lineTotal: moneySchema })), timeline: z.array(orderTimelineEventSchema).default([]), sellerOrders: z.array(sellerOrderBuyerSchema).default([]), fulfillment: z.record(z.string(), z.unknown()).optional(), payment: orderPaymentSchema.nullable().optional(), createdAt: z.string().or(z.date()) });
 export type Order = z.infer<typeof orderSchema>;
-export const problemSchema = z.object({ code: z.string(), status: z.number(), title: z.string(), requestId: z.string().optional(), details: z.unknown().optional() });
+export const problemSchema = z.object({
+  code: z.string(),
+  status: z.number(),
+  title: z.string(),
+  detail: z.string().optional(),
+  requestId: z.string().optional(),
+  details: z.unknown().optional(),
+  issues: z.array(z.object({ path: z.array(z.union([z.string(), z.number()])), message: z.string() })).optional(),
+});
 export type Problem = z.infer<typeof problemSchema>;

@@ -15,10 +15,12 @@ import { Button } from '@/components/button';
 import { getCheckoutOptions, previewCheckout, createOrder } from '../infrastructure/api';
 import { getMe } from '@/features/auth/infrastructure/api';
 import { getLoyaltyAccount } from '@/features/loyalty';
+import { ApiError } from '@/shared/api/client';
 import type { CheckoutPreview, OrderInput } from '@/shared/api/contracts';
 import styles from './checkout-flow.module.css';
 
 type SellerDeliverySelection = { delivery: 'PICKUP' | 'SHIPMENT'; pickupPointId?: string; shippingRateId?: string };
+type ShippingZoneOption = { id: string; name: string; provinces: string[]; rates: Array<{ id: string; name: string; price: { amountMinor: string; currency: string } }> };
 
 function estimateMaxRedeemablePoints(
   available: number,
@@ -30,6 +32,18 @@ function estimateMaxRedeemablePoints(
   const cap = storeSubtotalMinor * BigInt(maximumRedemptionPercent) / 100n;
   const byMoney = Number(cap / pointValueMinor);
   return Math.max(0, Math.min(available, byMoney));
+}
+
+function provincesFromZones(zones: ShippingZoneOption[]) {
+  return [...new Set(zones.flatMap((zone) => zone.provinces))].sort((left, right) => left.localeCompare(right, 'es'));
+}
+
+function ratesForProvince(zones: ShippingZoneOption[], province: string) {
+  const normalized = province.trim().toLowerCase();
+  if (!normalized) return [];
+  return zones
+    .filter((zone) => zone.provinces.some((entry) => entry.toLowerCase() === normalized))
+    .flatMap((zone) => zone.rates.map((rate) => ({ zone, rate })));
 }
 
 export function CheckoutFlow() {
@@ -81,6 +95,22 @@ export function CheckoutFlow() {
   }, [items, replaceProduct]);
 
   const sellerOptions = useMemo(() => options.data?.sellers ?? [], [options.data?.sellers]);
+  const shippingZones = useMemo(
+    () => (options.data?.fulfillment.shippingZones ?? []) as ShippingZoneOption[],
+    [options.data?.fulfillment.shippingZones],
+  );
+  const availableProvinces = useMemo(() => provincesFromZones(shippingZones), [shippingZones]);
+  const ratesForSelectedProvince = useMemo(
+    () => ratesForProvince(shippingZones, form.province),
+    [shippingZones, form.province],
+  );
+
+  useEffect(() => {
+    if (!shippingRateId) return;
+    if (ratesForSelectedProvince.some(({ rate }) => rate.id === shippingRateId)) return;
+    setShippingRateId('');
+    setQuote(undefined);
+  }, [ratesForSelectedProvince, shippingRateId]);
 
   const effectivePaymentMethod = !options.data?.paymentMethods.BANK_TRANSFER && options.data?.paymentMethods.MERCADO_PAGO ? 'MERCADO_PAGO' : paymentMethod;
   const input = useMemo<OrderInput | null>(() => {
@@ -91,9 +121,38 @@ export function CheckoutFlow() {
         const selectedPickupPointId = selection?.pickupPointId ?? pickupPointId ?? seller?.pickupPoints[0]?.id;
         return selectedPickupPointId ? { type: 'PICKUP', pickupPointId: selectedPickupPointId } : null;
       }
-      const selectedShippingRateId = selection?.shippingRateId ?? shippingRateId ?? seller?.shippingZones[0]?.rates[0]?.id;
-      if (!selectedShippingRateId || !form.recipientName || !form.recipientPhone || !form.addressLine1 || !form.city || !form.province || !form.postalCode) return null;
-      return { type: 'SHIPMENT', shippingRateId: selectedShippingRateId, ...form };
+      const zones = (seller?.shippingZones ?? shippingZones) as ShippingZoneOption[];
+      const matchingRates = ratesForProvince(zones, form.province);
+      const selectedShippingRateId = selection?.shippingRateId ?? shippingRateId;
+      const validRateId = matchingRates.some(({ rate }) => rate.id === selectedShippingRateId)
+        ? selectedShippingRateId
+        : undefined;
+      const recipientName = form.recipientName.trim();
+      const recipientPhone = form.recipientPhone.trim();
+      const addressLine1 = form.addressLine1.trim();
+      const city = form.city.trim();
+      const province = form.province.trim();
+      const postalCode = form.postalCode.trim();
+      if (
+        !validRateId
+        || !recipientName
+        || recipientPhone.length < 6
+        || !addressLine1
+        || !city
+        || !province
+        || postalCode.length < 3
+      ) return null;
+      return {
+        type: 'SHIPMENT',
+        shippingRateId: validRateId,
+        recipientName,
+        recipientPhone,
+        addressLine1,
+        ...(form.addressLine2.trim() ? { addressLine2: form.addressLine2.trim() } : {}),
+        city,
+        province,
+        postalCode,
+      };
     };
     const primarySeller = sellerOptions[0];
     const primaryFulfillment = buildFulfillment(sellerOptions.length > 1 && primarySeller ? sellerSelections[primarySeller.sellerKey] : undefined, primarySeller);
@@ -103,11 +162,11 @@ export function CheckoutFlow() {
     return {
       items: items.map((item) => ({ productId: item.id, quantity: item.quantity, productVersion: item.productVersion })),
       fulfillment: primaryFulfillment,
-      ...(sellerFulfillments ? { sellerFulfillments } : {}),
+      ...(sellerFulfillments.length ? { sellerFulfillments } : {}),
       paymentMethod: effectivePaymentMethod,
       pointsToRedeem,
     };
-  }, [items, delivery, pickupPointId, shippingRateId, form, effectivePaymentMethod, pointsToRedeem, sellerOptions, sellerSelections]);
+  }, [items, delivery, pickupPointId, shippingRateId, form, effectivePaymentMethod, pointsToRedeem, sellerOptions, sellerSelections, shippingZones]);
 
   const program = loyalty.data?.program;
   const account = loyalty.data?.account;
@@ -143,11 +202,27 @@ export function CheckoutFlow() {
     setForm((current) => ({ ...current, [key]: event.target.value }));
     resetQuote();
   };
+  const shipmentValidationMessage = useMemo(() => {
+    if (delivery !== 'SHIPMENT' && sellerOptions.every((seller) => (sellerSelections[seller.sellerKey]?.delivery ?? 'PICKUP') !== 'SHIPMENT')) return null;
+    if (!form.province.trim()) return 'Elegí una provincia para el envío.';
+    if (!shippingRateId && sellerOptions.length <= 1) return 'Elegí una tarifa de envío.';
+    if (!form.recipientName.trim()) return 'Completá el nombre completo.';
+    if (form.recipientPhone.trim().length < 6) return 'El teléfono debe tener al menos 6 caracteres.';
+    if (!form.addressLine1.trim()) return 'Completá la dirección.';
+    if (!form.city.trim()) return 'Completá la ciudad.';
+    if (form.postalCode.trim().length < 3) return 'El código postal debe tener al menos 3 caracteres.';
+    return null;
+  }, [delivery, form, sellerOptions, sellerSelections, shippingRateId]);
   const quoteIt = async () => {
-    if (!input) return;
+    if (!input) {
+      toast.error(shipmentValidationMessage ?? 'Completá la entrega y el pago para validar.');
+      return;
+    }
     setBusy(true);
     try { setQuote(await previewCheckout(input)); }
-    catch (error) { toast.error(error instanceof Error ? error.message : 'No pudimos validar tu compra'); }
+    catch (error) {
+      toast.error(error instanceof ApiError ? error.message : error instanceof Error ? error.message : 'No pudimos validar tu compra');
+    }
     finally { setBusy(false); }
   };
   const submit = async () => {
@@ -248,25 +323,45 @@ export function CheckoutFlow() {
                       </select>
                     </label>
                   ) : (
-                    <label>
-                      Tarifa de envío
-                      <select
-                        value={selection.shippingRateId ?? ''}
-                        onChange={(event) => {
-                          setSellerSelections((current) => ({ ...current, [seller.sellerKey]: { ...selection, shippingRateId: event.target.value } }));
-                          resetQuote();
-                        }}
-                      >
-                        <option value="">Elegí una tarifa</option>
-                        {seller.shippingZones.flatMap((zone) =>
-                          zone.rates.map((rate) => (
+                    <>
+                      <label>
+                        Provincia
+                        <select
+                          value={form.province}
+                          onChange={(event) => {
+                            setForm((current) => ({ ...current, province: event.target.value }));
+                            setSellerSelections((current) => ({
+                              ...current,
+                              [seller.sellerKey]: { ...selection, shippingRateId: undefined },
+                            }));
+                            resetQuote();
+                          }}
+                        >
+                          <option value="">Elegí una provincia</option>
+                          {provincesFromZones(seller.shippingZones as ShippingZoneOption[]).map((province) => (
+                            <option key={province} value={province}>{province}</option>
+                          ))}
+                        </select>
+                      </label>
+                      <label>
+                        Tarifa de envío
+                        <select
+                          value={selection.shippingRateId ?? ''}
+                          disabled={!form.province}
+                          onChange={(event) => {
+                            setSellerSelections((current) => ({ ...current, [seller.sellerKey]: { ...selection, shippingRateId: event.target.value } }));
+                            resetQuote();
+                          }}
+                        >
+                          <option value="">{form.province ? 'Elegí una tarifa' : 'Primero elegí la provincia'}</option>
+                          {ratesForProvince(seller.shippingZones as ShippingZoneOption[], form.province).map(({ zone, rate }) => (
                             <option key={rate.id} value={rate.id}>
                               {zone.name} · {rate.name} · {formatMoney(rate.price)}
                             </option>
-                          )),
-                        )}
-                      </select>
-                    </label>
+                          ))}
+                        </select>
+                      </label>
+                    </>
                   )}
                 </div>
               );
@@ -274,12 +369,11 @@ export function CheckoutFlow() {
             <div className={`${styles.formGrid} form-grid`}>
               {[
                 ['recipientName', 'Nombre completo'],
-                ['recipientPhone', 'Teléfono'],
+                ['recipientPhone', 'Teléfono (mín. 6)'],
                 ['addressLine1', 'Dirección'],
                 ['addressLine2', 'Piso/departamento (opcional)'],
                 ['city', 'Ciudad'],
-                ['province', 'Provincia'],
-                ['postalCode', 'Código postal'],
+                ['postalCode', 'Código postal (mín. 3)'],
               ].map(([key, label]) => (
                 <label key={key}>
                   {label}
@@ -335,33 +429,50 @@ export function CheckoutFlow() {
           ) : (
             <>
               <label>
+                Provincia
+                <select
+                  value={form.province}
+                  onChange={(event) => {
+                    setForm((current) => ({ ...current, province: event.target.value }));
+                    setShippingRateId('');
+                    resetQuote();
+                  }}
+                >
+                  <option value="">Elegí una provincia</option>
+                  {availableProvinces.map((province) => (
+                    <option key={province} value={province}>{province}</option>
+                  ))}
+                </select>
+              </label>
+              <label>
                 Tarifa de envío
                 <select
                   value={shippingRateId}
+                  disabled={!form.province}
                   onChange={(event) => {
                     setShippingRateId(event.target.value);
                     resetQuote();
                   }}
                 >
-                  <option value="">Elegí una tarifa</option>
-                  {options.data?.fulfillment.shippingZones.flatMap((zone) =>
-                    zone.rates.map((rate) => (
-                      <option key={rate.id} value={rate.id}>
-                        {zone.name} · {rate.name} · {formatMoney(rate.price)}
-                      </option>
-                    )),
-                  )}
+                  <option value="">{form.province ? 'Elegí una tarifa' : 'Primero elegí la provincia'}</option>
+                  {ratesForSelectedProvince.map(({ zone, rate }) => (
+                    <option key={rate.id} value={rate.id}>
+                      {zone.name} · {rate.name} · {formatMoney(rate.price)}
+                    </option>
+                  ))}
                 </select>
               </label>
+              {!form.province && availableProvinces.length === 0 && (
+                <p className="form-hint">No hay zonas de envío activas configuradas.</p>
+              )}
               <div className={`${styles.formGrid} form-grid`}>
                 {[
                   ['recipientName', 'Nombre completo'],
-                  ['recipientPhone', 'Teléfono'],
+                  ['recipientPhone', 'Teléfono (mín. 6)'],
                   ['addressLine1', 'Dirección'],
                   ['addressLine2', 'Piso/departamento (opcional)'],
                   ['city', 'Ciudad'],
-                  ['province', 'Provincia'],
-                  ['postalCode', 'Código postal'],
+                  ['postalCode', 'Código postal (mín. 3)'],
                 ].map(([key, label]) => (
                   <label key={key}>
                     {label}
@@ -561,6 +672,9 @@ export function CheckoutFlow() {
         >
           {syncingCart ? 'Actualizando precios…' : busy ? 'Validando…' : quote ? 'Crear orden' : 'Validar total'}
         </Button>
+        {!input && shipmentValidationMessage && (
+          <p className={`${styles.checkoutSummaryHint} form-hint checkout-summary-hint`}>{shipmentValidationMessage}</p>
+        )}
         <p className={`${styles.checkoutSummaryHint} form-hint checkout-summary-hint`}>
           El precio y el saldo mostrado son informativos hasta la validación final.
         </p>
