@@ -684,17 +684,472 @@
   overflow-wrap: anywhere;
 }
 
+.affiliateAdminSettings {
+  display: grid;
+  gap: 20px;
+}
+
+.affiliateAdminSettings .adminMetricGrid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-bottom: 0;
+}
+
+.affiliateAdminSettingsPanel { overflow: hidden; }
+
+.affiliateAdminSettingsHeader {
+  min-height: 72px;
+  padding: 18px 22px;
+}
+
+.affiliateAdminSettingsHeader h2 {
+  margin: 0;
+  font: 800 15px / 1.35 'Nunito', var(--font-geist), Arial, sans-serif;
+  text-transform: uppercase;
+}
+
+.affiliateAdminSettingsForm {
+  display: grid;
+  gap: 24px;
+  padding: 24px;
+}
+
+.affiliateAdminSettingsFields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.affiliateAdminSettingCard {
+  display: grid;
+  gap: 16px;
+  align-content: start;
+  padding: 20px;
+  border: 2px solid var(--line);
+  background: linear-gradient(160deg, rgba(18, 25, 33, .96), rgba(10, 15, 21, .98));
+  box-shadow: 4px 4px 0 #05070a;
+}
+
+.affiliateAdminSettingHeading {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+}
+
+.affiliateAdminSettingIcon {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 2px solid rgba(83, 190, 229, .35);
+  background: rgba(83, 190, 229, .1);
+  color: var(--cyan);
+}
+
+.affiliateAdminSettingHeading strong {
+  display: block;
+  color: var(--ink);
+  font: 800 13px / 1.35 'Nunito', var(--font-geist), Arial, sans-serif;
+  text-transform: uppercase;
+}
+
+.affiliateAdminSettingHeading span:last-child {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.affiliateAdminSettingsNote {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  padding: 16px 18px;
+  border: 2px solid rgba(83, 190, 229, .4);
+  background: rgba(83, 190, 229, .08);
+}
+
+.affiliateAdminSettingsNoteIcon {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  color: var(--cyan);
+}
+
+.affiliateAdminSettingsNote strong {
+  display: block;
+  color: var(--cyan);
+  font: 700 12px / 1.4 'Nunito', var(--font-geist), Arial, sans-serif;
+  text-transform: uppercase;
+}
+
+.affiliateAdminSettingsNote p {
+  margin: 6px 0 0;
+  color: #c8d6dd;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.affiliateAdminSettingsActions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-top: 20px;
+  border-top: 2px solid var(--line);
+}
+
+.affiliateAdminSettingsActions > span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.affiliateAdminSettingsActionButtons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.affiliateAdminSectionStack { display: grid; gap: 16px; }
+
+.affiliateAdminSectionStack > h3 {
+  margin: 0;
+  font: 700 13px/1.4 'Nunito', var(--font-geist), Arial, sans-serif;
+  text-transform: uppercase;
+}
+
+.affiliateAdminActionsRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.adminOrderDetail { display: grid; gap: 20px; }
+
+.adminOrderHero {
+  padding: 24px;
+  border: 2px solid var(--line-strong);
+  background: linear-gradient(135deg, rgba(83, 190, 229, .1), rgba(16, 22, 29, .98) 55%);
+  box-shadow: 6px 6px 0 #05070a;
+}
+
+.adminOrderHeroTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.adminOrderKicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--cyan);
+  font: 700 12px/1.4 'Nunito', var(--font-geist), Arial, sans-serif;
+  text-transform: uppercase;
+}
+
+.adminOrderStatus {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 0 10px;
+  border: 2px solid currentColor;
+  font: 700 12px/1.4 'Nunito', var(--font-geist), Arial, sans-serif;
+  text-transform: uppercase;
+}
+
+.adminOrderStatus.isPendingPayment { color: var(--muted); }
+.adminOrderStatus.isPaid { color: var(--accent); }
+.adminOrderStatus.isPreparing { color: var(--cyan); }
+.adminOrderStatus.isReady { color: var(--cyan); }
+.adminOrderStatus.isShipped { color: var(--cyan); }
+.adminOrderStatus.isCompleted { color: var(--green); }
+.adminOrderStatus.isWarning { color: var(--accent); }
+.adminOrderStatus.isCancelled { color: var(--warm); }
+
+.adminOrderHeroCopy {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.adminOrderHeroCopy h2 {
+  margin: 0 0 8px;
+  font: 700 clamp(24px, 3vw, 34px)/1.25 'Nunito', var(--font-geist), Arial, sans-serif;
+  text-transform: uppercase;
+}
+
+.adminOrderHeroCopy p { margin: 0; color: var(--muted); }
+
+.adminOrderHeroCopy a { color: var(--cyan); font-weight: 800; }
+
+.adminOrderHeroCopy a:hover { color: var(--accent); }
+
+.adminOrderAmount { text-align: right; }
+
+.adminOrderAmount span {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--muted);
+  font: 700 12px/1.4 'Nunito', var(--font-geist), Arial, sans-serif;
+  text-transform: uppercase;
+}
+
+.adminOrderAmount strong {
+  color: var(--accent);
+  font: 800 24px/1.25 'Nunito', var(--font-geist), Arial, sans-serif;
+}
+
+.adminOrderSummary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.adminOrderSummaryCard {
+  min-height: 120px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  border: 2px solid var(--line);
+  background: rgba(16, 22, 29, .97);
+  box-shadow: 4px 4px 0 #05070a;
+}
+
+.adminOrderSummaryCard.isHighlight {
+  border-color: rgba(255, 213, 47, .55);
+  background: linear-gradient(145deg, rgba(255, 213, 47, .12), rgba(16, 22, 29, .98));
+}
+
+.adminOrderSummaryCard > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font: 700 11px/1.4 'Nunito', var(--font-geist), Arial, sans-serif;
+  text-transform: uppercase;
+}
+
+.adminOrderSummaryCard > strong {
+  margin: auto 0 6px;
+  font: 800 20px/1.3 'Nunito', var(--font-geist), Arial, sans-serif;
+}
+
+.adminOrderSummaryCard > small { color: var(--muted); font-size: 12px; }
+
+.adminOrderColumns {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(260px, .7fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.adminOrderPrimary,
+.adminOrderAside { display: grid; gap: 20px; }
+
+.adminOrderCard {
+  padding: 20px;
+  border: 2px solid var(--line);
+  background: linear-gradient(145deg, rgba(22, 30, 39, .94), rgba(16, 22, 29, .98));
+  box-shadow: 5px 5px 0 #05070a;
+}
+
+.adminOrderSectionHeading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.adminOrderIcon {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border: 2px solid var(--accent);
+  background: rgba(255, 213, 47, .1);
+  color: var(--accent);
+}
+
+.adminOrderIcon.isCyan {
+  border-color: var(--cyan);
+  background: rgba(83, 190, 229, .1);
+  color: var(--cyan);
+}
+
+.adminOrderSectionHeading span {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--accent);
+  font: 700 11px/1.4 'Nunito', var(--font-geist), Arial, sans-serif;
+  text-transform: uppercase;
+}
+
+.adminOrderSectionHeading h3 {
+  margin: 0;
+  font: 700 14px/1.4 'Nunito', var(--font-geist), Arial, sans-serif;
+  text-transform: uppercase;
+}
+
+.adminOrderItems { display: grid; gap: 0; }
+
+.adminOrderItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.adminOrderItem:last-child { border-bottom: 0; padding-bottom: 0; }
+
+.adminOrderItem:first-child { padding-top: 0; }
+
+.adminOrderItem div { display: grid; gap: 4px; }
+
+.adminOrderItem strong { color: var(--ink); }
+
+.adminOrderItem span { color: var(--muted); font-size: 13px; }
+
+.adminOrderDelivery {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 18px;
+  margin: 0 0 16px;
+}
+
+.adminOrderDelivery div {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.adminOrderDelivery dt {
+  color: var(--muted);
+  font: 700 11px/1.4 'Nunito', var(--font-geist), Arial, sans-serif;
+  text-transform: uppercase;
+}
+
+.adminOrderDelivery dd {
+  margin: 6px 0 0;
+  color: var(--ink);
+  font-weight: 700;
+  line-height: 1.45;
+}
+
+.adminOrderMutedNote {
+  margin: 0 0 16px;
+  padding: 14px 16px;
+  border: 2px solid rgba(83, 190, 229, .35);
+  background: rgba(83, 190, 229, .08);
+  color: #c8d6dd;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.adminOrderTracking {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  padding-top: 4px;
+}
+
+.adminOrderTracking span {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--muted);
+  font: 700 11px/1.4 'Nunito', var(--font-geist), Arial, sans-serif;
+  text-transform: uppercase;
+}
+
+.adminOrderTracking strong {
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.adminOrderAsideCard { display: grid; gap: 12px; }
+
+.adminOrderAsideLabel {
+  display: block;
+  color: var(--muted);
+  font: 700 12px/1.4 'Nunito', var(--font-geist), Arial, sans-serif;
+  text-transform: uppercase;
+}
+
+.adminOrderAsideCard > p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.adminOrderActions {
+  display: grid;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.adminOrderActions :global(.button) { width: 100%; justify-content: center; }
+
+.adminOrderComplete {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 2px solid rgba(83, 190, 229, .35);
+  background: rgba(83, 190, 229, .08);
+  color: #c8d6dd;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.adminOrderMetaList { display: grid; gap: 12px; }
+
+.adminOrderMetaList div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--line);
+}
+
+.adminOrderMetaList div:last-child { border-bottom: 0; padding-bottom: 0; }
+
+.adminOrderMetaList span {
+  color: var(--muted);
+  font: 700 11px/1.4 'Nunito', var(--font-geist), Arial, sans-serif;
+  text-transform: uppercase;
+}
+
+.adminOrderMetaList strong { color: var(--ink); text-align: right; }
+
 @media (max-width: 1100px) {
   .adminMetricGrid,
   .adminPayoutSummary,
-  .adminListingSummary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .adminListingSummary,
+  .adminOrderSummary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .affiliateAdminSettings .adminMetricGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .adminPayoutColumns,
   .adminListingColumns,
+  .adminOrderColumns,
   .adminTwoColumn { grid-template-columns: 1fr; }
   .adminPayoutHeroCopy,
-  .adminListingHeroCopy { align-items: flex-start; flex-direction: column; }
+  .adminListingHeroCopy,
+  .adminOrderHeroCopy { align-items: flex-start; flex-direction: column; }
   .adminPayoutAmount,
-  .adminListingPrice { text-align: left; }
+  .adminListingPrice,
+  .adminOrderAmount { text-align: left; }
   .affiliateAdminPreview { grid-template-columns: 1fr; }
   .affiliateAdminPreviewImage { max-height: 360px; }
 }
@@ -702,16 +1157,36 @@
 @media (max-width: 900px) {
   .affiliateAdminLayout { grid-template-columns: 1fr; gap: 18px; }
   .affiliateAdminContent { gap: 18px; }
+  .affiliateAdminSettingsFields { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 760px) {
   .adminMetricGrid,
   .adminPayoutSummary,
   .adminListingSummary,
-  .adminPayoutMeta { grid-template-columns: 1fr; }
+  .adminOrderSummary,
+  .adminPayoutMeta,
+  .adminOrderDelivery,
+  .adminOrderTracking,
+  .affiliateAdminSettings .adminMetricGrid { grid-template-columns: 1fr; }
   .adminInlineFilter { grid-template-columns: 1fr; }
   .adminPayoutReveal { flex-direction: column; align-items: stretch; }
   .affiliateAdminContent { gap: 16px; }
   .affiliateAdminPublicationsList .affiliateAdminRow { padding-inline: 18px; }
   .affiliateAdminPreviewData { grid-template-columns: 1fr; }
+  .affiliateAdminSettingsForm { gap: 18px; padding: 18px; }
+  .affiliateAdminSettingsHeader { padding: 16px 18px; }
+  .affiliateAdminSettingCard { padding: 16px; }
+  .affiliateAdminSettingsActions {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .affiliateAdminSettingsActionButtons {
+    width: 100%;
+  }
+  .affiliateAdminSettingsActionButtons :global(.button) {
+    flex: 1;
+    justify-content: center;
+  }
 }

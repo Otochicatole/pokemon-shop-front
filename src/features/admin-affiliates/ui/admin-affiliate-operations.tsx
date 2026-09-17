@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { useMutation, useQuery as useReactQuery, useQueryClient, type UseQueryResult } from '@tanstack/react-query';
-import { ArrowDownToLine, ArrowLeft, Check, CircleDollarSign, Clock3, Eye, Landmark, RefreshCw, Search, Settings2, ShieldAlert, WalletCards, X } from 'lucide-react';
+import { ArrowDownToLine, ArrowLeft, Check, CircleDollarSign, Clock3, Eye, Info, Landmark, MapPin, Package, Percent, RefreshCw, Search, Settings2, ShieldAlert, Timer, Truck, WalletCards, X } from 'lucide-react';
 import { toast } from '@/components/feedback';
 import { AdminPageHeader, Button, Dialog, SelectField, TextareaField, TextField } from '@/components';
 import { adminErrorMessage, adminFetch } from '@/shared/admin/client';
@@ -36,7 +36,40 @@ type Listing = {
 };
 type ReviewDecision = 'APPROVED' | 'CHANGES_REQUESTED' | 'REJECTED';
 
-type SellerOrder = { id: string; number: string; sellerName: string; sellerType?: 'STORE' | 'AFFILIATE'; affiliate?: { id: string; publicName: string } | null; status: string; version: number; fulfillmentType?: 'SHIPMENT' | 'PICKUP'; subtotalMinor: string; shippingMinor: string; sellerNetMinor: string; allowedActions?: string[]; carrier?: string | null; trackingCode?: string | null; recipientName?: string | null; recipientPhone?: string | null; addressLine1?: string | null; addressLine2?: string | null; city?: string | null; province?: string | null; postalCode?: string | null; pickupPointAddress?: string | null; statusHistory?: Array<{ id: string; fromStatus: string | null; toStatus: string; note?: string | null; createdAt: string }>; parentOrder?: { id: string; number: string; status: string; paymentStatus: string | null }; order?: { number: string; userId?: string; paymentId?: string | null }; items?: Array<{ id?: string; productName?: string; name?: string; quantity: number; lineTotalMinor: string }> };
+type SellerOrder = {
+  id: string;
+  number: string;
+  sellerName: string;
+  sellerType?: 'STORE' | 'AFFILIATE';
+  affiliate?: { id: string; publicName: string } | null;
+  affiliateId?: string | null;
+  status: string;
+  version: number;
+  fulfillmentType?: 'SHIPMENT' | 'PICKUP';
+  subtotalMinor: string;
+  shippingMinor: string;
+  commissionMinor?: string;
+  sellerNetMinor: string;
+  allowedActions?: string[];
+  carrier?: string | null;
+  trackingCode?: string | null;
+  recipientName?: string | null;
+  recipientPhone?: string | null;
+  addressLine1?: string | null;
+  addressLine2?: string | null;
+  city?: string | null;
+  province?: string | null;
+  postalCode?: string | null;
+  pickupPointName?: string | null;
+  pickupPointAddress?: string | null;
+  shippingZoneName?: string | null;
+  shippingRateName?: string | null;
+  sellerContactPhone?: string | null;
+  statusHistory?: Array<{ id: string; fromStatus: string | null; toStatus: string; note?: string | null; createdAt: string }>;
+  parentOrder?: { id: string; number: string; status: string; paymentStatus: string | null };
+  order?: { number: string; userId?: string; paymentId?: string | null };
+  items?: Array<{ id?: string; productName?: string; name?: string; quantity: number; lineTotalMinor: string }>;
+};
 type RefundInput = { amountMinor: string; reason: string; externalReference: string; restock: boolean };
 type Issue = { id: string; status: string; reason: string; resolutionNote?: string | null; createdAt: string; version?: number; affiliate: { id: string; publicName: string }; sellerOrder: SellerOrder };
 type Cancellation = { id: string; status: string; reason: string; resolutionNote?: string | null; version: number; createdAt: string; affiliate: { id: string; publicName: string }; sellerOrder: SellerOrder; orderNumber?: string };
@@ -76,6 +109,22 @@ function payoutStatusClass(status: string) {
     REJECTED: styles.isRejected,
   };
   return [styles.adminPayoutStatus, map[status] ?? ''].filter(Boolean).join(' ');
+}
+function orderStatusClass(status: string) {
+  const map: Record<string, string> = {
+    PENDING_PAYMENT: styles.isPendingPayment,
+    PAID: styles.isPaid,
+    PREPARING: styles.isPreparing,
+    READY_FOR_PICKUP: styles.isReady,
+    PICKED_UP: styles.isReady,
+    SHIPPED: styles.isShipped,
+    COMPLETED: styles.isCompleted,
+    CANCELLATION_REQUESTED: styles.isWarning,
+    DISPUTED: styles.isWarning,
+    CANCELLED: styles.isCancelled,
+    REFUNDED: styles.isCancelled,
+  };
+  return [styles.adminOrderStatus, map[status] ?? ''].filter(Boolean).join(' ');
 }
 function ledgerBucket(value: string) { return ({ AVAILABLE: 'Disponible', RESERVED: 'Reservado', PENDING: 'Pendiente', PAID: 'Pagado' } as Record<string, string>)[value] ?? label(value); }
 function ledgerType(value: string) { return ({ PAYOUT_RESERVED: 'Reserva del retiro', PAYOUT_PAID: 'Retiro pagado', PAYOUT_RELEASED: 'Reserva liberada', SALE_RELEASED: 'Venta liberada' } as Record<string, string>)[value] ?? label(value); }
@@ -857,96 +906,315 @@ function OrderDetail({ query, onTransition, onRefund, refundPending }: { query: 
   const [refundReason, setRefundReason] = useState('');
   const [refundReference, setRefundReference] = useState('');
   const [restock, setRestock] = useState(false);
-  if (query.isLoading) return <Shell active="orders" title="Venta" description="Cargando…"><Feedback>Cargando…</Feedback></Shell>;
-  if (query.isError || !query.data) return <Shell active="orders" title="Venta no encontrada" description="La suborden no está disponible."><Feedback error>{query.error ? adminErrorMessage(query.error) : 'No encontrada'}</Feedback></Shell>;
+
+  if (query.isLoading) {
+    return <Shell active="orders" title="Venta" description="Cargando…"><Feedback>Cargando…</Feedback></Shell>;
+  }
+  if (query.isError || !query.data) {
+    return (
+      <Shell active="orders" title="Venta no encontrada" description="La suborden no está disponible.">
+        <Feedback error>{query.error ? adminErrorMessage(query.error) : 'No encontrada'}</Feedback>
+      </Shell>
+    );
+  }
+
   const order = query.data.order;
-  const next = order.status === 'PAID' ? 'PREPARING' : order.status === 'PREPARING' ? (order.fulfillmentType === 'PICKUP' ? 'READY_FOR_PICKUP' : 'SHIPPED') : order.status === 'READY_FOR_PICKUP' ? 'PICKED_UP' : order.status === 'SHIPPED' || order.status === 'PICKED_UP' ? 'COMPLETED' : null;
+  const next = order.status === 'PAID'
+    ? 'PREPARING'
+    : order.status === 'PREPARING'
+      ? (order.fulfillmentType === 'PICKUP' ? 'READY_FOR_PICKUP' : 'SHIPPED')
+      : order.status === 'READY_FOR_PICKUP'
+        ? 'PICKED_UP'
+        : order.status === 'SHIPPED' || order.status === 'PICKED_UP'
+          ? 'COMPLETED'
+          : null;
   const canRefund = !['PENDING_PAYMENT', 'CANCELLED', 'REFUNDED'].includes(order.status);
+  const parentNumber = order.parentOrder?.number ?? order.order?.number ?? '—';
+  const affiliateId = order.affiliate?.id ?? order.affiliateId ?? null;
+  const isPickup = order.fulfillmentType === 'PICKUP';
+  const hasShipmentAddress = Boolean(order.recipientName || order.addressLine1 || order.city || order.province);
+  const hasTracking = Boolean(order.carrier || order.trackingCode);
+  const closeRefund = () => {
+    if (refundPending) return;
+    setRefundOpen(false);
+    setRefundAmount('');
+    setRefundReason('');
+    setRefundReference('');
+    setRestock(false);
+  };
+
   return (
     <Shell
       active="orders"
       title={`Venta ${order.number}`}
-      description={`${order.sellerName} · estado ${label(order.status)}`}
+      description={`${order.sellerName} · intervención administrativa`}
       action={<Link className="button button-secondary" href="/admin/affiliates/orders"><ArrowLeft size={16} />Volver</Link>}
     >
-      <div className={styles.affiliateAdminOrderMetrics}>
-        <div><span>Importe vendedor</span><strong>{money(order.sellerNetMinor)}</strong></div>
-        <div><span>Subtotal</span><strong>{money(order.subtotalMinor)}</strong></div>
-        <div><span>Envío</span><strong>{money(order.shippingMinor)}</strong></div>
-        <div><span>Entrega</span><strong>{label(order.fulfillmentType ?? 'SHIPMENT')}</strong></div>
-      </div>
-      <section className={shared.adminPanel}>
-        <div className={shared.adminPanelHeader}>
-          <div>
-            <span className={shared.adminPanelKicker}>Detalle</span>
-            <h2>Información de la venta</h2>
+      <div className={styles.adminOrderDetail}>
+        <section className={styles.adminOrderHero}>
+          <div className={styles.adminOrderHeroTop}>
+            <span className={styles.adminOrderKicker}>
+              <Package size={16} /> Suborden marketplace
+            </span>
+            <span className={orderStatusClass(order.status)}>{label(order.status)}</span>
           </div>
-        </div>
-        <div className={[shared.adminPanelBody, styles.affiliateAdminSectionStack].filter(Boolean).join(' ')}>
-          <p className="form-hint">Orden general: {order.parentOrder?.number ?? order.order?.number ?? '—'} · Pago: {label(order.parentOrder?.paymentStatus ?? '—')}</p>
-          <div className={styles.affiliateAdminSectionStack}>
-            <h3>Productos</h3>
-            {order.items?.map((item, index) => (
-              <div className={styles.adminDetailLine} key={`${item.productName ?? item.name}-${index}`}>
-                <span>{item.productName ?? item.name} × {item.quantity}</span>
-                <strong>{money(item.lineTotalMinor)}</strong>
-              </div>
-            ))}
-            {!order.items?.length && <p className={shared.adminEmptyCopy}>Sin ítems cargados.</p>}
-          </div>
-          {order.fulfillmentType === 'SHIPMENT' && (
-            <p className="form-hint">Entrega: {[order.recipientName, order.addressLine1, order.addressLine2, order.city, order.province, order.postalCode].filter(Boolean).join(' · ') || 'Datos no disponibles hasta acreditar el pago'}</p>
-          )}
-          {order.fulfillmentType === 'PICKUP' && <p className="form-hint">Punto de retiro: {order.pickupPointAddress ?? '—'}</p>}
-          <p className="form-hint">Seguimiento: {[order.carrier, order.trackingCode].filter(Boolean).join(' · ') || 'Sin datos cargados'}</p>
-          <div className={styles.affiliateAdminActionsRow}>
-            {next && next !== 'COMPLETED' && <Button onClick={() => onTransition(next)}>Pasar a {label(next)}</Button>}
-            {next === 'COMPLETED' && <Button onClick={() => onTransition(next)}>Completar venta administrativamente</Button>}
-            {canRefund && <Button variant="danger" onClick={() => setRefundOpen((value) => !value)}>Registrar reembolso</Button>}
-          </div>
-          {refundOpen && canRefund && (
-            <form
-              className={shared.adminForm}
-              onSubmit={(event) => {
-                event.preventDefault();
-                if (refundAmount.trim() && refundReason.trim().length >= 3 && refundReference.trim().length >= 2) {
-                  onRefund({ amountMinor: refundAmount.trim(), reason: refundReason.trim(), externalReference: refundReference.trim(), restock });
-                  setRefundOpen(false);
-                }
-              }}
-            >
-              <TextField label="Monto a reembolsar (centavos USD)" inputMode="numeric" value={refundAmount} onChange={(event) => setRefundAmount(event.target.value.replace(/[^0-9]/g, ''))} required />
-              <TextareaField label="Motivo" value={refundReason} onChange={(event) => setRefundReason(event.target.value)} minLength={3} maxLength={500} required />
-              <TextField label="Referencia externa" value={refundReference} onChange={(event) => setRefundReference(event.target.value)} minLength={2} maxLength={150} required />
-              <label className="checkbox-field"><input type="checkbox" checked={restock} onChange={(event) => setRestock(event.target.checked)} /> Reponer stock</label>
-              <div className={shared.adminDialogActions}>
-                <Button type="button" variant="secondary" onClick={() => setRefundOpen(false)}>Cancelar</Button>
-                <Button type="submit" variant="danger" disabled={refundPending || refundAmount.trim().length === 0 || refundReason.trim().length < 3 || refundReference.trim().length < 2}>{refundPending ? 'Registrando…' : 'Confirmar reembolso'}</Button>
-              </div>
-            </form>
-          )}
-        </div>
-      </section>
-      {order.statusHistory?.length ? (
-        <section className={shared.adminPanel}>
-          <div className={shared.adminPanelHeader}>
+          <div className={styles.adminOrderHeroCopy}>
             <div>
-              <span className={shared.adminPanelKicker}>Historial</span>
-              <h2>Timeline</h2>
+              <h2>{order.number}</h2>
+              <p>
+                Vende{' '}
+                {affiliateId
+                  ? <Link href={`/admin/affiliates/sellers/${affiliateId}`}>{order.sellerName}</Link>
+                  : order.sellerName}
+                {' · '}Orden {parentNumber}
+                {order.parentOrder?.paymentStatus ? ` · Pago ${label(order.parentOrder.paymentStatus)}` : ''}
+              </p>
+            </div>
+            <div className={styles.adminOrderAmount}>
+              <span>Neto vendedor</span>
+              <strong>{money(order.sellerNetMinor)}</strong>
             </div>
           </div>
-          <div className={shared.adminPanelBody}>
-            <ol className={shared.adminTimeline}>
-              {order.statusHistory.map((event) => (
-                <li key={event.id}>
-                  <strong>{label(event.toStatus)}</strong>
-                  <span>{date(event.createdAt)}{event.note ? ` · ${event.note}` : ''}</span>
-                </li>
-              ))}
-            </ol>
-          </div>
         </section>
-      ) : null}
+
+        <div className={styles.adminOrderSummary}>
+          <article className={[styles.adminOrderSummaryCard, styles.isHighlight].filter(Boolean).join(' ')}>
+            <span><CircleDollarSign size={15} /> Subtotal</span>
+            <strong>{money(order.subtotalMinor)}</strong>
+            <small>Productos de esta suborden</small>
+          </article>
+          <article className={styles.adminOrderSummaryCard}>
+            <span><Truck size={15} /> Envío</span>
+            <strong>{money(order.shippingMinor)}</strong>
+            <small>{label(order.fulfillmentType ?? 'SHIPMENT')}</small>
+          </article>
+          <article className={styles.adminOrderSummaryCard}>
+            <span><ShieldAlert size={15} /> Comisión</span>
+            <strong>{money(order.commissionMinor)}</strong>
+            <small>Retención de plataforma</small>
+          </article>
+          <article className={styles.adminOrderSummaryCard}>
+            <span><Package size={15} /> Ítems</span>
+            <strong>{order.items?.reduce((sum, item) => sum + item.quantity, 0) ?? 0}</strong>
+            <small>{order.items?.length ?? 0} líneas</small>
+          </article>
+        </div>
+
+        <div className={styles.adminOrderColumns}>
+          <div className={styles.adminOrderPrimary}>
+            <section className={styles.adminOrderCard}>
+              <div className={styles.adminOrderSectionHeading}>
+                <div className={styles.adminOrderIcon}><Package size={18} /></div>
+                <div>
+                  <span>Catálogo</span>
+                  <h3>Productos</h3>
+                </div>
+              </div>
+              {order.items?.length ? (
+                <div className={styles.adminOrderItems}>
+                  {order.items.map((item, index) => (
+                    <div className={styles.adminOrderItem} key={item.id ?? `${item.productName ?? item.name}-${index}`}>
+                      <div>
+                        <strong>{item.productName ?? item.name ?? 'Producto'}</strong>
+                        <span>{item.quantity} unidad{item.quantity === 1 ? '' : 'es'}</span>
+                      </div>
+                      <strong>{money(item.lineTotalMinor)}</strong>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className={shared.adminEmptyCopy}>Sin ítems cargados.</p>
+              )}
+            </section>
+
+            <section className={styles.adminOrderCard}>
+              <div className={styles.adminOrderSectionHeading}>
+                <div className={[styles.adminOrderIcon, styles.isCyan].filter(Boolean).join(' ')}>
+                  {isPickup ? <MapPin size={18} /> : <Truck size={18} />}
+                </div>
+                <div>
+                  <span>Logística</span>
+                  <h3>{isPickup ? 'Retiro en punto' : 'Envío a domicilio'}</h3>
+                </div>
+              </div>
+
+              {isPickup ? (
+                <dl className={styles.adminOrderDelivery}>
+                  <div>
+                    <dt>Punto</dt>
+                    <dd>{order.pickupPointName ?? 'Punto de retiro'}</dd>
+                  </div>
+                  <div>
+                    <dt>Dirección</dt>
+                    <dd>{order.pickupPointAddress ?? 'Datos no disponibles hasta acreditar el pago.'}</dd>
+                  </div>
+                </dl>
+              ) : hasShipmentAddress ? (
+                <dl className={styles.adminOrderDelivery}>
+                  {order.recipientName && <div><dt>Destinatario</dt><dd>{order.recipientName}</dd></div>}
+                  {order.recipientPhone && <div><dt>Teléfono</dt><dd>{order.recipientPhone}</dd></div>}
+                  {(order.addressLine1 || order.addressLine2) && (
+                    <div>
+                      <dt>Dirección</dt>
+                      <dd>{[order.addressLine1, order.addressLine2].filter(Boolean).join(', ')}</dd>
+                    </div>
+                  )}
+                  {(order.city || order.province || order.postalCode) && (
+                    <div>
+                      <dt>Localidad</dt>
+                      <dd>{[order.city, order.province, order.postalCode].filter(Boolean).join(' · ')}</dd>
+                    </div>
+                  )}
+                  {(order.shippingZoneName || order.shippingRateName) && (
+                    <div>
+                      <dt>Tarifa</dt>
+                      <dd>{[order.shippingZoneName, order.shippingRateName].filter(Boolean).join(' · ')}</dd>
+                    </div>
+                  )}
+                </dl>
+              ) : (
+                <p className={styles.adminOrderMutedNote}>
+                  Los datos de envío se revelan cuando el pago de la orden general está acreditado.
+                </p>
+              )}
+
+              <div className={styles.adminOrderTracking}>
+                <div>
+                  <span>Seguimiento</span>
+                  <strong>{hasTracking ? [order.carrier, order.trackingCode].filter(Boolean).join(' · ') : 'Sin datos cargados'}</strong>
+                </div>
+                {order.sellerContactPhone && (
+                  <div>
+                    <span>Contacto vendedor</span>
+                    <strong>{order.sellerContactPhone}</strong>
+                  </div>
+                )}
+              </div>
+            </section>
+
+            {order.statusHistory?.length ? (
+              <section className={styles.adminOrderCard}>
+                <div className={styles.adminOrderSectionHeading}>
+                  <div className={[styles.adminOrderIcon, styles.isCyan].filter(Boolean).join(' ')}><Clock3 size={18} /></div>
+                  <div>
+                    <span>Auditoría</span>
+                    <h3>Historial de estados</h3>
+                  </div>
+                </div>
+                <ol className={shared.adminTimeline}>
+                  {order.statusHistory.map((event) => (
+                    <li key={event.id}>
+                      <strong>{label(event.toStatus)}</strong>
+                      <span>{date(event.createdAt)}{event.note ? ` · ${event.note}` : ''}</span>
+                    </li>
+                  ))}
+                </ol>
+              </section>
+            ) : null}
+          </div>
+
+          <aside className={styles.adminOrderAside}>
+            <section className={[styles.adminOrderCard, styles.adminOrderAsideCard].filter(Boolean).join(' ')}>
+              <span className={styles.adminOrderAsideLabel}>Acciones</span>
+              <span className={orderStatusClass(order.status)}>{label(order.status)}</span>
+              <p>Las transiciones administrativas quedan auditadas en el historial de la suborden.</p>
+              <div className={styles.adminOrderActions}>
+                {next && next !== 'COMPLETED' && (
+                  <Button onClick={() => onTransition(next)}>Pasar a {label(next)}</Button>
+                )}
+                {next === 'COMPLETED' && (
+                  <Button onClick={() => onTransition(next)}>Completar venta</Button>
+                )}
+                {!next && (
+                  <div className={styles.adminOrderComplete}>
+                    <Check size={16} />
+                    <span>Sin transición disponible en este estado.</span>
+                  </div>
+                )}
+                {canRefund && (
+                  <Button variant="danger" onClick={() => setRefundOpen(true)}>Registrar reembolso</Button>
+                )}
+                {affiliateId && (
+                  <Link className="button button-ghost" href={`/admin/affiliates/sellers/${affiliateId}`}>
+                    Ver ficha del afiliado
+                  </Link>
+                )}
+              </div>
+            </section>
+
+            <section className={[styles.adminOrderCard, styles.adminOrderAsideCard].filter(Boolean).join(' ')}>
+              <span className={styles.adminOrderAsideLabel}>Referencias</span>
+              <div className={styles.adminOrderMetaList}>
+                <div><span>Orden general</span><strong>{parentNumber}</strong></div>
+                <div><span>Pago</span><strong>{label(order.parentOrder?.paymentStatus ?? '—')}</strong></div>
+                <div><span>Estado orden</span><strong>{label(order.parentOrder?.status ?? '—')}</strong></div>
+                <div><span>Versión</span><strong>{order.version}</strong></div>
+              </div>
+            </section>
+          </aside>
+        </div>
+      </div>
+
+      <Dialog
+        open={refundOpen && canRefund}
+        title="Registrar reembolso"
+        description="El reembolso revierte la obligación del afiliado y queda registrado con referencia externa."
+        onClose={closeRefund}
+      >
+        <form
+          className={shared.adminForm}
+          onSubmit={(event) => {
+            event.preventDefault();
+            if (refundAmount.trim() && refundReason.trim().length >= 3 && refundReference.trim().length >= 2) {
+              onRefund({
+                amountMinor: refundAmount.trim(),
+                reason: refundReason.trim(),
+                externalReference: refundReference.trim(),
+                restock,
+              });
+              closeRefund();
+            }
+          }}
+        >
+          <TextField
+            label="Monto a reembolsar (centavos USD)"
+            inputMode="numeric"
+            value={refundAmount}
+            onChange={(event) => setRefundAmount(event.target.value.replace(/[^0-9]/g, ''))}
+            required
+          />
+          <TextareaField
+            label="Motivo"
+            value={refundReason}
+            onChange={(event) => setRefundReason(event.target.value)}
+            minLength={3}
+            maxLength={500}
+            required
+          />
+          <TextField
+            label="Referencia externa"
+            value={refundReference}
+            onChange={(event) => setRefundReference(event.target.value)}
+            minLength={2}
+            maxLength={150}
+            required
+          />
+          <label className="checkbox-field">
+            <input type="checkbox" checked={restock} onChange={(event) => setRestock(event.target.checked)} />
+            Reponer stock
+          </label>
+          <div className={shared.adminDialogActions}>
+            <Button type="button" variant="secondary" onClick={closeRefund} disabled={refundPending}>Cancelar</Button>
+            <Button
+              type="submit"
+              variant="danger"
+              disabled={refundPending || refundAmount.trim().length === 0 || refundReason.trim().length < 3 || refundReference.trim().length < 2}
+            >
+              {refundPending ? 'Registrando…' : 'Confirmar reembolso'}
+            </Button>
+          </div>
+        </form>
+      </Dialog>
     </Shell>
   );
 }
@@ -1153,35 +1421,136 @@ function Settings() {
     onError: (error) => toast.error(adminErrorMessage(error)),
   });
 
-  return <Shell active="settings" title="Configuración de afiliados" description="Comisión global y plazo de cierre automático. Cada suborden conserva la comisión aplicada al momento de la compra.">
-    <section className={[shared.adminPanel, styles.affiliateAdminSettingsPanel].filter(Boolean).join(' ')}>
-      <div className={[shared.adminPanelHeader, styles.affiliateAdminSettingsHeader].filter(Boolean).join(' ')}>
-        <div>
-          <span className={shared.adminPanelKicker}>Reglas comerciales</span>
-          <h2>Parámetros del programa</h2>
-        </div>
-        <Settings2 size={20} aria-hidden="true" />
-      </div>
-      {query.isLoading ? <Feedback>Cargando configuración…</Feedback> : query.isError ? <Feedback error>{adminErrorMessage(query.error)}</Feedback> : query.data && <form className={styles.affiliateAdminSettingsForm} onSubmit={(event) => { event.preventDefault(); save.mutate(); }}>
-        <div className={styles.affiliateAdminSettingsFields}>
-          <div className={styles.affiliateAdminSettingCard}>
-            <TextField label="Comisión global (%)" type="number" min="0" max="100" step="0.01" value={commission ?? String(query.data.commissionBps / 100)} onChange={(event) => setCommission(event.target.value)} />
-            <p className={styles.affiliateAdminSettingDescription}>Porcentaje que recibe la plataforma en cada nueva venta de afiliado.</p>
+  const commissionValue = commission ?? (query.data ? String(query.data.commissionBps / 100) : '');
+  const daysValue = days ?? (query.data ? String(query.data.autoCompleteDays) : '');
+  const commissionNumber = Number(commissionValue);
+  const daysNumber = Number(daysValue);
+  const commissionError = commissionValue === '' || Number.isNaN(commissionNumber) || commissionNumber < 0 || commissionNumber > 100
+    ? 'Ingresá un porcentaje entre 0 y 100.'
+    : undefined;
+  const daysError = daysValue === '' || Number.isNaN(daysNumber) || !Number.isInteger(daysNumber) || daysNumber < 1 || daysNumber > 90
+    ? 'Ingresá un entero entre 1 y 90.'
+    : undefined;
+  const dirty = commission !== null || days !== null;
+  const canSave = dirty && !commissionError && !daysError && !save.isPending;
+
+  return (
+    <Shell
+      active="settings"
+      title="Configuración de afiliados"
+      description="Comisión global y plazo de cierre automático. Cada suborden conserva la comisión aplicada al momento de la compra."
+      action={<Button variant="secondary" onClick={() => void query.refetch()} disabled={query.isFetching}><RefreshCw size={16} />Actualizar</Button>}
+    >
+      {query.isLoading ? <Feedback>Cargando configuración…</Feedback> : query.isError ? <Feedback error>{adminErrorMessage(query.error)}</Feedback> : query.data && (
+        <div className={styles.affiliateAdminSettings}>
+          <div className={styles.adminMetricGrid}>
+            <article className={styles.adminMetricCard}>
+              <span>Comisión vigente</span>
+              <strong>{(query.data.commissionBps / 100).toLocaleString('es-AR', { maximumFractionDigits: 2 })}%</strong>
+              <small>Se aplica a nuevas ventas</small>
+            </article>
+            <article className={styles.adminMetricCard}>
+              <span>Cierre automático</span>
+              <strong>{query.data.autoCompleteDays} días</strong>
+              <small>Sin incidencias abiertas</small>
+            </article>
+            <article className={styles.adminMetricCard}>
+              <span>Versión de reglas</span>
+              <strong>v{query.data.version}</strong>
+              <small>Control de concurrencia</small>
+            </article>
           </div>
-          <div className={styles.affiliateAdminSettingCard}>
-            <TextField label="Días hasta cierre automático" type="number" min="1" max="90" value={days ?? String(query.data.autoCompleteDays)} onChange={(event) => setDays(event.target.value)} />
-            <p className={styles.affiliateAdminSettingDescription}>Tiempo de espera antes de completar automáticamente una venta sin incidencias.</p>
-          </div>
+
+          <section className={[shared.adminPanel, styles.affiliateAdminSettingsPanel].filter(Boolean).join(' ')}>
+            <div className={[shared.adminPanelHeader, styles.affiliateAdminSettingsHeader].filter(Boolean).join(' ')}>
+              <div>
+                <span className={shared.adminPanelKicker}>Reglas comerciales</span>
+                <h2>Parámetros del programa</h2>
+              </div>
+              <Settings2 size={20} aria-hidden="true" />
+            </div>
+
+            <form
+              className={styles.affiliateAdminSettingsForm}
+              onSubmit={(event) => {
+                event.preventDefault();
+                if (!canSave) return;
+                save.mutate();
+              }}
+            >
+              <div className={styles.affiliateAdminSettingsFields}>
+                <div className={styles.affiliateAdminSettingCard}>
+                  <div className={styles.affiliateAdminSettingHeading}>
+                    <span className={styles.affiliateAdminSettingIcon} aria-hidden="true"><Percent size={16} /></span>
+                    <div>
+                      <strong>Comisión de plataforma</strong>
+                      <span>Porcentaje que se descuenta de cada nueva venta de afiliado.</span>
+                    </div>
+                  </div>
+                  <TextField
+                    label="Comisión global (%)"
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="0.01"
+                    inputMode="decimal"
+                    value={commissionValue}
+                    error={commission !== null ? commissionError : undefined}
+                    onChange={(event) => setCommission(event.target.value)}
+                  />
+                </div>
+
+                <div className={styles.affiliateAdminSettingCard}>
+                  <div className={styles.affiliateAdminSettingHeading}>
+                    <span className={styles.affiliateAdminSettingIcon} aria-hidden="true"><Timer size={16} /></span>
+                    <div>
+                      <strong>Cierre de ventas</strong>
+                      <span>Días de espera antes de completar automáticamente una venta sin incidencias.</span>
+                    </div>
+                  </div>
+                  <TextField
+                    label="Días hasta cierre automático"
+                    type="number"
+                    min="1"
+                    max="90"
+                    step="1"
+                    inputMode="numeric"
+                    value={daysValue}
+                    error={days !== null ? daysError : undefined}
+                    onChange={(event) => setDays(event.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div className={styles.affiliateAdminSettingsNote} role="note">
+                <span className={styles.affiliateAdminSettingsNoteIcon} aria-hidden="true"><Info size={16} /></span>
+                <div>
+                  <strong>La comisión se congela por suborden</strong>
+                  <p>Estos cambios solo afectan las nuevas ventas. El historial y las subórdenes ya creadas conservan la comisión aplicada al momento de la compra.</p>
+                </div>
+              </div>
+
+              <div className={styles.affiliateAdminSettingsActions}>
+                <span>{dirty ? 'Hay cambios sin guardar.' : 'Sin cambios pendientes.'}</span>
+                <div className={styles.affiliateAdminSettingsActionButtons}>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    disabled={!dirty || save.isPending}
+                    onClick={() => {
+                      setCommission(null);
+                      setDays(null);
+                    }}
+                  >
+                    Descartar
+                  </Button>
+                  <Button type="submit" disabled={!canSave}>{save.isPending ? 'Guardando…' : 'Guardar configuración'}</Button>
+                </div>
+              </div>
+            </form>
+          </section>
         </div>
-        <div className={styles.affiliateAdminSettingsNote}>
-          <strong>Importante</strong>
-          <p>La comisión queda congelada en cada suborden. Estos cambios solo afectan las nuevas ventas y no modifican el historial.</p>
-        </div>
-        <div className={styles.affiliateAdminSettingsActions}>
-          <span>Revisá los valores antes de guardar.</span>
-          <Button type="submit" disabled={save.isPending}>{save.isPending ? 'Guardando…' : 'Guardar configuración'}</Button>
-        </div>
-      </form>}
-    </section>
-  </Shell>;
+      )}
+    </Shell>
+  );
 }
