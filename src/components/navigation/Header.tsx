@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import { CartIndicator } from './CartIndicator';
 import { LoyaltyPointsIndicator } from '@/features/loyalty';
 import { NotificationBell } from '@/features/notifications';
+import { config } from '@/shared/config/env';
 import styles from './Header.module.css';
 
 export function Header({ cartCount = 0, sessionSlot, className = '', showAffiliateNav = false }: { cartCount?: number; sessionSlot?: ReactNode; className?: string; showAffiliateNav?: boolean }) {
@@ -37,7 +38,7 @@ export function Header({ cartCount = 0, sessionSlot, className = '', showAffilia
       <div className={`${styles.headerInner} header-inner`}>
         <Link href="/" className={`${styles.brand} brand`} onClick={close}>
           <span className={`${styles.brandMark} brand-mark`}>✦</span>
-          <span>Card Shop<small>objetos para coleccionar</small></span>
+          <span>{config.storeName}<small>objetos para coleccionar</small></span>
         </Link>
         <nav className={`${styles.mainNav} ${open ? styles.isOpen : ''} main-nav ${open ? 'is-open' : ''}`.trim()} aria-label="Navegación principal">
           <Link href="/" onClick={close}>Inicio</Link>

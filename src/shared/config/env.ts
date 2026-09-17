@@ -1,7 +1,7 @@
 const trimTrailingSlash = (value: string) => value.replace(/\/+$/, '');
 
 export const config = {
-  storeName: process.env.NEXT_PUBLIC_STORE_NAME ?? 'Card Shop',
+  storeName: process.env.NEXT_PUBLIC_STORE_NAME ?? 'Nevadatcg',
   // Server-side / Next rewrite target (can be internal).
   backendUrl: trimTrailingSlash(process.env.BACKEND_URL ?? 'http://localhost:3000'),
   // Browser-facing API origin for the storefront (Google OAuth + user cookies).

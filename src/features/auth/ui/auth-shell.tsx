@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
+import { config } from '@/shared/config/env';
 import styles from './auth-shell.module.css';
 
 export function AuthShell({ title, eyebrow, children, asideContent }: { title: string; eyebrow?: string; children: ReactNode; asideContent?: ReactNode }) {
@@ -8,7 +9,7 @@ export function AuthShell({ title, eyebrow, children, asideContent }: { title: s
       <div className={`${styles.authAside} ${asideContent ? `${styles.authAsideHero} auth-aside-hero` : ''} auth-aside`}>
         <Link href="/" className="brand light">
           <span className="brand-mark">✦</span>
-          <span>Card Shop<small>objetos para coleccionar</small></span>
+          <span>{config.storeName}<small>objetos para coleccionar</small></span>
         </Link>
         {asideContent ?? <p>Encontrá piezas que merecen un lugar especial.</p>}
       </div>

@@ -16,7 +16,15 @@ const geistMono = Geist_Mono({
   subsets: ['latin'],
 });
 
-export const metadata: Metadata = { title: { default: 'Card Shop · Objetos para coleccionar', template: '%s · Card Shop' }, description: 'Cartas y productos sellados seleccionados para coleccionistas.' };
+export const metadata: Metadata = {
+  title: { default: 'Nevadatcg · Objetos para coleccionar', template: '%s · Nevadatcg' },
+  description: 'Cartas y productos sellados seleccionados para coleccionistas.',
+  icons: {
+    icon: [{ url: '/logo.svg', type: 'image/svg+xml' }],
+    shortcut: '/logo.svg',
+    apple: '/logo.svg',
+  },
+};
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return <html lang="es"><body className={`${geistSans.variable} ${geistMono.variable}`}><Providers>{children}</Providers></body></html>;
