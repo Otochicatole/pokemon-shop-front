@@ -18,6 +18,7 @@ import {
   deleteAffiliateListing,
   getAffiliateBalance,
   getAffiliateLogistics,
+  getAffiliateOrder,
   getAffiliateProfile,
   listAffiliatePayouts,
   listAffiliateListings,
@@ -95,10 +96,10 @@ export function AffiliatePortal() {
     void queryClient.invalidateQueries({ queryKey: ['affiliate'] });
   };
   const listingTarget = section[0] === 'listings' && section[1] && section[1] !== 'new' ? listings.data?.find((listing) => listing.id === section[1]) : undefined;
-  const orderTarget = section[0] === 'orders' && section[1] ? orders.data?.find((order) => order.id === section[1]) : undefined;
+  const orderId = section[0] === 'orders' && section[1] ? section[1] : undefined;
   if (active === 'new') return <AffiliateLayout profile={profile.data} active="new">{profile.data.status === 'ACTIVE' ? <AffiliateListingCreateForm /> : <AffiliateSuspendedNotice />}</AffiliateLayout>;
   if (listingTarget) return <AffiliateLayout profile={profile.data} active="listings">{profile.data.status === 'ACTIVE' ? <AffiliateListingEditForm key={listingTarget.id} listing={listingTarget} onSaved={refreshAffiliate} /> : <AffiliateListingReadOnly listing={listingTarget} />}</AffiliateLayout>;
-  if (orderTarget) return <AffiliateLayout profile={profile.data} active="orders"><AffiliateOrderDetailView order={orderTarget} onRefresh={refreshAffiliate} /></AffiliateLayout>;
+  if (orderId) return <AffiliateLayout profile={profile.data} active="orders"><AffiliateOrderDetailPage id={orderId} onRefresh={refreshAffiliate} /></AffiliateLayout>;
   if (section[0] === 'listings' && listings.isLoading) return <AffiliateLayout profile={profile.data} active="listings"><AffiliateLoading /></AffiliateLayout>;
   if (section[0] === 'listings' && section[1]) return <AffiliateLayout profile={profile.data} active="listings"><AffiliateHeader eyebrow="Catálogo del afiliado" title="Publicación no encontrada" description="El borrador puede haber sido eliminado o ya no pertenece a tu cuenta." action={<Link className="button button-secondary" href="/affiliate/listings"><ArrowLeft size={16} />Volver a publicaciones</Link>} /></AffiliateLayout>;
 
@@ -152,11 +153,194 @@ function AffiliateOrdersView({ query, onRefresh }: { query: QueryResult<Affiliat
   return <><AffiliateHeader eyebrow="Operación comercial" title="Ventas" description="Actualizá la preparación y la entrega. La confirmación final y la liberación del saldo quedan fuera del control del afiliado." action={<><span className={styles.affiliateCountBadge}>{rows.length}</span><Button variant="secondary" onClick={() => void query.refetch()} disabled={query.isFetching}>Actualizar</Button></>} />{query.isLoading ? <AffiliateLoading /> : query.isError ? <AffiliateQueryError message={dataError(query.error)} /> : rows.length === 0 ? <section className={styles.affiliatePanel}><div className={styles.affiliateEmpty}><ClipboardList size={28} /><p>Todavía no tenés ventas.</p><span>Cuando alguien compre uno de tus productos, aparecerá acá.</span></div></section> : <section className={styles.affiliatePanel}><div className={styles.affiliatePanelHeading}><div className={styles.affiliatePanelHeadingCopy}><span className={styles.affiliatePanelIcon} aria-hidden="true"><ClipboardList size={18} /></span><div><p className="eyebrow">Pedidos</p><h2>Ventas activas y cerradas</h2></div></div></div><div className={styles.affiliateOrderList}>{rows.map((order) => { const next = nextStatus(order); const cancellable = order.allowedActions.includes('REQUEST_CANCELLATION'); return <article className={styles.affiliateOrderCard} key={order.id}><div className={styles.affiliateOrderHeading}><div><span className={styles.affiliateOrderNumber}>{order.number}</span><h2>{order.sellerName}</h2></div><span className={`${styles.affiliateListingStatus} ${statusModifier(order.status)}`}>{orderStatusLabel(order.status)}</span></div><div className={styles.affiliateOrderMeta}><span>Subtotal <strong>{formatMinor(order.subtotalMinor)}</strong></span><span>Comisión <strong>{formatMinor(order.commissionMinor)}</strong></span><span>Tu neto <strong className={styles.affiliateMoneyPositive}>{formatMinor(order.sellerNetMinor)}</strong></span></div><div className={styles.affiliateOrderItems}>{order.items.map((item, index) => <span key={`${order.id}-${index}`}>{item.productName ?? item.name ?? 'Producto'} × {item.quantity}</span>)}</div><div className={styles.affiliateOrderActions}><Link className="button button-ghost" href={`/affiliate/orders/${order.id}`}>Ver detalle</Link>{next && <Button onClick={() => update.mutate({ id: order.id, expectedVersion: order.version, status: next })} disabled={update.isPending}>{next === 'PREPARING' ? 'Empezar a preparar' : next === 'SHIPPED' ? 'Marcar como enviada' : next === 'READY_FOR_PICKUP' ? 'Lista para retirar' : 'Marcar retirada'}</Button>}{cancellable && <Button variant="ghost" onClick={() => { setCancelOpen(cancelOpen === order.id ? null : order.id); setCancelNote(''); }}>Solicitar cancelación</Button>}</div>{cancelOpen === order.id && <form className={styles.affiliateInlineForm} onSubmit={(event) => { event.preventDefault(); if (cancelNote.trim().length < 3) return toast.error('Explicá el motivo de la cancelación'); cancel.mutate({ id: order.id, expectedVersion: order.version, note: cancelNote.trim() }); }}><label>Motivo<textarea value={cancelNote} onChange={(event) => setCancelNote(event.target.value)} minLength={3} maxLength={500} rows={3} required /></label><div className={styles.affiliateRowActions}><Button type="button" variant="ghost" onClick={() => setCancelOpen(null)}>Volver</Button><Button type="submit" variant="danger" disabled={cancel.isPending}>{cancel.isPending ? 'Enviando…' : 'Enviar solicitud'}</Button></div></form>}</article>; })}</div></section>}</>;
 }
 
+function AffiliateOrderDetailPage({ id, onRefresh }: { id: string; onRefresh: () => void }) {
+  const query = useQuery({ queryKey: ['affiliate', 'orders', id], queryFn: () => getAffiliateOrder(id) });
+  if (query.isLoading) return <AffiliateLoading />;
+  if (query.isError || !query.data) {
+    return (
+      <>
+        <AffiliateHeader
+          eyebrow="Detalle de venta"
+          title="Venta no encontrada"
+          description="Puede que el pedido ya no exista o no pertenezca a tu cuenta."
+          action={<Link className="button button-secondary" href="/affiliate/orders"><ArrowLeft size={16} />Volver a ventas</Link>}
+        />
+        <section className={styles.affiliatePanel}>
+          <AffiliateQueryError message={dataError(query.error)} />
+        </section>
+      </>
+    );
+  }
+  return (
+    <AffiliateOrderDetailView
+      order={query.data}
+      onRefresh={() => {
+        void query.refetch();
+        onRefresh();
+      }}
+    />
+  );
+}
+
+function AffiliateOrderDelivery({ order }: { order: AffiliateOrder }) {
+  if (order.fulfillmentType === 'PICKUP') {
+    return (
+      <div className={styles.affiliateDeliveryBlock}>
+        <div className={styles.affiliatePanelHeading}>
+          <div>
+            <p className="eyebrow">Entrega</p>
+            <h2>Retiro</h2>
+          </div>
+        </div>
+        <p>
+          <strong>{order.pickupPointName ?? 'Punto de retiro'}</strong>
+          <br />
+          {order.pickupPointAddress ?? 'Datos no disponibles hasta acreditar el pago.'}
+        </p>
+      </div>
+    );
+  }
+
+  if (order.fulfillmentType !== 'SHIPMENT') return null;
+
+  const hasAddress = Boolean(order.recipientName || order.addressLine1 || order.city || order.province);
+  return (
+    <div className={styles.affiliateDeliveryBlock}>
+      <div className={styles.affiliatePanelHeading}>
+        <div>
+          <p className="eyebrow">Entrega</p>
+          <h2>Envío a domicilio</h2>
+        </div>
+      </div>
+      {hasAddress ? (
+        <dl className={styles.affiliateDeliveryDetails}>
+          {order.recipientName && <div><dt>Destinatario</dt><dd>{order.recipientName}</dd></div>}
+          {order.recipientPhone && <div><dt>Teléfono</dt><dd>{order.recipientPhone}</dd></div>}
+          {(order.addressLine1 || order.addressLine2) && (
+            <div>
+              <dt>Dirección</dt>
+              <dd>{[order.addressLine1, order.addressLine2].filter(Boolean).join(', ')}</dd>
+            </div>
+          )}
+          {(order.city || order.province || order.postalCode) && (
+            <div>
+              <dt>Localidad</dt>
+              <dd>{[order.city, order.province, order.postalCode].filter(Boolean).join(' · ')}</dd>
+            </div>
+          )}
+          {(order.shippingZoneName || order.shippingRateName) && (
+            <div>
+              <dt>Tarifa</dt>
+              <dd>{[order.shippingZoneName, order.shippingRateName].filter(Boolean).join(' · ')}</dd>
+            </div>
+          )}
+        </dl>
+      ) : (
+        <p className={styles.affiliateMuted}>Los datos de envío se habilitan cuando el pago esté acreditado.</p>
+      )}
+      {(order.carrier || order.trackingCode) && (
+        <p className={styles.affiliateMuted}>
+          Seguimiento: {[order.carrier, order.trackingCode].filter(Boolean).join(' · ')}
+        </p>
+      )}
+    </div>
+  );
+}
+
 function AffiliateOrderDetailView({ order, onRefresh }: { order: AffiliateOrder; onRefresh: () => void }) {
-  const [carrier, setCarrier] = useState(order.carrier ?? ''); const [trackingCode, setTrackingCode] = useState(order.trackingCode ?? '');
-  const update = useMutation({ mutationFn: (status: string) => updateAffiliateOrderStatus(order.id, { expectedVersion: order.version, status, carrier: carrier.trim() || null, trackingCode: trackingCode.trim() || null, note: 'Actualización desde el portal del afiliado.' }), onSuccess: () => { toast.success('Venta actualizada'); onRefresh(); }, onError: (error) => toast.error(dataError(error)) });
-  const next = order.allowedActions.includes('START_PREPARING') ? 'PREPARING' : order.allowedActions.includes('READY_FOR_PICKUP') ? 'READY_FOR_PICKUP' : order.allowedActions.includes('MARK_SHIPPED') ? 'SHIPPED' : order.allowedActions.includes('MARK_PICKED_UP') ? 'PICKED_UP' : null;
-  return <><AffiliateHeader eyebrow="Detalle de venta" title={order.number} description={`${order.sellerName} · ${orderStatusLabel(order.status)}`} action={<Link className="button button-secondary" href="/affiliate/orders"><ArrowLeft size={16} />Volver a ventas</Link>} /><section className={styles.affiliatePanel}><div className={styles.affiliateOrderMeta}><span>Subtotal <strong>{formatMinor(order.subtotalMinor)}</strong></span><span>Comisión <strong>{formatMinor(order.commissionMinor)}</strong></span><span>Neto pendiente <strong className={styles.affiliateMoneyPositive}>{formatMinor(order.sellerNetMinor)}</strong></span></div><div className={styles.affiliateOrderItems}>{order.items.map((item, index) => <span key={`${order.id}-${index}`}>{item.productName ?? item.name ?? 'Producto'} × {item.quantity}</span>)}</div>{order.status === 'PREPARING' && order.fulfillmentType === 'SHIPMENT' && <div className={styles.affiliateInlineGrid}><label>Transportista<input value={carrier} onChange={(event) => setCarrier(event.target.value)} placeholder="Opcional" /></label><label>Código de seguimiento<input value={trackingCode} onChange={(event) => setTrackingCode(event.target.value)} placeholder="Opcional" /></label></div>}<div className={styles.affiliateOrderActions}>{next && <Button onClick={() => update.mutate(next)} disabled={update.isPending}>{update.isPending ? 'Guardando…' : next === 'PREPARING' ? 'Empezar a preparar' : next === 'SHIPPED' ? 'Marcar como enviada' : next === 'READY_FOR_PICKUP' ? 'Lista para retirar' : 'Marcar retirada'}</Button>}{order.status === 'SHIPPED' || order.status === 'PICKED_UP' ? <p className="form-hint">La confirmación final la realiza el comprador o el cierre automático del sistema.</p> : null}</div></section><section className={styles.affiliatePanel}><div className={styles.affiliatePanelHeading}><div><p className="eyebrow">Historial</p><h2>Timeline de entrega</h2></div></div>{order.statusHistory.length ? <ol className={styles.orderTimeline}>{order.statusHistory.map((event, index) => <li className={index === order.statusHistory.length - 1 ? styles.isCurrent : undefined} key={event.id}><span className={styles.orderTimelineMarker} aria-hidden="true" /><div><strong>{orderStatusLabel(event.toStatus)}</strong><span>{formatDate(event.createdAt)}{event.note ? ` · ${event.note}` : ''}</span></div></li>)}</ol> : <p className={styles.affiliateMuted}>Todavía no hay eventos.</p>}</section></>;
+  const [carrier, setCarrier] = useState(order.carrier ?? '');
+  const [trackingCode, setTrackingCode] = useState(order.trackingCode ?? '');
+  const update = useMutation({
+    mutationFn: (status: string) => updateAffiliateOrderStatus(order.id, {
+      expectedVersion: order.version,
+      status,
+      carrier: carrier.trim() || null,
+      trackingCode: trackingCode.trim() || null,
+      note: 'Actualización desde el portal del afiliado.',
+    }),
+    onSuccess: () => { toast.success('Venta actualizada'); onRefresh(); },
+    onError: (error) => toast.error(dataError(error)),
+  });
+  const next = order.allowedActions.includes('START_PREPARING')
+    ? 'PREPARING'
+    : order.allowedActions.includes('READY_FOR_PICKUP')
+      ? 'READY_FOR_PICKUP'
+      : order.allowedActions.includes('MARK_SHIPPED')
+        ? 'SHIPPED'
+        : order.allowedActions.includes('MARK_PICKED_UP')
+          ? 'PICKED_UP'
+          : null;
+
+  return (
+    <>
+      <AffiliateHeader
+        eyebrow="Detalle de venta"
+        title={order.number}
+        description={`${order.sellerName} · ${orderStatusLabel(order.status)}`}
+        action={<Link className="button button-secondary" href="/affiliate/orders"><ArrowLeft size={16} />Volver a ventas</Link>}
+      />
+      <section className={styles.affiliatePanel}>
+        <div className={styles.affiliateOrderMeta}>
+          <span>Subtotal <strong>{formatMinor(order.subtotalMinor)}</strong></span>
+          <span>Comisión <strong>{formatMinor(order.commissionMinor)}</strong></span>
+          <span>Neto pendiente <strong className={styles.affiliateMoneyPositive}>{formatMinor(order.sellerNetMinor)}</strong></span>
+        </div>
+        <div className={styles.affiliateOrderItems}>
+          {order.items.map((item, index) => (
+            <span key={`${order.id}-${index}`}>{item.productName ?? item.name ?? 'Producto'} × {item.quantity}</span>
+          ))}
+        </div>
+        <AffiliateOrderDelivery order={order} />
+        {order.status === 'PREPARING' && order.fulfillmentType === 'SHIPMENT' && (
+          <div className={styles.affiliateInlineGrid}>
+            <label>Transportista<input value={carrier} onChange={(event) => setCarrier(event.target.value)} placeholder="Opcional" /></label>
+            <label>Código de seguimiento<input value={trackingCode} onChange={(event) => setTrackingCode(event.target.value)} placeholder="Opcional" /></label>
+          </div>
+        )}
+        <div className={styles.affiliateOrderActions}>
+          {next && (
+            <Button onClick={() => update.mutate(next)} disabled={update.isPending}>
+              {update.isPending
+                ? 'Guardando…'
+                : next === 'PREPARING'
+                  ? 'Empezar a preparar'
+                  : next === 'SHIPPED'
+                    ? 'Marcar como enviada'
+                    : next === 'READY_FOR_PICKUP'
+                      ? 'Lista para retirar'
+                      : 'Marcar retirada'}
+            </Button>
+          )}
+          {(order.status === 'SHIPPED' || order.status === 'PICKED_UP') && (
+            <p className="form-hint">La confirmación final la realiza el comprador o el cierre automático del sistema.</p>
+          )}
+        </div>
+      </section>
+      <section className={styles.affiliatePanel}>
+        <div className={styles.affiliatePanelHeading}>
+          <div>
+            <p className="eyebrow">Historial</p>
+            <h2>Timeline de entrega</h2>
+          </div>
+        </div>
+        {order.statusHistory.length ? (
+          <ol className={styles.orderTimeline}>
+            {order.statusHistory.map((event, index) => (
+              <li className={index === order.statusHistory.length - 1 ? styles.isCurrent : undefined} key={event.id}>
+                <span className={styles.orderTimelineMarker} aria-hidden="true" />
+                <div>
+                  <strong>{orderStatusLabel(event.toStatus)}</strong>
+                  <span>{formatDate(event.createdAt)}{event.note ? ` · ${event.note}` : ''}</span>
+                </div>
+              </li>
+            ))}
+          </ol>
+        ) : (
+          <p className={styles.affiliateMuted}>Todavía no hay eventos.</p>
+        )}
+      </section>
+    </>
+  );
 }
 
 function AffiliateBalanceView({ query, profile }: { query: QueryResult<AffiliateBalance>; profile: AffiliateProfile }) {

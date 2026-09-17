@@ -21,7 +21,37 @@ export const sellerOrderStatusSchema = z.enum(['PENDING_PAYMENT', 'PAID', 'PREPA
 export const sellerOrderItemSchema = z.object({ id: z.string().optional(), productId: z.string().nullable(), productName: z.string().optional(), name: z.string().optional(), quantity: z.number(), unitPriceMinor: z.string().optional(), lineTotalMinor: z.string() }).passthrough();
 export const sellerOrderHistorySchema = z.object({ id: z.string(), fromStatus: sellerOrderStatusSchema.nullable(), toStatus: sellerOrderStatusSchema, note: z.string().nullable(), createdAt: z.string(), changedByType: z.string().nullable().optional() }).passthrough();
 export const affiliateIssueSchema = z.object({ id: z.string(), status: z.string(), reason: z.string(), createdAt: z.string(), resolvedAt: z.string().nullable().optional() }).passthrough();
-export const affiliateOrderSchema = z.object({ id: z.string(), number: z.string(), sellerName: z.string(), status: sellerOrderStatusSchema, sellerType: z.enum(['STORE', 'AFFILIATE']).optional(), fulfillmentType: z.enum(['SHIPMENT', 'PICKUP']).optional(), subtotalMinor: z.string(), shippingMinor: z.string(), commissionMinor: z.string(), sellerNetMinor: z.string(), version: z.number(), carrier: z.string().nullable().optional(), trackingCode: z.string().nullable().optional(), autoCompleteAt: z.string().nullable().optional(), items: z.array(sellerOrderItemSchema), statusHistory: z.array(sellerOrderHistorySchema), issues: z.array(affiliateIssueSchema), allowedActions: z.array(z.string()).default([]) }).passthrough();
+export const affiliateOrderSchema = z.object({
+  id: z.string(),
+  number: z.string(),
+  sellerName: z.string(),
+  status: sellerOrderStatusSchema,
+  sellerType: z.enum(['STORE', 'AFFILIATE']).optional(),
+  fulfillmentType: z.enum(['SHIPMENT', 'PICKUP']).optional(),
+  subtotalMinor: z.string(),
+  shippingMinor: z.string(),
+  commissionMinor: z.string(),
+  sellerNetMinor: z.string(),
+  version: z.number(),
+  carrier: z.string().nullable().optional(),
+  trackingCode: z.string().nullable().optional(),
+  autoCompleteAt: z.string().nullable().optional(),
+  recipientName: z.string().nullable().optional(),
+  recipientPhone: z.string().nullable().optional(),
+  addressLine1: z.string().nullable().optional(),
+  addressLine2: z.string().nullable().optional(),
+  city: z.string().nullable().optional(),
+  province: z.string().nullable().optional(),
+  postalCode: z.string().nullable().optional(),
+  shippingZoneName: z.string().nullable().optional(),
+  shippingRateName: z.string().nullable().optional(),
+  pickupPointName: z.string().nullable().optional(),
+  pickupPointAddress: z.string().nullable().optional(),
+  items: z.array(sellerOrderItemSchema),
+  statusHistory: z.array(sellerOrderHistorySchema),
+  issues: z.array(affiliateIssueSchema),
+  allowedActions: z.array(z.string()).default([]),
+}).passthrough();
 export const affiliateOrdersEnvelopeSchema = z.object({ items: z.array(affiliateOrderSchema), page: z.number(), pageSize: z.number(), total: z.number(), totalPages: z.number() });
 export const affiliateShippingRateSchema = z.object({ id: z.string(), name: z.string(), priceMinor: z.string(), active: z.boolean() }).passthrough();
 export const affiliateShippingZoneSchema = z.object({ id: z.string(), name: z.string(), active: z.boolean(), provinces: z.array(z.object({ id: z.string(), province: z.string() }).passthrough()), rates: z.array(affiliateShippingRateSchema) }).passthrough();

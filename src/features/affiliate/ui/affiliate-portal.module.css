@@ -1051,6 +1051,41 @@
 }
 .affiliateFormDivider { margin-top: 24px; padding-top: 24px; border-top: 2px solid var(--line); }
 .affiliateInlineGrid { gap: 14px; margin-top: 20px; padding-top: 20px; border-top: 2px solid var(--line); }
+
+.affiliateDeliveryBlock {
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+}
+
+.affiliateDeliveryBlock > p {
+  margin: 8px 0 0;
+  line-height: 1.55;
+}
+
+.affiliateDeliveryDetails {
+  display: grid;
+  gap: 10px;
+  margin: 12px 0 0;
+}
+
+.affiliateDeliveryDetails > div {
+  display: grid;
+  gap: 4px;
+}
+
+.affiliateDeliveryDetails dt {
+  color: var(--muted);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.affiliateDeliveryDetails dd {
+  margin: 0;
+  line-height: 1.45;
+}
+
 .affiliateUploadRow > input[type='file'] {
   min-height: 48px;
   padding: 12px;
