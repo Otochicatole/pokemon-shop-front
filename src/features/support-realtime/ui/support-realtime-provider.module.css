@@ -3,9 +3,9 @@
   display: grid;
   gap: 10px;
   padding: 14px 16px;
-  border: 2px solid rgba(255, 213, 47, .72);
+  border: 2px solid #ffd52f;
   border-radius: 0;
-  background: linear-gradient(135deg, rgba(255, 213, 47, .12), rgba(10, 16, 22, .98) 52%);
+  background: #16140e;
   color: var(--ink);
   box-shadow: 5px 5px 0 #05070a;
   text-align: left;
@@ -15,7 +15,7 @@
 
 .realtimeNotificationToast:hover {
   border-color: var(--accent);
-  background: linear-gradient(135deg, rgba(255, 213, 47, .16), rgba(10, 16, 22, .98) 58%);
+  background: #1a1810;
   box-shadow: 7px 7px 0 #05070a;
   transform: translate(-2px, -2px);
 }
@@ -43,22 +43,22 @@
 
 .toastIconSupport {
   color: var(--cyan);
-  background: rgba(83, 190, 229, .1);
+  background: #102018;
 }
 
 .toastIconOrder {
   color: var(--green);
-  background: rgba(121, 201, 107, .1);
+  background: #142018;
 }
 
 .toastIconPayment {
   color: var(--accent);
-  background: rgba(255, 213, 47, .1);
+  background: #201c10;
 }
 
 .toastIconAffiliate {
   color: var(--purple);
-  background: rgba(183, 123, 225, .1);
+  background: #1a1420;
 }
 
 .toastBadge,
@@ -141,14 +141,14 @@
 }
 
 .realtimeNotificationToastAdmin {
-  border-color: rgba(83, 190, 229, .7);
-  background: linear-gradient(135deg, rgba(83, 190, 229, .12), rgba(10, 16, 22, .98) 52%);
+  border-color: #53bee5;
+  background: #0e1418;
   font-family: 'Nunito', var(--font-geist), Arial, sans-serif;
 }
 
 .realtimeNotificationToastAdmin:hover {
   border-color: var(--cyan);
-  background: linear-gradient(135deg, rgba(83, 190, 229, .16), rgba(10, 16, 22, .98) 58%);
+  background: #10181c;
 }
 
 .realtimeNotificationToastAdmin:focus-visible {
