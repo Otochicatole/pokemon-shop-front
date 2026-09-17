@@ -98,8 +98,11 @@
   pointer-events: none;
 }
 
-.catalogFilterToggle {
+.catalogFilterToggleSlot {
   display: none;
+}
+
+.catalogFilterToggle {
   box-shadow: 4px 4px 0 #05070a;
 }
 
@@ -229,8 +232,9 @@
     display: none;
   }
 
-  .catalogFilterToggle {
-    display: inline-flex;
+  .catalogFilterToggleSlot {
+    display: flex;
+    align-self: end;
   }
 
   .catalogLayout {
@@ -275,7 +279,7 @@
     min-width: 0;
   }
 
-  .catalogFilterToggle {
+  .catalogFilterToggleSlot {
     order: 3;
     align-self: end;
   }

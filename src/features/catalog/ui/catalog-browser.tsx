@@ -108,16 +108,18 @@ function CatalogBrowserController({ initialFilters }: { initialFilters: CatalogF
             <ChevronDown size={16} aria-hidden="true" className={styles.catalogSortIcon} />
           </span>
         </label>
-        <Button
-          type="button"
-          variant="secondary"
-          className={`${styles.catalogFilterToggle} catalog-filter-toggle`}
-          aria-expanded={filterDrawerOpen}
-          aria-controls="catalog-filter-drawer"
-          onClick={() => setFilterDrawerOpen(true)}
-        >
-          <SlidersHorizontal size={17} /> Filtros{activeCount > 0 && <span>{activeCount}</span>}
-        </Button>
+        <div className={styles.catalogFilterToggleSlot}>
+          <Button
+            type="button"
+            variant="secondary"
+            className={`${styles.catalogFilterToggle} catalog-filter-toggle`}
+            aria-expanded={filterDrawerOpen}
+            aria-controls="catalog-filter-drawer"
+            onClick={() => setFilterDrawerOpen(true)}
+          >
+            <SlidersHorizontal size={17} /> Filtros{activeCount > 0 && <span>{activeCount}</span>}
+          </Button>
+        </div>
       </div>
 
       <CatalogActiveFilters filters={filters} facets={facetsQuery.data} onChange={changeFilters} onClear={clearFilters} />
