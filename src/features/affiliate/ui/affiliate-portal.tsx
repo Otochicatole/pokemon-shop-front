@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState, type FormEvent } from 'react';
 import { useMutation, useQuery, useQueryClient, type UseQueryResult } from '@tanstack/react-query';
-import { Archive, ArrowLeft, CheckCircle2, ClipboardList, FilePlus2, LayoutDashboard, MapPin, Package, Pencil, Plus, Store, Trash2, Truck, WalletCards, Settings, X } from 'lucide-react';
+import { Archive, ArchiveRestore, ArrowLeft, CheckCircle2, ClipboardList, FilePlus2, LayoutDashboard, MapPin, Package, Pencil, Plus, Store, Trash2, Truck, WalletCards, Settings, X } from 'lucide-react';
 import { toast } from '@/components/feedback';
 import { Button } from '@/components/button';
 import { ApiError } from '@/shared/api/client';
@@ -26,6 +26,7 @@ import {
   requestAffiliateOrderCancellation,
   requestAffiliatePayout,
   submitAffiliateListing,
+  unarchiveAffiliateListing,
   updateAffiliateOrderStatus,
   updateAffiliateProfile,
 } from '../infrastructure/api';
@@ -46,11 +47,13 @@ const tabs: Array<{ href: string; label: string; key: ActiveTab; icon: typeof La
   { href: '/affiliate/settings', label: 'Configuración', key: 'settings', icon: Settings },
 ];
 
-const listingStatusLabels: Record<string, string> = { DRAFT: 'Borrador', PENDING_REVIEW: 'En revisión', CHANGES_REQUESTED: 'Cambios solicitados', REJECTED: 'Rechazada', APPROVED: 'Aprobada' };
+const listingStatusLabels: Record<string, string> = { DRAFT: 'Borrador', PENDING_REVIEW: 'En revisión', CHANGES_REQUESTED: 'Cambios solicitados', REJECTED: 'Rechazada', APPROVED: 'Aprobada', ARCHIVED: 'Archivada' };
 const orderStatusLabels: Record<string, string> = { PENDING_PAYMENT: 'Pendiente de pago', PAYMENT_REVIEW: 'Pago en revisión', PAID: 'Pagada', PREPARING: 'Preparando', READY_FOR_PICKUP: 'Lista para retirar', PICKED_UP: 'Retirada', SHIPPED: 'Enviada', COMPLETED: 'Completada', CANCELLATION_REQUESTED: 'Cancelación solicitada', CANCELLED: 'Cancelada', REFUNDED: 'Reembolsada', DISPUTED: 'En disputa' };
 const listingKindLabels: Record<string, string> = { SINGLE_CARD: 'Carta individual', SEALED_PRODUCT: 'Producto sellado', ACCESSORY: 'Accesorio' };
 
 function dataError(error: unknown) { return error instanceof Error ? error.message : 'No se pudo completar la operación'; }
+function isListingArchived(listing: AffiliateListing) { return listing.product.status === 'ARCHIVED'; }
+function listingDisplayStatus(listing: AffiliateListing) { return isListingArchived(listing) ? 'ARCHIVED' : listing.status; }
 function listingStatusLabel(status: string) { return listingStatusLabels[status] ?? status; }
 function listingKindLabel(kind: string) { return listingKindLabels[kind] ?? kind; }
 function orderStatusLabel(status: string) { return orderStatusLabels[status] ?? status; }
@@ -98,7 +101,16 @@ export function AffiliatePortal() {
   const listingTarget = section[0] === 'listings' && section[1] && section[1] !== 'new' ? listings.data?.find((listing) => listing.id === section[1]) : undefined;
   const orderId = section[0] === 'orders' && section[1] ? section[1] : undefined;
   if (active === 'new') return <AffiliateLayout profile={profile.data} active="new">{profile.data.status === 'ACTIVE' ? <AffiliateListingCreateForm /> : <AffiliateSuspendedNotice />}</AffiliateLayout>;
-  if (listingTarget) return <AffiliateLayout profile={profile.data} active="listings">{profile.data.status === 'ACTIVE' ? <AffiliateListingEditForm key={listingTarget.id} listing={listingTarget} onSaved={refreshAffiliate} /> : <AffiliateListingReadOnly listing={listingTarget} />}</AffiliateLayout>;
+  if (listingTarget) {
+    const archived = isListingArchived(listingTarget);
+    return (
+      <AffiliateLayout profile={profile.data} active="listings">
+        {profile.data.status === 'ACTIVE' && !archived
+          ? <AffiliateListingEditForm key={listingTarget.id} listing={listingTarget} onSaved={refreshAffiliate} />
+          : <AffiliateListingReadOnly listing={listingTarget} />}
+      </AffiliateLayout>
+    );
+  }
   if (orderId) return <AffiliateLayout profile={profile.data} active="orders"><AffiliateOrderDetailPage id={orderId} onRefresh={refreshAffiliate} /></AffiliateLayout>;
   if (section[0] === 'listings' && listings.isLoading) return <AffiliateLayout profile={profile.data} active="listings"><AffiliateLoading /></AffiliateLayout>;
   if (section[0] === 'listings' && section[1]) return <AffiliateLayout profile={profile.data} active="listings"><AffiliateHeader eyebrow="Catálogo del afiliado" title="Publicación no encontrada" description="El borrador puede haber sido eliminado o ya no pertenece a tu cuenta." action={<Link className="button button-secondary" href="/affiliate/listings"><ArrowLeft size={16} />Volver a publicaciones</Link>} /></AffiliateLayout>;
@@ -115,12 +127,45 @@ function AffiliateDashboard({ profile, listings, orders, balance, listingsLoadin
 
 function AffiliateSuspendedNotice() { return <><AffiliateHeader eyebrow="Acceso limitado" title="Cuenta suspendida" description="Podés consultar tus publicaciones, ventas y saldo, y terminar entregas ya pagadas. Las nuevas publicaciones, cambios de logística y retiros están bloqueados." /><section className={styles.affiliatePanel}><div className={styles.affiliateFeedback}><strong>Operación restringida</strong><span>Contactá a administración si necesitás revisar la suspensión.</span></div></section></>; }
 
-function AffiliateListingReadOnly({ listing }: { listing: AffiliateListing }) { return <><AffiliateHeader eyebrow="Publicación" title={listing.product.name} description={`Estado actual: ${listingStatusLabel(listing.status)}`} action={<Link className="button button-secondary" href="/affiliate/listings">Volver</Link>} /><section className={styles.affiliatePanel}><div className={styles.affiliateOrderMeta}><span>Precio <strong>{formatMinor(listing.product.priceMinor)}</strong></span><span>Stock <strong>{listing.product.inventory?.available ?? 0}</strong></span><span>Versión <strong>{listing.product.version}</strong></span></div><p>{listing.product.description || 'Sin descripción.'}</p>{listing.reviewNote && <p className={styles.affiliateReviewNote}>Nota de revisión: {listing.reviewNote}</p>}</section></>; }
+function AffiliateListingReadOnly({ listing }: { listing: AffiliateListing }) {
+  const displayStatus = listingDisplayStatus(listing);
+  return (
+    <>
+      <AffiliateHeader
+        eyebrow="Publicación"
+        title={listing.product.name}
+        description={`Estado actual: ${listingStatusLabel(displayStatus)}`}
+        action={<Link className="button button-secondary" href="/affiliate/listings">Volver</Link>}
+      />
+      <section className={styles.affiliatePanel}>
+        <div className={styles.affiliateOrderMeta}>
+          <span>Precio <strong>{formatMinor(listing.product.priceMinor)}</strong></span>
+          <span>Stock <strong>{listing.product.inventory?.available ?? 0}</strong></span>
+          <span>Versión <strong>{listing.product.version}</strong></span>
+        </div>
+        <p>{listing.product.description || 'Sin descripción.'}</p>
+        {isListingArchived(listing) && (
+          <p className={styles.affiliateReviewNote}>
+            Esta publicación está archivada y no aparece en el catálogo. Podés restaurarla desde el listado.
+          </p>
+        )}
+        {listing.reviewNote && <p className={styles.affiliateReviewNote}>Nota de revisión: {listing.reviewNote}</p>}
+      </section>
+    </>
+  );
+}
 
 function AffiliateEmptyListing({ editable = true }: { editable?: boolean }) { return <div className={styles.affiliateEmpty}><Package size={28} /><p>Todavía no tenés publicaciones.</p>{editable && <Link href="/affiliate/listings/new">Crear la primera</Link>}</div>; }
 
 function AffiliateListingsView({ query, onRefresh, profile }: { query: QueryResult<AffiliateListing[]>; onRefresh: () => void; profile: AffiliateProfile }) {
   const queryClient = useQueryClient();
+  const patchListingProduct = (id: string, productStatus: string, version: number) => {
+    queryClient.setQueryData<AffiliateListing[]>(['affiliate', 'listings'], (current) => current?.map((listing) => (
+      listing.id === id
+        ? { ...listing, product: { ...listing.product, status: productStatus, version } }
+        : listing
+    )));
+  };
   const submit = useMutation({
     mutationFn: submitAffiliateListing,
     onSuccess: (result) => {
@@ -132,15 +177,108 @@ function AffiliateListingsView({ query, onRefresh, profile }: { query: QueryResu
     },
     onError: (error) => toast.error(dataError(error)),
   });
-  const archive = useMutation({ mutationFn: ({ id, version }: { id: string; version: number }) => archiveAffiliateListing(id, version), onSuccess: () => { toast.success('Publicación archivada'); onRefresh(); }, onError: (error) => toast.error(dataError(error)) });
+  const archive = useMutation({
+    mutationFn: ({ id, version }: { id: string; version: number }) => archiveAffiliateListing(id, version),
+    onSuccess: (result) => {
+      patchListingProduct(result.id, 'ARCHIVED', result.version);
+      toast.success('Publicación archivada');
+      onRefresh();
+    },
+    onError: (error) => toast.error(dataError(error)),
+  });
+  const unarchive = useMutation({
+    mutationFn: ({ id, version }: { id: string; version: number }) => unarchiveAffiliateListing(id, version),
+    onSuccess: (result) => {
+      patchListingProduct(result.id, result.status, result.version);
+      toast.success('Publicación restaurada');
+      onRefresh();
+    },
+    onError: (error) => toast.error(dataError(error)),
+  });
   const remove = useMutation({ mutationFn: ({ id, version }: { id: string; version: number }) => deleteAffiliateListing(id, version), onSuccess: () => { toast.success('Borrador eliminado'); void queryClient.invalidateQueries({ queryKey: ['affiliate'] }); }, onError: (error) => toast.error(dataError(error)) });
   const rows = query.data ?? [];
-  return <><AffiliateHeader eyebrow="Catálogo del afiliado" title="Publicaciones" description="Los cambios sobre una publicación aprobada vuelven a borrador y requieren una nueva revisión." action={<><span className={styles.affiliateCountBadge}>{rows.length}</span><Button variant="secondary" onClick={() => void query.refetch()} disabled={query.isFetching}>Actualizar</Button>{profile.status === 'ACTIVE' && <Link className="button button-primary" href="/affiliate/listings/new"><Plus size={16} />Nueva publicación</Link>}</>} />{query.isLoading ? <AffiliateLoading /> : query.isError ? <AffiliateQueryError message={dataError(query.error)} /> : rows.length === 0 ? <section className={styles.affiliatePanel}><AffiliateEmptyListing editable={profile.status === 'ACTIVE'} /></section> : <section className={styles.affiliatePanel}><div className={styles.affiliatePanelHeading}><div className={styles.affiliatePanelHeadingCopy}><span className={styles.affiliatePanelIcon} aria-hidden="true"><Package size={18} /></span><div><p className="eyebrow">Inventario</p><h2>Todas las publicaciones</h2></div></div></div><div className={styles.affiliateListingList}>{rows.map((listing) => <AffiliateListingRow key={listing.id} listing={listing} editable={profile.status === 'ACTIVE'} onSubmit={() => submit.mutate(listing.id)} onArchive={() => archive.mutate({ id: listing.id, version: listing.product.version })} onDelete={() => remove.mutate({ id: listing.id, version: listing.product.version })} busy={submit.isPending || archive.isPending || remove.isPending} detailed />)}</div></section>}</>;
+  const busy = submit.isPending || archive.isPending || unarchive.isPending || remove.isPending;
+  return (
+    <>
+      <AffiliateHeader
+        eyebrow="Catálogo del afiliado"
+        title="Publicaciones"
+        description="Los cambios sobre una publicación aprobada vuelven a borrador y requieren una nueva revisión."
+        action={(
+          <>
+            <span className={styles.affiliateCountBadge}>{rows.length}</span>
+            <Button variant="secondary" onClick={() => void query.refetch()} disabled={query.isFetching}>Actualizar</Button>
+            {profile.status === 'ACTIVE' && <Link className="button button-primary" href="/affiliate/listings/new"><Plus size={16} />Nueva publicación</Link>}
+          </>
+        )}
+      />
+      {query.isLoading ? <AffiliateLoading /> : query.isError ? <AffiliateQueryError message={dataError(query.error)} /> : rows.length === 0 ? (
+        <section className={styles.affiliatePanel}><AffiliateEmptyListing editable={profile.status === 'ACTIVE'} /></section>
+      ) : (
+        <section className={styles.affiliatePanel}>
+          <div className={styles.affiliatePanelHeading}>
+            <div className={styles.affiliatePanelHeadingCopy}>
+              <span className={styles.affiliatePanelIcon} aria-hidden="true"><Package size={18} /></span>
+              <div>
+                <p className="eyebrow">Inventario</p>
+                <h2>Todas las publicaciones</h2>
+              </div>
+            </div>
+          </div>
+          <div className={styles.affiliateListingList}>
+            {rows.map((listing) => (
+              <AffiliateListingRow
+                key={listing.id}
+                listing={listing}
+                editable={profile.status === 'ACTIVE'}
+                onSubmit={() => submit.mutate(listing.id)}
+                onArchive={() => archive.mutate({ id: listing.id, version: listing.product.version })}
+                onUnarchive={() => unarchive.mutate({ id: listing.id, version: listing.product.version })}
+                onDelete={() => remove.mutate({ id: listing.id, version: listing.product.version })}
+                busy={busy}
+                detailed
+              />
+            ))}
+          </div>
+        </section>
+      )}
+    </>
+  );
 }
 
-function AffiliateListingRow({ listing, onSubmit, onArchive, onDelete, busy = false, detailed = false, editable = true }: { listing: AffiliateListing; onSubmit?: () => void; onArchive?: () => void; onDelete?: () => void; busy?: boolean; detailed?: boolean; editable?: boolean }) {
-  const canSubmit = ['DRAFT', 'CHANGES_REQUESTED', 'REJECTED'].includes(listing.status);
-  return <article className={styles.affiliateListingRow}><div className={styles.affiliateListingCopy}><strong>{listing.product.name}</strong><span>{listingKindLabel(listing.product.kind)} · {formatMinor(listing.product.priceMinor)} · Stock {listing.product.inventory?.available ?? 0}</span>{detailed && listing.reviewNote && <small className={styles.affiliateReviewNote}>Nota de revisión: {listing.reviewNote}</small>}</div><span className={`${styles.affiliateListingStatus} ${statusModifier(listing.status)}`}>{listingStatusLabel(listing.status)}</span>{editable && <div className={styles.affiliateRowActions}><Link className="button button-ghost" href={`/affiliate/listings/${listing.id}`}><Pencil size={14} />Editar</Link>{canSubmit && onSubmit && <Button variant="secondary" onClick={onSubmit} disabled={busy}><CheckCircle2 size={15} />Enviar a revisión</Button>}{listing.status === 'APPROVED' && onArchive && <Button variant="ghost" onClick={onArchive} disabled={busy}><Archive size={14} />Archivar</Button>}{canSubmit && onDelete && <Button variant="ghost" onClick={onDelete} disabled={busy}><Trash2 size={15} />Eliminar</Button>}</div>}</article>;
+function AffiliateListingRow({ listing, onSubmit, onArchive, onUnarchive, onDelete, busy = false, detailed = false, editable = true }: {
+  listing: AffiliateListing;
+  onSubmit?: () => void;
+  onArchive?: () => void;
+  onUnarchive?: () => void;
+  onDelete?: () => void;
+  busy?: boolean;
+  detailed?: boolean;
+  editable?: boolean;
+}) {
+  const archived = isListingArchived(listing);
+  const displayStatus = listingDisplayStatus(listing);
+  const canSubmit = !archived && ['DRAFT', 'CHANGES_REQUESTED', 'REJECTED'].includes(listing.status);
+  const canArchive = !archived && listing.status === 'APPROVED';
+  return (
+    <article className={styles.affiliateListingRow}>
+      <div className={styles.affiliateListingCopy}>
+        <strong>{listing.product.name}</strong>
+        <span>{listingKindLabel(listing.product.kind)} · {formatMinor(listing.product.priceMinor)} · Stock {listing.product.inventory?.available ?? 0}</span>
+        {detailed && listing.reviewNote && <small className={styles.affiliateReviewNote}>Nota de revisión: {listing.reviewNote}</small>}
+      </div>
+      <span className={`${styles.affiliateListingStatus} ${statusModifier(displayStatus)}`}>{listingStatusLabel(displayStatus)}</span>
+      {editable && (
+        <div className={styles.affiliateRowActions}>
+          {!archived && <Link className="button button-ghost" href={`/affiliate/listings/${listing.id}`}><Pencil size={14} />Editar</Link>}
+          {canSubmit && onSubmit && <Button variant="secondary" onClick={onSubmit} disabled={busy}><CheckCircle2 size={15} />Enviar a revisión</Button>}
+          {canArchive && onArchive && <Button variant="ghost" onClick={onArchive} disabled={busy}><Archive size={14} />Archivar</Button>}
+          {archived && onUnarchive && <Button variant="secondary" onClick={onUnarchive} disabled={busy}><ArchiveRestore size={14} />Desarchivar</Button>}
+          {canSubmit && onDelete && <Button variant="ghost" onClick={onDelete} disabled={busy}><Trash2 size={15} />Eliminar</Button>}
+        </div>
+      )}
+    </article>
+  );
 }
 
 function AffiliateOrdersView({ query, onRefresh }: { query: QueryResult<AffiliateOrder[]>; onRefresh: () => void }) {

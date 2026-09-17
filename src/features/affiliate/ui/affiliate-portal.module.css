@@ -551,6 +551,7 @@
 .affiliateListingStatus.isCancelled,
 .affiliateListingStatus.isRefunded { color: var(--warm); background: rgba(255, 91, 85, .08); }
 .affiliateListingStatus.isChangesRequested { color: var(--purple); background: rgba(183, 123, 225, .08); }
+.affiliateListingStatus.isArchived { color: var(--muted); background: rgba(148, 163, 174, .12); }
 
 .affiliateRowActions { gap: 8px; }
 .affiliateRowActions :global(.button) { min-height: 37px; padding-inline: 11px; font-size: 7px; }

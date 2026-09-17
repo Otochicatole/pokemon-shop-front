@@ -120,7 +120,12 @@ export async function updateAffiliateShippingRate(zoneId: string, rateId: string
 export async function updateAffiliatePickupPoint(id: string, input: Record<string, unknown>) { return data(await apiFetch(`/affiliate/pickup-points/${id}`, { method: 'PATCH', body: JSON.stringify(input) })); }
 
 export async function deleteAffiliateListing(id: string, expectedVersion: number) { await apiFetch(`/affiliate/listings/${id}`, { method: 'DELETE', body: JSON.stringify({ expectedVersion }) }); }
-export async function archiveAffiliateListing(id: string, expectedVersion: number) { return data(await apiFetch(`/affiliate/listings/${id}/archive`, { method: 'POST', body: JSON.stringify({ expectedVersion }) })); }
+export async function archiveAffiliateListing(id: string, expectedVersion: number) {
+  return data<{ id: string; status: string; version: number }>(await apiFetch(`/affiliate/listings/${id}/archive`, { method: 'POST', body: JSON.stringify({ expectedVersion }) }));
+}
+export async function unarchiveAffiliateListing(id: string, expectedVersion: number) {
+  return data<{ id: string; status: string; version: number }>(await apiFetch(`/affiliate/listings/${id}/unarchive`, { method: 'POST', body: JSON.stringify({ expectedVersion }) }));
+}
 export async function deleteAffiliateImage(listingId: string, imageId: string, expectedVersion: number) { await apiFetch(`/affiliate/listings/${listingId}/images/${imageId}`, { method: 'DELETE', body: JSON.stringify({ expectedVersion }) }); }
 
 export async function listAdminAffiliates() { const rows = data<unknown[]>(await import('@/shared/admin/client').then(({ adminFetch }) => adminFetch('/admin/affiliates'))); return rows; }
