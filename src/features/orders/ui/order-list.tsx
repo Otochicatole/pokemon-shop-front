@@ -11,10 +11,10 @@ import { formatDate, formatMoney, statusLabel } from '@/shared/lib/format';
 import styles from './order-list.module.css';
 
 function statusTone(status: string): BadgeTone {
-  if (['COMPLETED', 'PAID'].includes(status)) return 'green';
-  if (['CANCELLED', 'EXPIRED', 'REFUND_RECORDED'].includes(status)) return 'red';
-  if (['PENDING_PAYMENT', 'PAYMENT_REVIEW'].includes(status)) return 'yellow';
-  if (['PREPARING', 'READY_FOR_PICKUP', 'SHIPPED'].includes(status)) return 'cyan';
+  if (['COMPLETED', 'PAID', 'PICKED_UP'].includes(status)) return 'green';
+  if (['CANCELLED', 'EXPIRED', 'REFUND_RECORDED', 'REFUNDED', 'DISPUTED'].includes(status)) return 'red';
+  if (['PENDING_PAYMENT', 'PAYMENT_REVIEW', 'ACTION_REQUIRED'].includes(status)) return 'yellow';
+  if (['PREPARING', 'READY_FOR_PICKUP', 'SHIPPED', 'IN_FULFILLMENT'].includes(status)) return 'cyan';
   return 'purple';
 }
 

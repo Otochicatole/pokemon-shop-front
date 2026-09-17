@@ -12,15 +12,35 @@ import { EmptyState } from '@/components/feedback';
 import { Dialog } from '@/components/overlay';
 import { confirmSellerOrder, getOrder, cancelOrder, openSellerOrderIssue, refreshOrderPaymentStatus } from '../infrastructure/api';
 import { resumePaymentSession, uploadReceipt } from '@/features/checkout/infrastructure/api';
+import type { Order } from '@/shared/api/contracts';
 import { formatDate, formatMoney, statusLabel } from '@/shared/lib/format';
 import styles from './order-detail.module.css';
 
+const aggregateStatuses = new Set(['IN_FULFILLMENT', 'PARTIALLY_COMPLETED', 'ACTION_REQUIRED']);
+
 function statusTone(status: string): BadgeTone {
-  if (['COMPLETED', 'PAID'].includes(status)) return 'green';
-  if (['CANCELLED', 'EXPIRED', 'REFUND_RECORDED'].includes(status)) return 'red';
-  if (['PENDING_PAYMENT', 'PAYMENT_REVIEW'].includes(status)) return 'yellow';
-  if (['PREPARING', 'READY_FOR_PICKUP', 'SHIPPED'].includes(status)) return 'cyan';
+  if (['COMPLETED', 'PAID', 'PICKED_UP'].includes(status)) return 'green';
+  if (['CANCELLED', 'EXPIRED', 'REFUND_RECORDED', 'REFUNDED', 'DISPUTED'].includes(status)) return 'red';
+  if (['PENDING_PAYMENT', 'PAYMENT_REVIEW', 'ACTION_REQUIRED'].includes(status)) return 'yellow';
+  if (['PREPARING', 'READY_FOR_PICKUP', 'SHIPPED', 'IN_FULFILLMENT'].includes(status)) return 'cyan';
   return 'purple';
+}
+
+/** Buyer-facing status: prefer seller sub-orders when the parent is a marketplace aggregate. */
+function resolveDisplayStatus(order: Order): string {
+  const sellers = order.sellerOrders;
+  if (sellers.length === 0) return order.status;
+  const unique = [...new Set(sellers.map((seller) => seller.status))];
+  if (unique.length === 1) return unique[0]!;
+  if (aggregateStatuses.has(order.status)) return order.status;
+  return order.status;
+}
+
+function resolveTimeline(order: Order) {
+  if (order.sellerOrders.length === 1 && order.sellerOrders[0]!.timeline.length > 0) {
+    return order.sellerOrders[0]!.timeline;
+  }
+  return order.timeline;
 }
 
 const mercadoPagoReturnParams = [
@@ -86,8 +106,10 @@ export function OrderDetail({ number }: { number: string }) {
   }
   const order = query.data;
   const payment = order.payment;
+  const displayStatus = resolveDisplayStatus(order);
+  const timeline = resolveTimeline(order);
   const canCancel = ['PENDING_PAYMENT', 'PAYMENT_REVIEW'].includes(order.status);
-  const credited = ['PAID', 'PREPARING', 'READY_FOR_PICKUP', 'SHIPPED', 'COMPLETED'].includes(order.status);
+  const credited = ['PAID', 'PREPARING', 'READY_FOR_PICKUP', 'PICKED_UP', 'SHIPPED', 'COMPLETED', 'IN_FULFILLMENT', 'PARTIALLY_COMPLETED'].includes(order.status);
   const onReceipt = async (file: File) => {
     setBusy(true);
     try { await uploadReceipt(order.number, file); await query.refetch(); toast.success('Comprobante recibido'); }
@@ -149,10 +171,10 @@ export function OrderDetail({ number }: { number: string }) {
       <header className={styles.heading}>
         <div>
           <p className="eyebrow">Orden {order.number}</p>
-          <h1>{statusLabel(order.status)}</h1>
+          <h1>{statusLabel(displayStatus)}</h1>
           <p>Creada el {formatDate(order.createdAt)}</p>
         </div>
-        <StatusBadge status={statusLabel(order.status)} tone={statusTone(order.status)} />
+        <StatusBadge status={statusLabel(displayStatus)} tone={statusTone(displayStatus)} />
       </header>
       <div className={styles.orderColumns}>
         <section className={styles.orderCard}>
@@ -261,14 +283,14 @@ export function OrderDetail({ number }: { number: string }) {
         <section className={`${styles.orderCard} ${styles.orderTimelineCard}`}>
           <div className={styles.cardLabel}>Timeline</div>
           <h2>Seguimiento de la orden</h2>
-          {order.timeline.length > 0 ? (
+          {timeline.length > 0 ? (
             <ol className={styles.orderTimeline}>
-              {order.timeline.map((event, index) => (
-                <li className={index === order.timeline.length - 1 ? styles.isCurrent : ''} key={event.id}>
+              {timeline.map((event, index) => (
+                <li className={index === timeline.length - 1 ? styles.isCurrent : ''} key={event.id}>
                   <span className={styles.orderTimelineMarker} aria-hidden="true" />
                   <div>
                     <strong>{statusLabel(event.toStatus)}</strong>
-                    <span>{formatDate(event.createdAt)}{index === order.timeline.length - 1 ? ' · Estado actual' : ''}</span>
+                    <span>{formatDate(event.createdAt)}{index === timeline.length - 1 ? ' · Estado actual' : ''}</span>
                   </div>
                 </li>
               ))}
@@ -320,7 +342,7 @@ export function OrderDetail({ number }: { number: string }) {
                     )}
                   </div>
                 </div>
-                {sellerOrder.timeline.length > 0 && (
+                {order.sellerOrders.length > 1 && sellerOrder.timeline.length > 0 && (
                   <ol className={`${styles.orderTimeline} ${styles.sellerOrderTimeline}`}>
                     {sellerOrder.timeline.map((event, index) => (
                       <li className={index === sellerOrder.timeline.length - 1 ? styles.isCurrent : ''} key={event.id}>

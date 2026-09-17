@@ -6,7 +6,7 @@ const labels: Record<string, string> = {
   DRAFT: 'Borrador', PUBLISHED: 'Publicado', ARCHIVED: 'Archivado',
   SINGLE_CARD: 'Carta individual', SEALED_PRODUCT: 'Producto sellado', ACCESSORY: 'Accesorio',
   UNIQUE: 'Unidad única', QUANTITY: 'Por cantidad',
-  PENDING_PAYMENT: 'Pago pendiente', PAYMENT_REVIEW: 'Comprobante en revisión', PAID: 'Pagada', PREPARING: 'Preparando', READY_FOR_PICKUP: 'Lista para retirar', SHIPPED: 'Enviada', COMPLETED: 'Completada', CANCELLED: 'Cancelada', EXPIRED: 'Vencida', REFUND_RECORDED: 'Reembolso registrado', PAYMENT_REQUIRES_REVIEW: 'Pago requiere revisión',
+  PENDING_PAYMENT: 'Pago pendiente', PAYMENT_REVIEW: 'Comprobante en revisión', PAID: 'Pagada', PREPARING: 'Preparando', READY_FOR_PICKUP: 'Lista para retirar', PICKED_UP: 'Retirada', SHIPPED: 'Enviada', COMPLETED: 'Completada', CANCELLED: 'Cancelada', EXPIRED: 'Vencida', REFUND_RECORDED: 'Reembolso registrado', PAYMENT_REQUIRES_REVIEW: 'Pago requiere revisión', IN_FULFILLMENT: 'En preparación', PARTIALLY_COMPLETED: 'Parcialmente completada', ACTION_REQUIRED: 'Requiere acción',
   PENDING: 'Pendiente', UNDER_REVIEW: 'En revisión', APPROVED: 'Aprobado', REJECTED: 'Rechazado', FAILED: 'Fallido', REFUNDED: 'Reembolsado', DISPUTED: 'En disputa', REQUIRES_REVIEW: 'Requiere revisión',
   BANK_TRANSFER: 'Transferencia', MERCADO_PAGO: 'Mercado Pago', SHIPMENT: 'Envío', PICKUP: 'Retiro',
   ACTIVE: 'Activo', SUSPENDED: 'Suspendido',
