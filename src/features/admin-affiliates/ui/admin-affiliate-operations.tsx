@@ -308,6 +308,7 @@ function SellerDetail({ query }: { query: QueryState<{ affiliate: Seller; balanc
 function Listings({ id }: { id?: string }) {
   const [status, setStatus] = useState('');
   const [preview, setPreview] = useState<Listing | null>(null);
+  const [previewImageId, setPreviewImageId] = useState<string | null>(null);
   const client = useQueryClient();
   const query = useQuery({
     queryKey: ['admin', 'affiliate-listings-all', status],
@@ -429,7 +430,15 @@ function Listings({ id }: { id?: string }) {
                       </Link>
                     </div>
                     <div className={shared.adminRowActions}>
-                      <Button variant="ghost" onClick={() => setPreview(row)}><Eye size={15} />Preview</Button>
+                      <Button
+                        variant="ghost"
+                        onClick={() => {
+                          setPreview(row);
+                          setPreviewImageId(row.product.images[0]?.id ?? null);
+                        }}
+                      >
+                        <Eye size={15} />Preview
+                      </Button>
                       <Link className="button button-ghost" href={`/admin/affiliates/listings/${row.id}`}>Revisar</Link>
                       {row.status === 'PENDING_REVIEW' && (
                         <>
@@ -452,31 +461,78 @@ function Listings({ id }: { id?: string }) {
       </section>
       <Dialog
         open={Boolean(preview)}
-        title={preview?.product.name ?? 'Preview'}
+        title={preview ? `Preview · ${preview.product.name}` : 'Preview de publicación'}
         description={preview ? `Publicación de ${preview.affiliate.publicName}` : undefined}
-        onClose={() => setPreview(null)}
-        className={shared.adminWideDialog}
+        onClose={() => {
+          setPreview(null);
+          setPreviewImageId(null);
+        }}
+        className={[shared.adminWideDialog, styles.affiliateAdminPreviewDialog].filter(Boolean).join(' ')}
       >
-        {preview && (
-          <div className={styles.affiliateAdminPreview}>
-            <div className={styles.affiliateAdminPreviewMedia}>
-              <div className={styles.affiliateAdminPreviewImage}>
-                {preview.product.images[0]
-                  ? <Image src={preview.product.images[0].url} alt={preview.product.images[0].altText ?? preview.product.name} width={640} height={380} unoptimized />
-                  : <span>Sin imágenes</span>}
+        {preview && (() => {
+          const images = preview.product.images;
+          const activeImage = images.find((image) => image.id === previewImageId) ?? images[0] ?? null;
+          return (
+            <>
+              <div className={styles.affiliateAdminPreview}>
+                <div className={styles.affiliateAdminPreviewMedia}>
+                  <div className={styles.affiliateAdminPreviewImage}>
+                    {activeImage
+                      ? <Image src={activeImage.url} alt={activeImage.altText ?? preview.product.name} width={560} height={560} unoptimized />
+                      : <span>Sin imágenes</span>}
+                  </div>
+                  {images.length > 1 && (
+                    <div className={styles.affiliateAdminPreviewThumbnails} aria-label="Imágenes de la publicación">
+                      {images.map((image, index) => (
+                        <button
+                          key={image.id}
+                          type="button"
+                          className={image.id === activeImage?.id ? styles.isActive : undefined}
+                          onClick={() => setPreviewImageId(image.id)}
+                          aria-label={`Ver imagen ${index + 1}`}
+                        >
+                          <Image src={image.url} alt={image.altText ?? ''} width={72} height={72} unoptimized />
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <div className={styles.affiliateAdminPreviewDetails}>
+                  <div>
+                    <span className={shared.adminPanelKicker}>{label(preview.status)}</span>
+                    <h3>{preview.product.name}</h3>
+                    <p className={styles.affiliateAdminPreviewSeller}>Vende {preview.affiliate.publicName}</p>
+                  </div>
+                  <dl className={styles.affiliateAdminPreviewData}>
+                    <div><dt>Tipo</dt><dd>{listingKindLabel(preview.product.kind)}</dd></div>
+                    <div><dt>Precio</dt><dd className={styles.affiliateAdminPreviewPrice}>{money(preview.product.priceMinor)}</dd></div>
+                    <div><dt>Stock</dt><dd>{preview.product.inventory?.available ?? 0} unidades</dd></div>
+                    <div><dt>Imágenes</dt><dd>{images.length}</dd></div>
+                  </dl>
+                  <div className={styles.affiliateAdminPreviewDescription}>
+                    <span className={shared.adminPanelKicker}>Descripción</span>
+                    <p>{preview.product.description.trim() || 'El afiliado no agregó una descripción.'}</p>
+                  </div>
+                  <div className={shared.adminDialogActions}>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      onClick={() => {
+                        setPreview(null);
+                        setPreviewImageId(null);
+                      }}
+                    >
+                      Cerrar
+                    </Button>
+                    <Link className="button button-primary" href={`/admin/affiliates/listings/${preview.id}`}>
+                      Abrir ficha completa
+                    </Link>
+                  </div>
+                </div>
               </div>
-            </div>
-            <div className={styles.affiliateAdminPreviewDetails}>
-              <h3>{preview.product.name}</h3>
-              <p>{preview.product.description || 'Sin descripción.'}</p>
-              <strong>{money(preview.product.priceMinor)}</strong>
-              <span>Stock disponible: {preview.product.inventory?.available ?? 0}</span>
-              <div className={shared.adminDialogActions}>
-                <Link className="button button-primary" href={`/admin/affiliates/listings/${preview.id}`}>Abrir ficha completa</Link>
-              </div>
-            </div>
-          </div>
-        )}
+            </>
+          );
+        })()}
       </Dialog>
     </Shell>
   );
@@ -579,11 +635,11 @@ function ListingDetail({
                 </div>
               </div>
               <div className={shared.adminPanelBody}>
-                <div className={styles.affiliateAdminPreview} style={{ marginTop: 0 }}>
+                <div className={styles.affiliateAdminPreview}>
                   <div className={styles.affiliateAdminPreviewMedia}>
                     <div className={styles.affiliateAdminPreviewImage}>
                       {activeImage
-                        ? <Image src={activeImage.url} alt={activeImage.altText ?? item.product.name} width={640} height={640} unoptimized />
+                        ? <Image src={activeImage.url} alt={activeImage.altText ?? item.product.name} width={560} height={560} unoptimized />
                         : <span>Sin imágenes</span>}
                     </div>
                     {images.length > 1 && (
@@ -592,7 +648,7 @@ function ListingDetail({
                           <button
                             key={image.id}
                             type="button"
-                            className={image.id === activeImage?.id? styles.isActive : ''}
+                            className={image.id === activeImage?.id ? styles.isActive : undefined}
                             onClick={() => setImageId(image.id)}
                             aria-label={`Ver imagen ${index + 1}`}
                           >
@@ -603,13 +659,9 @@ function ListingDetail({
                     )}
                   </div>
                   <div className={styles.affiliateAdminPreviewDetails}>
-                    <div>
+                    <div className={styles.affiliateAdminPreviewDescription}>
                       <span className={shared.adminPanelKicker}>Descripción</span>
-                      <p className={styles.affiliateAdminPreviewDescription} style={{ margin: 0 }}>
-                        <span style={{ display: 'block', marginTop: 8, color: '#c5cfd7', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
-                          {item.product.description.trim() || 'El afiliado no agregó una descripción.'}
-                        </span>
-                      </p>
+                      <p>{item.product.description.trim() || 'El afiliado no agregó una descripción.'}</p>
                     </div>
                     <dl className={styles.affiliateAdminPreviewData}>
                       <div><dt>Precio</dt><dd className={styles.affiliateAdminPreviewPrice}>{money(item.product.priceMinor)}</dd></div>
