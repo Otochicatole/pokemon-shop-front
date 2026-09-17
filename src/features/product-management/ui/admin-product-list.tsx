@@ -328,7 +328,7 @@ export function AdminProductListView() {
           danger={bulkCopy[bulkAction].danger !== false}
           busy={bulk.isPending}
           onClose={() => !bulk.isPending && setBulkAction(null)}
-          onConfirm={() => bulk.mutateAsync(bulkAction).catch(() => undefined)}
+          onConfirm={async () => { await bulk.mutateAsync(bulkAction).catch(() => undefined); }}
         />
       )}
     </>

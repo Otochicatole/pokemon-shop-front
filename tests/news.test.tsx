@@ -4,8 +4,8 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { NewsCarousel } from '@/features/news';
 
 const items = [
-  { id: '11111111-1111-4111-8111-111111111111', title: 'Primera noticia', summary: 'Información uno' },
-  { id: '22222222-2222-4222-8222-222222222222', title: 'Segunda noticia', summary: 'Información dos' },
+  { id: '11111111-1111-4111-8111-111111111111', title: 'Primera noticia', summary: 'Información uno', coverUrl: null },
+  { id: '22222222-2222-4222-8222-222222222222', title: 'Segunda noticia', summary: 'Información dos', coverUrl: null },
 ];
 
 afterEach(() => { vi.useRealTimers(); });
