@@ -43,6 +43,14 @@
   background: rgba(83, 190, 229, .055);
 }
 
+.adminDataTable tbody tr.adminTableRowSelected {
+  background: rgba(83, 190, 229, .1);
+}
+
+.adminDataTable tbody tr.adminTableRowSelected:hover {
+  background: rgba(83, 190, 229, .14);
+}
+
 .adminTablePrimary {
   display: flex;
   align-items: center;
