@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import { useMutation, useQuery as useReactQuery, useQueryClient, type UseQueryResult } from '@tanstack/react-query';
 import { ArrowDownToLine, ArrowLeft, Check, CircleDollarSign, Clock3, Eye, Landmark, RefreshCw, Search, Settings2, ShieldAlert, WalletCards, X } from 'lucide-react';
 import { toast } from '@/components/feedback';
-import { AdminPageHeader, Button, Dialog, TextareaField, TextField } from '@/components';
+import { AdminPageHeader, Button, Dialog, SelectField, TextareaField, TextField } from '@/components';
 import { adminErrorMessage, adminFetch } from '@/shared/admin/client';
 import { AffiliateAdminNavigation, type AffiliateAdminSection } from './affiliate-admin-navigation';
 import styles from './admin-affiliate-operations.module.css';
@@ -64,8 +64,20 @@ function payoutStatusClass(status: string) { return `admin-payout-status is-${st
 function ledgerBucket(value: string) { return ({ AVAILABLE: 'Disponible', RESERVED: 'Reservado', PENDING: 'Pendiente', PAID: 'Pagado' } as Record<string, string>)[value] ?? label(value); }
 function ledgerType(value: string) { return ({ PAYOUT_RESERVED: 'Reserva del retiro', PAYOUT_PAID: 'Retiro pagado', PAYOUT_RELEASED: 'Reserva liberada', SALE_RELEASED: 'Venta liberada' } as Record<string, string>)[value] ?? label(value); }
 
-function Shell({ active, title, description, action, children }: { active: Section; title: string; description: string; action?: React.ReactNode; children: React.ReactNode }) { return <><AdminPageHeader eyebrow="Marketplace" title={title} description={description} actions={action} /><div className="affiliate-admin-layout"><AffiliateAdminNavigation active={active} /><div className="affiliate-admin-content">{children}</div></div></>; }
-function Feedback({ children, error = false }: { children: React.ReactNode; error?: boolean }) { return <div className={`admin-feedback ${error ? 'is-error' : ''}`} role={error ? 'alert' : undefined}>{children}</div>; }
+function Shell({ active, title, description, action, children }: { active: Section; title: string; description: string; action?: React.ReactNode; children: React.ReactNode }) {
+  return (
+    <>
+      <AdminPageHeader eyebrow="Marketplace" title={title} description={description} actions={action} />
+      <div className="affiliate-admin-layout">
+        <AffiliateAdminNavigation active={active} />
+        <div className="affiliate-admin-content">{children}</div>
+      </div>
+    </>
+  );
+}
+function Feedback({ children, error = false }: { children: React.ReactNode; error?: boolean }) {
+  return <div className={`admin-feedback ${error ? 'is-error' : ''}`} role={error ? 'alert' : undefined}>{children}</div>;
+}
 
 export function AdminAffiliateOperations({ section, id }: { section: Section; id?: string }) {
   if (section === 'overview') return <Overview />;
@@ -80,28 +92,201 @@ export function AdminAffiliateOperations({ section, id }: { section: Section; id
 
 function Overview() {
   const query = useQuery({ queryKey: ['admin', 'affiliate-summary'], queryFn: () => adminFetch<Summary>('/admin/affiliates/summary').then(payload) });
-  return <Shell active="overview" title="Resumen de afiliados" description="Supervisá la operación comercial, las obligaciones de saldo y las colas que requieren atención." action={<Button variant="secondary" onClick={() => void query.refetch()} disabled={query.isFetching}><RefreshCw size={16} />Actualizar</Button>}>
-    {query.isLoading ? <Feedback>Cargando resumen…</Feedback> : query.isError ? <Feedback error>{adminErrorMessage(query.error)}</Feedback> : query.data && <div className="admin-affiliate-dashboard"><div className="admin-metric-grid"><article className="admin-metric-card"><span>Afiliados</span><strong>{query.data.affiliates}</strong><small>Activos y suspendidos</small></article><article className="admin-metric-card"><span>Incidencias abiertas</span><strong>{query.data.queues.issues}</strong><small>Requieren resolución</small></article><article className="admin-metric-card"><span>Cancelaciones</span><strong>{query.data.queues.cancellations}</strong><small>Esperando decisión</small></article><article className="admin-metric-card"><span>Obligaciones</span><strong>{money(query.data.obligationsMinor)}</strong><small>Pendiente, disponible y reservado</small></article></div><section className="admin-panel"><div className="admin-panel-header"><div><span className="admin-panel-kicker">Colas operativas</span><h2>Atención prioritaria</h2></div></div><div className="admin-panel-body admin-affiliate-queue-links"><Link href="/admin/affiliates/issues"><ShieldAlert size={18} /><span><strong>{query.data.queues.issues} incidencias abiertas</strong><small>Resolver, continuar o reembolsar</small></span></Link><Link href="/admin/affiliates/cancellations"><X size={18} /><span><strong>{query.data.queues.cancellations} cancelaciones solicitadas</strong><small>Aprobar o rechazar con motivo</small></span></Link><Link href="/admin/affiliates/payouts"><WalletCards size={18} /><span><strong>{query.data.queues.payouts} retiros por procesar</strong><small>Flujo solicitado, procesando y pagado</small></span></Link></div></section></div>}
-  </Shell>;
+  return (
+    <Shell
+      active="overview"
+      title="Resumen de afiliados"
+      description="Supervisá la operación comercial, las obligaciones de saldo y las colas que requieren atención."
+      action={<Button variant="secondary" onClick={() => void query.refetch()} disabled={query.isFetching}><RefreshCw size={16} />Actualizar</Button>}
+    >
+      {query.isLoading ? <Feedback>Cargando resumen…</Feedback> : query.isError ? <Feedback error>{adminErrorMessage(query.error)}</Feedback> : query.data && (
+        <div className="admin-affiliate-dashboard">
+          <div className="admin-metric-grid">
+            <article className="admin-metric-card"><span>Afiliados</span><strong>{query.data.affiliates}</strong><small>Activos y suspendidos</small></article>
+            <article className="admin-metric-card"><span>Incidencias abiertas</span><strong>{query.data.queues.issues}</strong><small>Requieren resolución</small></article>
+            <article className="admin-metric-card"><span>Cancelaciones</span><strong>{query.data.queues.cancellations}</strong><small>Esperando decisión</small></article>
+            <article className="admin-metric-card"><span>Obligaciones</span><strong>{money(query.data.obligationsMinor)}</strong><small>Pendiente, disponible y reservado</small></article>
+          </div>
+          <section className="admin-panel">
+            <div className="admin-panel-header">
+              <div>
+                <span className="admin-panel-kicker">Colas operativas</span>
+                <h2>Atención prioritaria</h2>
+              </div>
+            </div>
+            <div className="admin-panel-body admin-affiliate-queue-links">
+              <Link href="/admin/affiliates/issues"><ShieldAlert size={18} /><span><strong>{query.data.queues.issues} incidencias abiertas</strong><small>Resolver, continuar o reembolsar</small></span></Link>
+              <Link href="/admin/affiliates/cancellations"><X size={18} /><span><strong>{query.data.queues.cancellations} cancelaciones solicitadas</strong><small>Aprobar o rechazar con motivo</small></span></Link>
+              <Link href="/admin/affiliates/payouts"><WalletCards size={18} /><span><strong>{query.data.queues.payouts} retiros por procesar</strong><small>Flujo solicitado, procesando y pagado</small></span></Link>
+            </div>
+          </section>
+        </div>
+      )}
+    </Shell>
+  );
 }
 
 function Sellers({ id }: { id?: string }) {
-  const client = useQueryClient(); const [search, setSearch] = useState(''); const [submitted, setSubmitted] = useState('');
+  const client = useQueryClient();
+  const [search, setSearch] = useState('');
+  const [submitted, setSubmitted] = useState('');
   const query = useQuery({ queryKey: ['admin', 'affiliate-sellers', submitted], queryFn: () => queryPage<Seller>(`/admin/affiliates?pageSize=50${submitted ? `&search=${encodeURIComponent(submitted)}` : ''}`) });
   const detail = useQuery({ queryKey: ['admin', 'affiliate-seller', id], queryFn: () => adminFetch<{ affiliate: Seller; balance: Record<string, string>; listings: Listing[]; orders: SellerOrder[]; payouts: Payout[] }>(`/admin/affiliates/${id}`).then(payload), enabled: Boolean(id) });
   const update = useMutation({ mutationFn: (row: Seller) => adminFetch(`/admin/affiliates/${row.id}`, { method: 'PATCH', body: JSON.stringify({ expectedVersion: row.version, status: row.status === 'ACTIVE' ? 'SUSPENDED' : 'ACTIVE' }) }), onSuccess: () => { toast.success('Estado actualizado'); void client.invalidateQueries({ queryKey: ['admin', 'affiliate-sellers'] }); }, onError: (error) => toast.error(adminErrorMessage(error)) });
   if (id) return <SellerDetail query={detail} />;
-  return <Shell active="sellers" title="Afiliados" description="Listado filtrable de vendedores, estado, publicaciones, ventas y saldo." action={<Button variant="secondary" onClick={() => void query.refetch()} disabled={query.isFetching}><RefreshCw size={16} />Actualizar</Button>}><section className="admin-panel"><div className="admin-panel-header"><div><span className="admin-panel-kicker">Directorio</span><h2>Vendedores habilitados</h2></div></div><form className="admin-inline-filter" onSubmit={(event) => { event.preventDefault(); setSubmitted(search.trim()); }}><TextField label="Buscar" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Nombre o email" /><Button type="submit" variant="secondary"><Search size={16} />Buscar</Button></form>{query.isLoading ? <Feedback>Cargando afiliados…</Feedback> : query.isError ? <Feedback error>{adminErrorMessage(query.error)}</Feedback> : <div className="admin-panel-body"><ul className="admin-list">{query.data.items.map((row) => <li key={row.id}><div className="admin-list-row"><Link href={`/admin/affiliates/sellers/${row.id}`}><strong>{row.publicName}</strong><span>{row.user?.name ? `${row.user.name} · ` : ''}{row.user?.email}</span><small>{row.counts?.listings ?? 0} publicaciones · {row.counts?.sellerOrders ?? 0} ventas</small></Link><div className="admin-row-actions"><span className={`admin-badge ${row.status === 'ACTIVE' ? 'admin-badge-green' : 'admin-badge-red'}`}>{row.status === 'ACTIVE' ? 'Activo' : 'Suspendido'}</span><Button variant="ghost" onClick={() => update.mutate(row)} disabled={update.isPending}>{row.status === 'ACTIVE' ? 'Suspender' : 'Reactivar'}</Button></div></div></li>)}</ul>{query.data.items.length === 0 && <p className="admin-empty-copy">No encontramos afiliados.</p>}</div>}</section></Shell>;
+  return (
+    <Shell
+      active="sellers"
+      title="Afiliados"
+      description="Listado filtrable de vendedores, estado, publicaciones, ventas y saldo."
+      action={<Button variant="secondary" onClick={() => void query.refetch()} disabled={query.isFetching}><RefreshCw size={16} />Actualizar</Button>}
+    >
+      <form className="admin-toolbar affiliate-admin-toolbar" onSubmit={(event) => { event.preventDefault(); setSubmitted(search.trim()); }}>
+        <TextField label="Buscar" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Nombre o email" />
+        <Button type="submit" variant="secondary"><Search size={16} />Buscar</Button>
+      </form>
+      <section className="admin-panel">
+        <div className="admin-panel-header">
+          <div>
+            <span className="admin-panel-kicker">Directorio</span>
+            <h2>Vendedores habilitados</h2>
+          </div>
+          {!query.isLoading && !query.isError ? <span className="admin-count-badge">{query.data.items.length}</span> : null}
+        </div>
+        {query.isLoading ? <Feedback>Cargando afiliados…</Feedback> : query.isError ? <Feedback error>{adminErrorMessage(query.error)}</Feedback> : (
+          <div className="admin-panel-body">
+            <ul className="admin-list">
+              {query.data.items.map((row) => (
+                <li key={row.id}>
+                  <div className="admin-list-row">
+                    <Link href={`/admin/affiliates/sellers/${row.id}`}>
+                      <strong>{row.publicName}</strong>
+                      <span>{row.user?.name ? `${row.user.name} · ` : ''}{row.user?.email}</span>
+                      <small>{row.counts?.listings ?? 0} publicaciones · {row.counts?.sellerOrders ?? 0} ventas</small>
+                    </Link>
+                    <div className="admin-row-actions">
+                      <span className={`admin-badge ${row.status === 'ACTIVE' ? 'admin-badge-green' : 'admin-badge-red'}`}>{row.status === 'ACTIVE' ? 'Activo' : 'Suspendido'}</span>
+                      <Button variant="ghost" onClick={() => update.mutate(row)} disabled={update.isPending}>{row.status === 'ACTIVE' ? 'Suspender' : 'Reactivar'}</Button>
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+            {query.data.items.length === 0 && <p className="admin-empty-copy">No encontramos afiliados.</p>}
+          </div>
+        )}
+      </section>
+    </Shell>
+  );
 }
 
 function SellerDetail({ query }: { query: QueryState<{ affiliate: Seller; balance: Record<string, string>; listings: Listing[]; orders: SellerOrder[]; payouts: Payout[] }> }) {
-  const client = useQueryClient(); const [commissionDraft, setCommissionDraft] = useState<string | undefined>(undefined);
-  const saveCommission = useMutation({ mutationFn: ({ affiliate, value }: { affiliate: Seller; value: number | null }) => adminFetch(`/admin/affiliates/${affiliate.id}`, { method: 'PATCH', body: JSON.stringify({ expectedVersion: affiliate.version, commissionBpsOverride: value }) }), onSuccess: () => { toast.success('Excepción de comisión guardada'); setCommissionDraft(undefined); void client.invalidateQueries({ queryKey: ['admin', 'affiliate-seller'] }); }, onError: (error) => toast.error(adminErrorMessage(error)) });
+  const client = useQueryClient();
+  const [commissionDraft, setCommissionDraft] = useState<string | undefined>(undefined);
+  const saveCommission = useMutation({
+    mutationFn: ({ affiliate, value }: { affiliate: Seller; value: number | null }) =>
+      adminFetch(`/admin/affiliates/${affiliate.id}`, { method: 'PATCH', body: JSON.stringify({ expectedVersion: affiliate.version, commissionBpsOverride: value }) }),
+    onSuccess: () => {
+      toast.success('Excepción de comisión guardada');
+      setCommissionDraft(undefined);
+      void client.invalidateQueries({ queryKey: ['admin', 'affiliate-seller'] });
+    },
+    onError: (error) => toast.error(adminErrorMessage(error)),
+  });
   if (query.isLoading) return <Shell active="sellers" title="Ficha del afiliado" description="Cargando información del vendedor."><Feedback>Cargando…</Feedback></Shell>;
   if (query.isError || !query.data) return <Shell active="sellers" title="Afiliado no encontrado" description="La ficha no está disponible."><Feedback error>{query.error ? adminErrorMessage(query.error) : 'No encontrado'}</Feedback></Shell>;
   const { affiliate, balance, listings, orders, payouts } = query.data;
   const currentCommission = commissionDraft ?? (affiliate.commissionBpsOverride === null || affiliate.commissionBpsOverride === undefined ? '' : String(affiliate.commissionBpsOverride / 100));
-  return <Shell active="sellers" title={affiliate.publicName} description="Perfil, comisión, publicaciones, ventas, logística, saldo y retiros." action={<Link className="button button-secondary" href="/admin/affiliates/sellers"><ArrowLeft size={16} />Volver</Link>}><div className="admin-metric-grid"><article className="admin-metric-card"><span>Estado</span><strong>{affiliate.status === 'ACTIVE' ? 'Activo' : 'Suspendido'}</strong><small>{affiliate.user?.email}</small></article><article className="admin-metric-card"><span>Comisión por defecto</span><strong>{affiliate.commissionBpsOverride === null || affiliate.commissionBpsOverride === undefined ? 'Global' : `${affiliate.commissionBpsOverride / 100}%`}</strong><small>Se congela en cada nueva suborden</small></article><article className="admin-metric-card"><span>Disponible</span><strong>{money(balance.AVAILABLE)}</strong><small>Saldo que puede retirar</small></article><article className="admin-metric-card"><span>Pendiente</span><strong>{money(balance.PENDING)}</strong><small>Ventas en período de cierre</small></article><article className="admin-metric-card"><span>Reservado</span><strong>{money(balance.RESERVED)}</strong><small>Retiros en proceso</small></article></div><section className="admin-panel"><div className="admin-panel-header"><h2>Excepción individual de comisión</h2></div><div className="admin-panel-body"><form className="admin-inline-filter" onSubmit={(event) => { event.preventDefault(); const value = currentCommission.trim() === '' ? null : Math.round(Number(currentCommission) * 100); if (value !== null && (!Number.isFinite(value) || value < 0 || value > 10000)) return toast.error('Ingresá una comisión entre 0 y 100%'); saveCommission.mutate({ affiliate, value }); }}><TextField label="Comisión (%)" type="number" min="0" max="100" step="0.01" value={currentCommission} onChange={(event) => setCommissionDraft(event.target.value)} placeholder="Vacío = usar global" /><Button type="submit" disabled={saveCommission.isPending}>Guardar comisión</Button></form><p className="form-hint">Dejá vacío para volver a la comisión global. Las ventas históricas no se recalculan.</p></div></section><div className="admin-two-column"><section className="admin-panel"><div className="admin-panel-header"><h2>Publicaciones ({listings.length})</h2></div><div className="admin-panel-body">{listings.map((item) => <Link className="admin-detail-link" href={`/admin/affiliates/listings/${item.id}`} key={item.id}><strong>{item.product.name}</strong><span>{label(item.status)} · {money(item.product.priceMinor)}</span></Link>)}</div></section><section className="admin-panel"><div className="admin-panel-header"><h2>Ventas recientes ({orders.length})</h2></div><div className="admin-panel-body">{orders.map((item) => <Link className="admin-detail-link" href={`/admin/affiliates/orders/${item.id}`} key={item.id}><strong>{item.number}</strong><span>{label(item.status)} · {money(item.sellerNetMinor)}</span></Link>)}</div></section></div><section className="admin-panel"><div className="admin-panel-header"><h2>Historial de retiros</h2></div><div className="admin-panel-body">{payouts.map((item) => <div className="admin-detail-line" key={item.id}><span>{date(item.createdAt)}</span><strong>{money(item.amountMinor)}</strong><em>{label(item.status)}</em></div>)}</div></section></Shell>;
+  return (
+    <Shell
+      active="sellers"
+      title={affiliate.publicName}
+      description="Perfil, comisión, publicaciones, ventas, logística, saldo y retiros."
+      action={<Link className="button button-secondary" href="/admin/affiliates/sellers"><ArrowLeft size={16} />Volver</Link>}
+    >
+      <div className="admin-metric-grid">
+        <article className="admin-metric-card"><span>Estado</span><strong>{affiliate.status === 'ACTIVE' ? 'Activo' : 'Suspendido'}</strong><small>{affiliate.user?.email}</small></article>
+        <article className="admin-metric-card"><span>Comisión por defecto</span><strong>{affiliate.commissionBpsOverride === null || affiliate.commissionBpsOverride === undefined ? 'Global' : `${affiliate.commissionBpsOverride / 100}%`}</strong><small>Se congela en cada nueva suborden</small></article>
+        <article className="admin-metric-card"><span>Disponible</span><strong>{money(balance.AVAILABLE)}</strong><small>Saldo que puede retirar</small></article>
+        <article className="admin-metric-card"><span>Pendiente</span><strong>{money(balance.PENDING)}</strong><small>Ventas en período de cierre</small></article>
+        <article className="admin-metric-card"><span>Reservado</span><strong>{money(balance.RESERVED)}</strong><small>Retiros en proceso</small></article>
+      </div>
+      <section className="admin-panel">
+        <div className="admin-panel-header">
+          <div>
+            <span className="admin-panel-kicker">Comercial</span>
+            <h2>Excepción individual de comisión</h2>
+          </div>
+        </div>
+        <div className="admin-panel-body affiliate-admin-section-stack">
+          <form
+            className="admin-inline-filter"
+            onSubmit={(event) => {
+              event.preventDefault();
+              const value = currentCommission.trim() === '' ? null : Math.round(Number(currentCommission) * 100);
+              if (value !== null && (!Number.isFinite(value) || value < 0 || value > 10000)) return toast.error('Ingresá una comisión entre 0 y 100%');
+              saveCommission.mutate({ affiliate, value });
+            }}
+          >
+            <TextField label="Comisión (%)" type="number" min="0" max="100" step="0.01" value={currentCommission} onChange={(event) => setCommissionDraft(event.target.value)} placeholder="Vacío = usar global" />
+            <Button type="submit" disabled={saveCommission.isPending}>Guardar comisión</Button>
+          </form>
+          <p className="form-hint">Dejá vacío para volver a la comisión global. Las ventas históricas no se recalculan.</p>
+        </div>
+      </section>
+      <div className="admin-two-column">
+        <section className="admin-panel">
+          <div className="admin-panel-header">
+            <div>
+              <span className="admin-panel-kicker">Catálogo</span>
+              <h2>Publicaciones ({listings.length})</h2>
+            </div>
+          </div>
+          <div className="admin-panel-body affiliate-admin-section-stack">
+            {listings.length ? listings.map((item) => (
+              <Link className="admin-detail-link" href={`/admin/affiliates/listings/${item.id}`} key={item.id}>
+                <strong>{item.product.name}</strong>
+                <span>{label(item.status)} · {money(item.product.priceMinor)}</span>
+              </Link>
+            )) : <p className="admin-empty-copy">Sin publicaciones.</p>}
+          </div>
+        </section>
+        <section className="admin-panel">
+          <div className="admin-panel-header">
+            <div>
+              <span className="admin-panel-kicker">Operación</span>
+              <h2>Ventas recientes ({orders.length})</h2>
+            </div>
+          </div>
+          <div className="admin-panel-body affiliate-admin-section-stack">
+            {orders.length ? orders.map((item) => (
+              <Link className="admin-detail-link" href={`/admin/affiliates/orders/${item.id}`} key={item.id}>
+                <strong>{item.number}</strong>
+                <span>{label(item.status)} · {money(item.sellerNetMinor)}</span>
+              </Link>
+            )) : <p className="admin-empty-copy">Sin ventas recientes.</p>}
+          </div>
+        </section>
+      </div>
+      <section className="admin-panel">
+        <div className="admin-panel-header">
+          <div>
+            <span className="admin-panel-kicker">Finanzas</span>
+            <h2>Historial de retiros</h2>
+          </div>
+        </div>
+        <div className="admin-panel-body">
+          {payouts.length ? payouts.map((item) => (
+            <div className="admin-detail-line" key={item.id}>
+              <span>{date(item.createdAt)}</span>
+              <strong>{money(item.amountMinor)}</strong>
+              <em>{label(item.status)}</em>
+            </div>
+          )) : <p className="admin-empty-copy">Todavía no hay retiros.</p>}
+        </div>
+      </section>
+    </Shell>
+  );
 }
 
 function Listings({ id }: { id?: string }) {
@@ -204,7 +389,10 @@ function Listings({ id }: { id?: string }) {
     >
       <section className="admin-panel">
         <div className="admin-panel-header">
-          <h2>Control editorial</h2>
+          <div>
+            <span className="admin-panel-kicker">Control editorial</span>
+            <h2>Publicaciones</h2>
+          </div>
           <select aria-label="Filtrar por estado" value={status} onChange={(event) => setStatus(event.target.value)}>
             <option value="">Todos los estados</option>
             {['DRAFT', 'PENDING_REVIEW', 'CHANGES_REQUESTED', 'REJECTED', 'APPROVED'].map((value) => (
@@ -535,19 +723,164 @@ function ListingDetail({
 }
 
 function Orders({ id }: { id?: string }) {
-  const [status, setStatus] = useState(''); const [search, setSearch] = useState(''); const [submitted, setSubmitted] = useState(''); const client = useQueryClient();
+  const [status, setStatus] = useState('');
+  const [search, setSearch] = useState('');
+  const [submitted, setSubmitted] = useState('');
+  const client = useQueryClient();
   const query = useQuery({ queryKey: ['admin', 'affiliate-orders', status, submitted], queryFn: () => queryPage<SellerOrder>(`/admin/affiliates/seller-orders?pageSize=50&sellerType=AFFILIATE${status ? `&status=${status}` : ''}${submitted ? `&search=${encodeURIComponent(submitted)}` : ''}`) });
   const detail = useQuery({ queryKey: ['admin', 'affiliate-order', id], queryFn: () => adminFetch<{ order: SellerOrder }>(`/admin/affiliates/seller-orders/${id}`).then(payload), enabled: Boolean(id) });
   const transition = useMutation({ mutationFn: ({ row, next }: { row: SellerOrder; next: string }) => adminFetch(`/admin/affiliates/seller-orders/${row.id}/status`, { method: 'POST', body: JSON.stringify({ expectedVersion: row.version, status: next, note: 'Intervención administrativa desde el panel de afiliados.' }) }), onSuccess: () => { toast.success('Estado de venta actualizado'); void client.invalidateQueries({ queryKey: ['admin', 'affiliate-orders'] }); }, onError: (error) => toast.error(adminErrorMessage(error)) });
   const refund = useMutation({ mutationFn: ({ row, input }: { row: SellerOrder; input: RefundInput }) => adminFetch(`/admin/affiliates/seller-orders/${row.id}/refund`, { method: 'POST', body: JSON.stringify({ expectedVersion: row.version, ...input }) }), onSuccess: () => { toast.success('Reembolso registrado'); void client.invalidateQueries({ queryKey: ['admin', 'affiliate-orders'] }); void detail.refetch(); }, onError: (error) => toast.error(adminErrorMessage(error)) });
   if (id) return <OrderDetail query={detail} onTransition={(next) => detail.data && transition.mutate({ row: detail.data.order, next })} onRefund={(input) => detail.data && refund.mutate({ row: detail.data.order, input })} refundPending={refund.isPending} />;
-  return <Shell active="orders" title="Ventas" description="Subórdenes por vendedor con estado, importes, entrega, seguimiento y acciones permitidas." action={<Button variant="secondary" onClick={() => void query.refetch()} disabled={query.isFetching}><RefreshCw size={16} />Actualizar</Button>}><section className="admin-panel"><div className="admin-panel-header"><h2>Subórdenes</h2><select aria-label="Filtrar ventas" value={status} onChange={(event) => setStatus(event.target.value)}><option value="">Todos los estados</option>{['PENDING_PAYMENT', 'PAID', 'PREPARING', 'READY_FOR_PICKUP', 'PICKED_UP', 'SHIPPED', 'COMPLETED', 'CANCELLATION_REQUESTED', 'DISPUTED', 'CANCELLED', 'REFUNDED'].map((value) => <option key={value} value={value}>{label(value)}</option>)}</select></div><form className="admin-inline-filter" onSubmit={(event) => { event.preventDefault(); setSubmitted(search.trim()); }}><TextField label="Buscar" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Número o vendedor" /><Button type="submit" variant="secondary"><Search size={16} />Buscar</Button></form>{query.isLoading ? <Feedback>Cargando ventas…</Feedback> : query.isError ? <Feedback error>{adminErrorMessage(query.error)}</Feedback> : <div className="admin-panel-body"><ul className="admin-list">{query.data.items.map((row) => <li key={row.id}><div className="admin-list-row"><Link href={`/admin/affiliates/orders/${row.id}`}><strong>{row.number}</strong><span>{row.sellerName} · {label(row.status)} · {money(row.sellerNetMinor)}</span></Link><div className="admin-row-actions"><span className="admin-badge">{label(row.fulfillmentType ?? 'SHIPMENT')}</span><Link className="button button-ghost" href={`/admin/affiliates/orders/${row.id}`}>Ver detalle</Link></div></div></li>)}</ul></div>}</section></Shell>;
+  return (
+    <Shell
+      active="orders"
+      title="Ventas"
+      description="Subórdenes por vendedor con estado, importes, entrega, seguimiento y acciones permitidas."
+      action={<Button variant="secondary" onClick={() => void query.refetch()} disabled={query.isFetching}><RefreshCw size={16} />Actualizar</Button>}
+    >
+      <form className="admin-toolbar affiliate-admin-toolbar" onSubmit={(event) => { event.preventDefault(); setSubmitted(search.trim()); }}>
+        <TextField className="admin-search-field" label="Buscar" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Número o vendedor" />
+        <SelectField label="Estado" value={status} onChange={(event) => setStatus(event.target.value)}>
+          <option value="">Todos los estados</option>
+          {['PENDING_PAYMENT', 'PAID', 'PREPARING', 'READY_FOR_PICKUP', 'PICKED_UP', 'SHIPPED', 'COMPLETED', 'CANCELLATION_REQUESTED', 'DISPUTED', 'CANCELLED', 'REFUNDED'].map((value) => (
+            <option key={value} value={value}>{label(value)}</option>
+          ))}
+        </SelectField>
+        <Button type="submit" variant="secondary"><Search size={16} />Buscar</Button>
+      </form>
+      <section className="admin-panel">
+        <div className="admin-panel-header">
+          <div>
+            <span className="admin-panel-kicker">Marketplace</span>
+            <h2>Subórdenes</h2>
+          </div>
+          {!query.isLoading && !query.isError ? <span className="admin-count-badge">{query.data.items.length}</span> : null}
+        </div>
+        {query.isLoading ? <Feedback>Cargando ventas…</Feedback> : query.isError ? <Feedback error>{adminErrorMessage(query.error)}</Feedback> : (
+          <div className="admin-panel-body">
+            <ul className="admin-list">
+              {query.data.items.map((row) => (
+                <li key={row.id}>
+                  <div className="admin-list-row">
+                    <Link href={`/admin/affiliates/orders/${row.id}`}>
+                      <strong>{row.number}</strong>
+                      <span>{row.sellerName} · {label(row.status)} · {money(row.sellerNetMinor)}</span>
+                    </Link>
+                    <div className="admin-row-actions">
+                      <span className="admin-badge">{label(row.fulfillmentType ?? 'SHIPMENT')}</span>
+                      <Link className="button button-ghost" href={`/admin/affiliates/orders/${row.id}`}>Ver detalle</Link>
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+            {query.data.items.length === 0 && <p className="admin-empty-copy">No hay ventas para este filtro.</p>}
+          </div>
+        )}
+      </section>
+    </Shell>
+  );
 }
 
 function OrderDetail({ query, onTransition, onRefund, refundPending }: { query: QueryState<{ order: SellerOrder }>; onTransition: (next: string) => void; onRefund: (input: RefundInput) => void; refundPending: boolean }) {
-  const [refundOpen, setRefundOpen] = useState(false); const [refundAmount, setRefundAmount] = useState(''); const [refundReason, setRefundReason] = useState(''); const [refundReference, setRefundReference] = useState(''); const [restock, setRestock] = useState(false);
-  if (query.isLoading) return <Shell active="orders" title="Venta" description="Cargando…"><Feedback>Cargando…</Feedback></Shell>; if (query.isError || !query.data) return <Shell active="orders" title="Venta no encontrada" description="La suborden no está disponible."><Feedback error>{query.error ? adminErrorMessage(query.error) : 'No encontrada'}</Feedback></Shell>; const order = query.data.order; const next = order.status === 'PAID' ? 'PREPARING' : order.status === 'PREPARING' ? (order.fulfillmentType === 'PICKUP' ? 'READY_FOR_PICKUP' : 'SHIPPED') : order.status === 'READY_FOR_PICKUP' ? 'PICKED_UP' : order.status === 'SHIPPED' || order.status === 'PICKED_UP' ? 'COMPLETED' : null; const canRefund = !['PENDING_PAYMENT', 'CANCELLED', 'REFUNDED'].includes(order.status);
-  return <Shell active="orders" title={`Venta ${order.number}`} description={`${order.sellerName} · estado ${label(order.status)}`} action={<Link className="button button-secondary" href="/admin/affiliates/orders"><ArrowLeft size={16} />Volver</Link>}><section className="admin-panel"><div className="admin-panel-body"><div className="admin-detail-grid"><div><span>Importe vendedor</span><strong>{money(order.sellerNetMinor)}</strong></div><div><span>Subtotal</span><strong>{money(order.subtotalMinor)}</strong></div><div><span>Envío</span><strong>{money(order.shippingMinor)}</strong></div><div><span>Entrega</span><strong>{label(order.fulfillmentType ?? 'SHIPMENT')}</strong></div></div><p className="form-hint">Orden general: {order.parentOrder?.number ?? order.order?.number ?? '—'} · Pago: {label(order.parentOrder?.paymentStatus ?? '—')}</p><h3>Productos</h3>{order.items?.map((item, index) => <div className="admin-detail-line" key={`${item.productName ?? item.name}-${index}`}><span>{item.productName ?? item.name} × {item.quantity}</span><strong>{money(item.lineTotalMinor)}</strong></div>)}{order.fulfillmentType === 'SHIPMENT' && <p className="form-hint">Entrega: {[order.recipientName, order.addressLine1, order.addressLine2, order.city, order.province, order.postalCode].filter(Boolean).join(' · ') || 'Datos no disponibles hasta acreditar el pago'}</p>}{order.fulfillmentType === 'PICKUP' && <p className="form-hint">Punto de retiro: {order.pickupPointAddress ?? '—'}</p>}<p className="form-hint">Seguimiento: {[order.carrier, order.trackingCode].filter(Boolean).join(' · ') || 'Sin datos cargados'}</p>{next && next !== 'COMPLETED' && <Button onClick={() => onTransition(next)}>Pasar a {label(next)}</Button>}{next === 'COMPLETED' && <Button onClick={() => onTransition(next)}>Completar venta administrativamente</Button>}{canRefund && <Button variant="danger" onClick={() => setRefundOpen((value) => !value)}>Registrar reembolso</Button>}{refundOpen && canRefund && <form className="admin-form" onSubmit={(event) => { event.preventDefault(); if (refundAmount.trim() && refundReason.trim().length >= 3 && refundReference.trim().length >= 2) { onRefund({ amountMinor: refundAmount.trim(), reason: refundReason.trim(), externalReference: refundReference.trim(), restock }); setRefundOpen(false); } }}><TextField label="Monto a reembolsar (centavos USD)" inputMode="numeric" value={refundAmount} onChange={(event) => setRefundAmount(event.target.value.replace(/[^0-9]/g, ''))} required /><TextareaField label="Motivo" value={refundReason} onChange={(event) => setRefundReason(event.target.value)} minLength={3} maxLength={500} required /><TextField label="Referencia externa" value={refundReference} onChange={(event) => setRefundReference(event.target.value)} minLength={2} maxLength={150} required /><label className="checkbox-field"><input type="checkbox" checked={restock} onChange={(event) => setRestock(event.target.checked)} /> Reponer stock</label><div className="admin-dialog-actions"><Button type="button" variant="secondary" onClick={() => setRefundOpen(false)}>Cancelar</Button><Button type="submit" variant="danger" disabled={refundPending || refundAmount.trim().length === 0 || refundReason.trim().length < 3 || refundReference.trim().length < 2}>{refundPending ? 'Registrando…' : 'Confirmar reembolso'}</Button></div></form>}</div></section>{order.statusHistory?.length ? <section className="admin-panel"><div className="admin-panel-header"><h2>Timeline</h2></div><div className="admin-panel-body"><ol className="order-timeline">{order.statusHistory.map((event) => <li key={event.id}><span className="order-timeline-marker" /><div><strong>{label(event.toStatus)}</strong><span>{date(event.createdAt)}{event.note ? ` · ${event.note}` : ''}</span></div></li>)}</ol></div></section> : null}</Shell>;
+  const [refundOpen, setRefundOpen] = useState(false);
+  const [refundAmount, setRefundAmount] = useState('');
+  const [refundReason, setRefundReason] = useState('');
+  const [refundReference, setRefundReference] = useState('');
+  const [restock, setRestock] = useState(false);
+  if (query.isLoading) return <Shell active="orders" title="Venta" description="Cargando…"><Feedback>Cargando…</Feedback></Shell>;
+  if (query.isError || !query.data) return <Shell active="orders" title="Venta no encontrada" description="La suborden no está disponible."><Feedback error>{query.error ? adminErrorMessage(query.error) : 'No encontrada'}</Feedback></Shell>;
+  const order = query.data.order;
+  const next = order.status === 'PAID' ? 'PREPARING' : order.status === 'PREPARING' ? (order.fulfillmentType === 'PICKUP' ? 'READY_FOR_PICKUP' : 'SHIPPED') : order.status === 'READY_FOR_PICKUP' ? 'PICKED_UP' : order.status === 'SHIPPED' || order.status === 'PICKED_UP' ? 'COMPLETED' : null;
+  const canRefund = !['PENDING_PAYMENT', 'CANCELLED', 'REFUNDED'].includes(order.status);
+  return (
+    <Shell
+      active="orders"
+      title={`Venta ${order.number}`}
+      description={`${order.sellerName} · estado ${label(order.status)}`}
+      action={<Link className="button button-secondary" href="/admin/affiliates/orders"><ArrowLeft size={16} />Volver</Link>}
+    >
+      <div className="affiliate-admin-order-metrics">
+        <div><span>Importe vendedor</span><strong>{money(order.sellerNetMinor)}</strong></div>
+        <div><span>Subtotal</span><strong>{money(order.subtotalMinor)}</strong></div>
+        <div><span>Envío</span><strong>{money(order.shippingMinor)}</strong></div>
+        <div><span>Entrega</span><strong>{label(order.fulfillmentType ?? 'SHIPMENT')}</strong></div>
+      </div>
+      <section className="admin-panel">
+        <div className="admin-panel-header">
+          <div>
+            <span className="admin-panel-kicker">Detalle</span>
+            <h2>Información de la venta</h2>
+          </div>
+        </div>
+        <div className="admin-panel-body affiliate-admin-section-stack">
+          <p className="form-hint">Orden general: {order.parentOrder?.number ?? order.order?.number ?? '—'} · Pago: {label(order.parentOrder?.paymentStatus ?? '—')}</p>
+          <div className="affiliate-admin-section-stack">
+            <h3>Productos</h3>
+            {order.items?.map((item, index) => (
+              <div className="admin-detail-line" key={`${item.productName ?? item.name}-${index}`}>
+                <span>{item.productName ?? item.name} × {item.quantity}</span>
+                <strong>{money(item.lineTotalMinor)}</strong>
+              </div>
+            ))}
+            {!order.items?.length && <p className="admin-empty-copy">Sin ítems cargados.</p>}
+          </div>
+          {order.fulfillmentType === 'SHIPMENT' && (
+            <p className="form-hint">Entrega: {[order.recipientName, order.addressLine1, order.addressLine2, order.city, order.province, order.postalCode].filter(Boolean).join(' · ') || 'Datos no disponibles hasta acreditar el pago'}</p>
+          )}
+          {order.fulfillmentType === 'PICKUP' && <p className="form-hint">Punto de retiro: {order.pickupPointAddress ?? '—'}</p>}
+          <p className="form-hint">Seguimiento: {[order.carrier, order.trackingCode].filter(Boolean).join(' · ') || 'Sin datos cargados'}</p>
+          <div className="affiliate-admin-actions-row">
+            {next && next !== 'COMPLETED' && <Button onClick={() => onTransition(next)}>Pasar a {label(next)}</Button>}
+            {next === 'COMPLETED' && <Button onClick={() => onTransition(next)}>Completar venta administrativamente</Button>}
+            {canRefund && <Button variant="danger" onClick={() => setRefundOpen((value) => !value)}>Registrar reembolso</Button>}
+          </div>
+          {refundOpen && canRefund && (
+            <form
+              className="admin-form"
+              onSubmit={(event) => {
+                event.preventDefault();
+                if (refundAmount.trim() && refundReason.trim().length >= 3 && refundReference.trim().length >= 2) {
+                  onRefund({ amountMinor: refundAmount.trim(), reason: refundReason.trim(), externalReference: refundReference.trim(), restock });
+                  setRefundOpen(false);
+                }
+              }}
+            >
+              <TextField label="Monto a reembolsar (centavos USD)" inputMode="numeric" value={refundAmount} onChange={(event) => setRefundAmount(event.target.value.replace(/[^0-9]/g, ''))} required />
+              <TextareaField label="Motivo" value={refundReason} onChange={(event) => setRefundReason(event.target.value)} minLength={3} maxLength={500} required />
+              <TextField label="Referencia externa" value={refundReference} onChange={(event) => setRefundReference(event.target.value)} minLength={2} maxLength={150} required />
+              <label className="checkbox-field"><input type="checkbox" checked={restock} onChange={(event) => setRestock(event.target.checked)} /> Reponer stock</label>
+              <div className="admin-dialog-actions">
+                <Button type="button" variant="secondary" onClick={() => setRefundOpen(false)}>Cancelar</Button>
+                <Button type="submit" variant="danger" disabled={refundPending || refundAmount.trim().length === 0 || refundReason.trim().length < 3 || refundReference.trim().length < 2}>{refundPending ? 'Registrando…' : 'Confirmar reembolso'}</Button>
+              </div>
+            </form>
+          )}
+        </div>
+      </section>
+      {order.statusHistory?.length ? (
+        <section className="admin-panel">
+          <div className="admin-panel-header">
+            <div>
+              <span className="admin-panel-kicker">Historial</span>
+              <h2>Timeline</h2>
+            </div>
+          </div>
+          <div className="admin-panel-body">
+            <ol className="admin-timeline">
+              {order.statusHistory.map((event) => (
+                <li key={event.id}>
+                  <strong>{label(event.toStatus)}</strong>
+                  <span>{date(event.createdAt)}{event.note ? ` · ${event.note}` : ''}</span>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </section>
+      ) : null}
+    </Shell>
+  );
 }
 
 function Queue({ section, id }: { section: 'issues' | 'cancellations'; id?: string }) {
@@ -558,8 +891,80 @@ function Queue({ section, id }: { section: 'issues' | 'cancellations'; id?: stri
   const resolve = useMutation({ mutationFn: async (input: { id: string; version: number; kind: 'issue' | 'cancellation'; decision: string; note: string; refundAmountMinor?: string; externalReference?: string }) => adminFetch(`/admin/affiliates/${input.kind === 'issue' ? 'issues' : 'cancellations'}/${input.id}/resolve`, { method: 'POST', body: JSON.stringify({ expectedVersion: input.version, decision: input.decision, note: input.note, ...(input.refundAmountMinor ? { refundAmountMinor: input.refundAmountMinor, externalReference: input.externalReference, restock: true } : {}) }) }), onSuccess: () => { toast.success('Resolución guardada'); setResolution(null); setNote(''); setRefundAmountMinor(''); setExternalReference(''); void client.invalidateQueries({ queryKey: ['admin', 'affiliate', section] }); void detail.refetch(); }, onError: (error) => toast.error(adminErrorMessage(error)) });
   const isIssue = section === 'issues'; const openResolution = (item: Issue | Cancellation) => { setResolution({ id: item.id, version: item.version ?? item.sellerOrder.version, kind: isIssue ? 'issue' : 'cancellation' }); setDecision(isIssue ? 'CONTINUE' : 'REJECTED'); setNote(''); setRefundAmountMinor(''); setExternalReference(''); };
   const record = id && detail.data ? (isIssue ? (detail.data as { issue: Issue }).issue : (detail.data as { cancellation: Cancellation }).cancellation) : null;
-  if (id) return <Shell active={section} title={isIssue ? 'Detalle de incidencia' : 'Detalle de cancelación'} description="Resolvé la operación con motivo obligatorio y trazabilidad contable." action={<Link className="button button-secondary" href={`/admin/affiliates/${section}`}><ArrowLeft size={16} />Volver</Link>}>{detail.isLoading ? <Feedback>Cargando…</Feedback> : detail.isError || !record ? <Feedback error>{detail.error ? adminErrorMessage(detail.error) : 'No encontrado'}</Feedback> : <section className="admin-panel"><div className="admin-panel-body"><h2>{record.sellerOrder.number} · {record.affiliate.publicName}</h2><p>{record.reason}</p><p className="form-hint">Estado: {label(record.status)} · Creado: {date(record.createdAt)}</p>{(record.status === 'OPEN' || record.status === 'REQUESTED') && <Button variant="secondary" onClick={() => openResolution(record)}>{isIssue ? 'Resolver incidencia' : 'Decidir cancelación'}</Button>}</div></section>}<ResolutionDialog isIssue={isIssue} resolution={resolution} note={note} setNote={setNote} decision={decision} setDecision={setDecision} refundAmountMinor={refundAmountMinor} setRefundAmountMinor={setRefundAmountMinor} externalReference={externalReference} setExternalReference={setExternalReference} resolve={resolve} onClose={() => setResolution(null)} /></Shell>;
-  return <Shell active={section} title={isIssue ? 'Incidencias' : 'Cancelaciones'} description={isIssue ? 'Cola abierta e historial de reclamos, con resolución contable y operativa completa.' : 'Solicitudes de cancelación versionadas con motivo obligatorio y resolución auditada.'}><section className="admin-panel"><div className="admin-panel-header"><h2>{isIssue ? 'Incidencias abiertas e historial' : 'Solicitudes recibidas'}</h2></div>{query.isLoading ? <Feedback>Cargando…</Feedback> : query.isError ? <Feedback error>{adminErrorMessage(query.error)}</Feedback> : <div className="admin-panel-body"><ul className="admin-list">{query.data.items.map((item) => <li key={item.id}><div className="admin-list-row"><Link href={`/admin/affiliates/${section}/${item.id}`}><strong>{item.sellerOrder.number} · {item.affiliate.publicName}</strong><span>{item.reason}</span><small>{date(item.createdAt)} · {label(item.status)}</small></Link>{item.status === 'OPEN' || item.status === 'REQUESTED' ? <div className="admin-row-actions"><Button variant="secondary" onClick={() => openResolution(item)}>{isIssue ? 'Resolver' : 'Decidir'}</Button></div> : null}</div></li>)}</ul>{query.data.items.length === 0 && <p className="admin-empty-copy">No hay elementos en esta cola.</p>}</div>}</section><ResolutionDialog isIssue={isIssue} resolution={resolution} note={note} setNote={setNote} decision={decision} setDecision={setDecision} refundAmountMinor={refundAmountMinor} setRefundAmountMinor={setRefundAmountMinor} externalReference={externalReference} setExternalReference={setExternalReference} resolve={resolve} onClose={() => setResolution(null)} /></Shell>;
+  if (id) {
+    return (
+      <Shell
+        active={section}
+        title={isIssue ? 'Detalle de incidencia' : 'Detalle de cancelación'}
+        description="Resolvé la operación con motivo obligatorio y trazabilidad contable."
+        action={<Link className="button button-secondary" href={`/admin/affiliates/${section}`}><ArrowLeft size={16} />Volver</Link>}
+      >
+        {detail.isLoading ? <Feedback>Cargando…</Feedback> : detail.isError || !record ? <Feedback error>{detail.error ? adminErrorMessage(detail.error) : 'No encontrado'}</Feedback> : (
+          <section className="admin-panel">
+            <div className="admin-panel-header">
+              <div>
+                <span className="admin-panel-kicker">{isIssue ? 'Incidencia' : 'Cancelación'}</span>
+                <h2>{record.sellerOrder.number} · {record.affiliate.publicName}</h2>
+              </div>
+              <span className="admin-badge">{label(record.status)}</span>
+            </div>
+            <div className="admin-panel-body affiliate-admin-section-stack">
+              <p>{record.reason}</p>
+              <p className="form-hint">Creado: {date(record.createdAt)}</p>
+              {(record.status === 'OPEN' || record.status === 'REQUESTED') && (
+                <div className="affiliate-admin-actions-row">
+                  <Button variant="secondary" onClick={() => openResolution(record)}>{isIssue ? 'Resolver incidencia' : 'Decidir cancelación'}</Button>
+                </div>
+              )}
+            </div>
+          </section>
+        )}
+        <ResolutionDialog isIssue={isIssue} resolution={resolution} note={note} setNote={setNote} decision={decision} setDecision={setDecision} refundAmountMinor={refundAmountMinor} setRefundAmountMinor={setRefundAmountMinor} externalReference={externalReference} setExternalReference={setExternalReference} resolve={resolve} onClose={() => setResolution(null)} />
+      </Shell>
+    );
+  }
+  return (
+    <Shell
+      active={section}
+      title={isIssue ? 'Incidencias' : 'Cancelaciones'}
+      description={isIssue ? 'Cola abierta e historial de reclamos, con resolución contable y operativa completa.' : 'Solicitudes de cancelación versionadas con motivo obligatorio y resolución auditada.'}
+      action={<Button variant="secondary" onClick={() => void query.refetch()} disabled={query.isFetching}><RefreshCw size={16} />Actualizar</Button>}
+    >
+      <section className="admin-panel">
+        <div className="admin-panel-header">
+          <div>
+            <span className="admin-panel-kicker">Cola operativa</span>
+            <h2>{isIssue ? 'Incidencias abiertas e historial' : 'Solicitudes recibidas'}</h2>
+          </div>
+          {!query.isLoading && !query.isError ? <span className="admin-count-badge">{query.data.items.length}</span> : null}
+        </div>
+        {query.isLoading ? <Feedback>Cargando…</Feedback> : query.isError ? <Feedback error>{adminErrorMessage(query.error)}</Feedback> : (
+          <div className="admin-panel-body">
+            <ul className="admin-list">
+              {query.data.items.map((item) => (
+                <li key={item.id}>
+                  <div className="admin-list-row">
+                    <Link href={`/admin/affiliates/${section}/${item.id}`}>
+                      <strong>{item.sellerOrder.number} · {item.affiliate.publicName}</strong>
+                      <span>{item.reason}</span>
+                      <small>{date(item.createdAt)} · {label(item.status)}</small>
+                    </Link>
+                    {item.status === 'OPEN' || item.status === 'REQUESTED' ? (
+                      <div className="admin-row-actions">
+                        <Button variant="secondary" onClick={() => openResolution(item)}>{isIssue ? 'Resolver' : 'Decidir'}</Button>
+                      </div>
+                    ) : null}
+                  </div>
+                </li>
+              ))}
+            </ul>
+            {query.data.items.length === 0 && <p className="admin-empty-copy">No hay elementos en esta cola.</p>}
+          </div>
+        )}
+      </section>
+      <ResolutionDialog isIssue={isIssue} resolution={resolution} note={note} setNote={setNote} decision={decision} setDecision={setDecision} refundAmountMinor={refundAmountMinor} setRefundAmountMinor={setRefundAmountMinor} externalReference={externalReference} setExternalReference={setExternalReference} resolve={resolve} onClose={() => setResolution(null)} />
+    </Shell>
+  );
 }
 
 function ResolutionDialog({ isIssue, resolution, note, setNote, decision, setDecision, refundAmountMinor, setRefundAmountMinor, externalReference, setExternalReference, resolve, onClose }: { isIssue: boolean; resolution: { id: string; version: number; kind: 'issue' | 'cancellation' } | null; note: string; setNote: (value: string) => void; decision: string; setDecision: (value: string) => void; refundAmountMinor: string; setRefundAmountMinor: (value: string) => void; externalReference: string; setExternalReference: (value: string) => void; resolve: { isPending: boolean; mutate: (input: { id: string; version: number; kind: 'issue' | 'cancellation'; decision: string; note: string; refundAmountMinor?: string; externalReference?: string }) => void }; onClose: () => void }) {
@@ -614,7 +1019,41 @@ function PayoutsLegacy({ id }: { id?: string }) {
   const reveal = useMutation({ mutationFn: (payoutId: string) => adminFetch<{ destination: string; expiresInSeconds: number }>(`/admin/affiliates/payouts/${payoutId}/reveal-destination`, { method: 'POST', body: JSON.stringify({}) }).then(payload), onSuccess: (result) => { setRevealedDestination(result.destination); toast.success(`Destino revelado por ${result.expiresInSeconds} segundos`); }, onError: (error) => toast.error(adminErrorMessage(error)) });
   useEffect(() => { if (!revealedDestination) return; const timer = window.setTimeout(() => setRevealedDestination(null), 60_000); return () => window.clearTimeout(timer); }, [revealedDestination]);
   if (id) return <Shell active="payouts" title="Detalle de retiro" description="Destino enmascarado, revelado controlado, referencia externa y movimientos reservados." action={<Link className="button button-secondary" href="/admin/affiliates/payouts"><ArrowLeft size={16} />Volver</Link>}>{detail.isLoading ? <Feedback>Cargando…</Feedback> : detail.isError || !detail.data ? <Feedback error>{detail.error ? adminErrorMessage(detail.error) : 'No encontrado'}</Feedback> : <section className="admin-panel"><div className="admin-panel-body"><h2>{detail.data.payout.affiliate.publicName} · {money(detail.data.payout.amountMinor)}</h2><p>Estado: {label(detail.data.payout.status)} · Destino terminado en {detail.data.payout.destinationLast4 ?? '—'}</p><div className="admin-row-actions"><Button variant="ghost" onClick={() => reveal.mutate(detail.data!.payout.id)} disabled={reveal.isPending || !detail.data.payout.destinationLast4}><Eye size={15} />Revelar destino</Button>{revealedDestination && <strong className="admin-sensitive-value">{revealedDestination}</strong>}</div><p>Referencia registrada: {detail.data.payout.externalReference ?? '—'}</p><TextField label="Referencia externa del pago" value={externalReference} onChange={(event) => setExternalReference(event.target.value)} placeholder="Transferencia-2026-001" required /><div className="admin-row-actions">{detail.data.payout.status === 'REQUESTED' && <Button onClick={() => process.mutate({ row: detail.data.payout, next: 'PROCESSING' })} disabled={process.isPending || externalReference.trim().length < 2}>Pasar a procesando</Button>}{detail.data.payout.status === 'PROCESSING' && <><Button onClick={() => process.mutate({ row: detail.data.payout, next: 'PAID' })} disabled={process.isPending || externalReference.trim().length < 2}>Marcar pagado</Button><Button variant="danger" onClick={() => process.mutate({ row: detail.data.payout, next: 'REJECTED' })} disabled={process.isPending || externalReference.trim().length < 2}>Rechazar</Button></>}</div><h3>Movimientos</h3>{detail.data.ledger.map((entry) => <div className="admin-detail-line" key={entry.id}><span>{entry.bucket} · {entry.type}</span><strong>{money(entry.amountMinor)}</strong></div>)}</div></section>}</Shell>;
-  return <Shell active="payouts" title="Retiros" description="Solicitudes con destino enmascarado y flujo en dos pasos: procesando y pagado o rechazado."><section className="admin-panel"><div className="admin-panel-header"><h2>Historial de retiros</h2><select aria-label="Filtrar retiros" value={status} onChange={(event) => setStatus(event.target.value)}><option value="">Todos</option>{['REQUESTED', 'PROCESSING', 'PAID', 'REJECTED'].map((value) => <option key={value} value={value}>{label(value)}</option>)}</select></div>{query.isLoading ? <Feedback>Cargando retiros…</Feedback> : query.isError ? <Feedback error>{adminErrorMessage(query.error)}</Feedback> : <div className="admin-panel-body"><ul className="admin-list">{query.data.items.map((row) => <li key={row.id}><div className="admin-list-row"><Link href={`/admin/affiliates/payouts/${row.id}`}><strong>{row.affiliate.publicName} · {money(row.amountMinor)}</strong><span>Destino terminado en {row.destinationLast4 ?? '—'} · {date(row.createdAt)}</span><small>{label(row.status)}</small></Link><div className="admin-row-actions"><Link className="button button-ghost" href={`/admin/affiliates/payouts/${row.id}`}>Ver detalle</Link></div></div></li>)}</ul>{query.data.items.length === 0 && <p className="admin-empty-copy">No hay retiros para este filtro.</p>}</div>}</section></Shell>;
+  return <Shell active="payouts" title="Retiros" description="Solicitudes con destino enmascarado y flujo en dos pasos: procesando y pagado o rechazado." action={<Button variant="secondary" onClick={() => void query.refetch()} disabled={query.isFetching}><RefreshCw size={16} />Actualizar</Button>}>
+    <section className="admin-panel">
+      <div className="admin-panel-header">
+        <div>
+          <span className="admin-panel-kicker">Finanzas</span>
+          <h2>Historial de retiros</h2>
+        </div>
+        <select aria-label="Filtrar retiros" value={status} onChange={(event) => setStatus(event.target.value)}>
+          <option value="">Todos</option>
+          {['REQUESTED', 'PROCESSING', 'PAID', 'REJECTED'].map((value) => <option key={value} value={value}>{label(value)}</option>)}
+        </select>
+      </div>
+      {query.isLoading ? <Feedback>Cargando retiros…</Feedback> : query.isError ? <Feedback error>{adminErrorMessage(query.error)}</Feedback> : (
+        <div className="admin-panel-body">
+          <ul className="admin-list">
+            {query.data.items.map((row) => (
+              <li key={row.id}>
+                <div className="admin-list-row">
+                  <Link href={`/admin/affiliates/payouts/${row.id}`}>
+                    <strong>{row.affiliate.publicName} · {money(row.amountMinor)}</strong>
+                    <span>Destino terminado en {row.destinationLast4 ?? '—'} · {date(row.createdAt)}</span>
+                    <small>{label(row.status)}</small>
+                  </Link>
+                  <div className="admin-row-actions">
+                    <Link className="button button-ghost" href={`/admin/affiliates/payouts/${row.id}`}>Ver detalle</Link>
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ul>
+          {query.data.items.length === 0 && <p className="admin-empty-copy">No hay retiros para este filtro.</p>}
+        </div>
+      )}
+    </section>
+  </Shell>;
 }
 
 function Settings() {

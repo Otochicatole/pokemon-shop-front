@@ -33,7 +33,7 @@ export const notificationSchema = z.object({
   message: z.string(),
   readAt: z.string().nullable(),
   createdAt: z.string(),
-  reference: notificationReferenceSchema,
+  reference: notificationReferenceSchema.nullable(),
 });
 
 export const notificationListEnvelopeSchema = z.object({

@@ -183,26 +183,86 @@
 .affiliate-admin-selected-user small { margin-top: 5px; color: var(--muted); font: 10px ui-monospace, SFMono-Regular, Consolas, monospace; overflow-wrap: anywhere; }
 .affiliate-admin-user-change { align-self: start; border: 0; background: transparent; color: var(--cyan); font: 700 12px/1.4 'Nunito', var(--font-geist), Arial, sans-serif; text-transform: uppercase; cursor: pointer; }
 .affiliate-admin-user-change:hover { color: var(--accent); }
-.affiliate-admin-layout { display: grid; grid-template-columns: minmax(190px, 220px) minmax(0, 1fr); align-items: start; gap: 20px; }
-.affiliate-admin-content { min-width: 0; }
-.affiliate-admin-navigation { position: sticky; top: 20px; padding: 14px; border: 2px solid var(--line); background: rgba(10, 15, 21, .97); box-shadow: 5px 5px 0 #05070a; }
-.affiliate-admin-navigation-heading { display: grid; gap: 4px; padding: 4px 8px 14px; border-bottom: 2px solid var(--line); }
+.affiliate-admin-layout { display: grid; grid-template-columns: minmax(200px, 240px) minmax(0, 1fr); align-items: start; gap: 24px; }
+.affiliate-admin-content { min-width: 0; display: grid; gap: 20px; align-content: start; }
+.affiliate-admin-content > .admin-metric-grid,
+.affiliate-admin-content > .admin-affiliate-dashboard .admin-metric-grid { margin-bottom: 0; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+.affiliate-admin-content > .admin-tabs { margin: 0; }
+.affiliate-admin-content > .admin-tabs-content { padding-top: 0; }
+.affiliate-admin-content > .admin-tabs-content[hidden] { display: none; }
+.affiliate-admin-content > .admin-feedback { margin: 0; }
+.affiliate-admin-content .admin-panel-header { min-height: 64px; padding: 14px 18px; }
+.affiliate-admin-content .admin-panel-header > div:first-child { min-width: 0; }
+.affiliate-admin-content .admin-panel-header > div:first-child .admin-panel-kicker { margin-bottom: 4px; }
+.affiliate-admin-navigation { position: sticky; top: 24px; padding: 16px; border: 2px solid var(--line); background: rgba(10, 15, 21, .97); box-shadow: 5px 5px 0 #05070a; }
+.affiliate-admin-navigation-heading { display: grid; gap: 6px; padding: 6px 10px 16px; border-bottom: 2px solid var(--line); }
 .affiliate-admin-navigation-heading .admin-panel-kicker { margin-bottom: 0; }
 .affiliate-admin-navigation-heading strong { color: var(--ink); font: 700 13px/1.4 'Nunito', var(--font-geist), Arial, sans-serif; text-transform: uppercase; }
-.affiliate-admin-navigation nav { display: grid; gap: 4px; padding-top: 10px; }
-.affiliate-admin-navigation a { display: flex; align-items: center; min-height: 40px; padding: 0 10px; border: 1px solid transparent; color: var(--muted); font: 700 12px/1.4 'Nunito', var(--font-geist), Arial, sans-serif; text-transform: uppercase; }
+.affiliate-admin-navigation nav { display: grid; gap: 6px; padding-top: 12px; }
+.affiliate-admin-navigation a { display: flex; align-items: center; min-height: 42px; padding: 0 12px; border: 1px solid transparent; color: var(--muted); font: 700 12px/1.4 'Nunito', var(--font-geist), Arial, sans-serif; text-transform: uppercase; transition: border-color .16s, background .16s, color .16s; }
 .affiliate-admin-navigation a:hover, .affiliate-admin-navigation a.is-active { border-color: var(--accent); background: rgba(255, 213, 47, .08); color: var(--accent); }
+.affiliate-admin-toolbar { margin: 0; }
+.affiliate-admin-toolbar.admin-toolbar { margin-bottom: 0; }
+.affiliate-admin-panel-filter { display: inline-flex; align-items: center; gap: 10px; }
+.affiliate-admin-panel-filter select,
+.admin-panel-header select {
+  min-height: 40px;
+  min-width: 180px;
+  padding: 0 12px;
+  border: 2px solid var(--line);
+  background: #0b1118;
+  color: var(--ink);
+  font: 700 12px/1.4 'Nunito', var(--font-geist), Arial, sans-serif;
+}
+.affiliate-admin-panel-filter select:focus,
+.admin-panel-header select:focus { outline: 2px solid var(--accent); outline-offset: 2px; }
+.affiliate-admin-content .admin-list li { padding: 0; }
+.affiliate-admin-content .admin-list .admin-list-row { gap: 16px; padding: 16px 4px; }
+.affiliate-admin-content .affiliate-admin-directory-list .affiliate-admin-row,
+.affiliate-admin-content .affiliate-admin-publications-list .affiliate-admin-row { padding: 16px 30px; }
+.affiliate-admin-content .admin-list .admin-list-row > a,
+.affiliate-admin-content .admin-list .admin-list-row > div:first-child { min-width: 0; flex: 1; display: grid; gap: 4px; text-decoration: none; color: inherit; }
+.affiliate-admin-content .admin-list .admin-list-row small { display: block; margin-top: 2px; color: var(--muted); font-size: 12px; }
+.affiliate-admin-content .admin-list .admin-list-row > a:hover strong { color: var(--cyan); }
+.affiliate-admin-content .admin-panel + .admin-panel { margin-top: 0; }
+.affiliate-admin-section-stack { display: grid; gap: 16px; }
+.affiliate-admin-section-stack > h3 { margin: 0; font: 700 13px/1.4 'Nunito', var(--font-geist), Arial, sans-serif; text-transform: uppercase; }
+.affiliate-admin-actions-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.affiliate-admin-order-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+.affiliate-admin-order-metrics > div {
+  display: grid;
+  gap: 8px;
+  min-height: 96px;
+  padding: 16px;
+  border: 2px solid var(--line);
+  background: rgba(10, 15, 21, .72);
+  box-shadow: 3px 3px 0 #05070a;
+}
+.affiliate-admin-order-metrics > div > span {
+  color: var(--muted);
+  font: 700 11px/1.4 'Nunito', var(--font-geist), Arial, sans-serif;
+  text-transform: uppercase;
+}
+.affiliate-admin-order-metrics > div > strong {
+  margin-top: auto;
+  color: var(--ink);
+  font: 800 18px/1.3 'Nunito', var(--font-geist), Arial, sans-serif;
+}
 .affiliate-admin-settings-panel { overflow: hidden; }
 .affiliate-admin-settings-header { min-height: 76px; padding: 20px 24px; }
 .affiliate-admin-settings-header h2 { font-size: 13px; }
 .affiliate-admin-settings-form { display: grid; gap: 26px; padding: 28px; }
 .affiliate-admin-settings-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; max-width: 980px; }
-.affiliate-admin-setting-card { display: grid; gap: 13px; margin-top: 12px; padding: 20px; border: 2px solid var(--line); background: rgba(10, 15, 21, .72); }
+.affiliate-admin-setting-card { display: grid; gap: 13px; margin-top: 0; padding: 20px; border: 2px solid var(--line); background: rgba(10, 15, 21, .72); }
 .affiliate-admin-setting-description { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.55; }
-.affiliate-admin-settings-note { display: grid; gap: 7px; max-width: 980px; margin-top: 4px; padding: 16px 18px; border: 2px solid rgba(83, 190, 229, .4); background: rgba(83, 190, 229, .08); }
+.affiliate-admin-settings-note { display: grid; gap: 7px; max-width: 980px; margin-top: 0; padding: 16px 18px; border: 2px solid rgba(83, 190, 229, .4); background: rgba(83, 190, 229, .08); }
 .affiliate-admin-settings-note strong { color: var(--cyan); font: 700 12px/1.4 'Nunito', var(--font-geist), Arial, sans-serif; text-transform: uppercase; }
 .affiliate-admin-settings-note p { margin: 0; color: #c8d6dd; font-size: 13px; line-height: 1.55; }
-.affiliate-admin-settings-actions { display: flex; align-items: center; justify-content: space-between; gap: 20px; max-width: 980px; margin-top: 4px; padding-top: 22px; border-top: 2px solid var(--line); }
+.affiliate-admin-settings-actions { display: flex; align-items: center; justify-content: space-between; gap: 20px; max-width: 980px; margin-top: 0; padding-top: 22px; border-top: 2px solid var(--line); }
 .affiliate-admin-settings-actions > span { color: var(--muted); font-size: 12px; }
 .affiliate-admin-settings-actions .button { min-width: 0; }
 .admin-panel-kicker { display: block; margin-bottom: 8px; color: var(--accent); font: 700 11px/1.4 'Nunito', var(--font-geist), Arial, sans-serif; letter-spacing: .05em; text-transform: uppercase; }
@@ -678,10 +738,13 @@
   .admin-stats-compact { grid-template-columns: 1fr; }
   .supplier-toolbar,
   .news-toolbar { grid-template-columns: 1fr; }
-  .affiliate-admin-layout { grid-template-columns: 1fr; gap: 14px; }
-  .affiliate-admin-navigation { position: static; padding: 10px; }
-  .affiliate-admin-navigation nav { display: flex; overflow-x: auto; padding-top: 8px; }
+  .affiliate-admin-layout { grid-template-columns: 1fr; gap: 18px; }
+  .affiliate-admin-content { gap: 18px; }
+  .affiliate-admin-navigation { position: static; padding: 12px; }
+  .affiliate-admin-navigation-heading { padding: 4px 8px 12px; }
+  .affiliate-admin-navigation nav { display: flex; overflow-x: auto; gap: 4px; padding-top: 10px; }
   .affiliate-admin-navigation a { flex: 0 0 auto; white-space: nowrap; }
+  .affiliate-admin-order-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .affiliate-admin-settings-fields { grid-template-columns: 1fr; max-width: none; }
   .affiliate-admin-settings-note,
   .affiliate-admin-settings-actions { max-width: none; }
@@ -696,12 +759,17 @@
   .admin-page-actions .button { flex: 1; }
   .affiliate-admin-row { align-items: flex-start; flex-direction: column; }
   .affiliate-admin-row .admin-row-actions { width: 100%; justify-content: flex-start; }
+  .affiliate-admin-content { gap: 16px; }
+  .affiliate-admin-order-metrics { grid-template-columns: 1fr; }
   .affiliate-admin-settings-form { gap: 20px; padding: 18px; }
   .affiliate-admin-settings-header { padding: 18px; }
-  .affiliate-admin-setting-card { margin-top: 8px; padding: 16px; }
+  .affiliate-admin-setting-card { padding: 16px; }
   .affiliate-admin-settings-actions { align-items: stretch; flex-direction: column; gap: 12px; }
   .affiliate-admin-settings-actions .button { width: 100%; }
-  .affiliate-admin-publications-list .affiliate-admin-row { padding-inline: 30px; }
+  .admin-panel-header select { width: 100%; min-width: 0; }
+  .affiliate-admin-publications-list .affiliate-admin-row { padding-inline: 18px; }
+  .affiliate-admin-content .affiliate-admin-directory-list .affiliate-admin-row,
+  .affiliate-admin-content .affiliate-admin-publications-list .affiliate-admin-row { padding: 14px 18px; }
   .affiliate-admin-preview { grid-template-columns: 1fr; }
   .affiliate-admin-preview-image { max-height: 360px; }
   .affiliate-admin-preview-data { gap: 0 12px; }
@@ -796,8 +864,8 @@
   min-height: 120px;
   display: grid;
   place-items: center;
-  margin: 16px;
-  padding: 24px;
+  margin: 0;
+  padding: 28px 24px;
   border: 2px dashed var(--line-strong);
   color: var(--muted);
   text-align: center;
@@ -814,7 +882,7 @@
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 14px;
-  margin-bottom: 18px;
+  margin-bottom: 0;
 }
 .admin-metric-card {
   min-height: 124px;
@@ -845,37 +913,53 @@
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: end;
   gap: 12px;
-  margin: 16px 16px 0;
+  margin: 0;
 }
-.admin-affiliate-dashboard { display: grid; gap: 18px; }
+.admin-panel > .admin-inline-filter {
+  padding: 16px 18px;
+  border-bottom: 2px solid var(--line);
+}
+.admin-panel > .admin-inline-filter:last-child { border-bottom: 0; }
+.admin-panel-body > .admin-inline-filter {
+  padding: 0;
+  border: 0;
+}
+.admin-affiliate-dashboard { display: grid; gap: 20px; }
 .admin-affiliate-queue-links {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
 }
 .admin-affiliate-queue-links a {
-  min-height: 72px;
-  padding: 14px;
+  min-height: 88px;
+  padding: 16px;
   display: grid;
-  gap: 6px;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 14px;
   border: 2px solid var(--line);
   background: #0b1118;
+  text-decoration: none;
   transition: border-color .16s, transform .16s, box-shadow .16s;
 }
+.admin-affiliate-queue-links a > svg { color: var(--cyan); flex-shrink: 0; }
 .admin-affiliate-queue-links a:hover {
   border-color: var(--cyan);
   transform: translate(-2px, -2px);
   box-shadow: 4px 4px 0 #05070a;
 }
-.admin-affiliate-queue-links strong { font: 700 13px/1.4 'Nunito', var(--font-geist), Arial, sans-serif; text-transform: uppercase; }
-.admin-affiliate-queue-links span { color: var(--muted); font-size: 13px; }
+.admin-affiliate-queue-links a > span { display: grid; gap: 6px; min-width: 0; }
+.admin-affiliate-queue-links strong { color: var(--ink); font: 700 13px/1.4 'Nunito', var(--font-geist), Arial, sans-serif; text-transform: uppercase; }
+.admin-affiliate-queue-links small { display: block; color: var(--muted); font-size: 13px; line-height: 1.45; font-weight: 400; text-transform: none; }
 .admin-two-column {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
+  gap: 20px;
 }
-.admin-detail-link { color: var(--cyan); font-weight: 800; }
-.admin-detail-link:hover { color: var(--accent); }
+.admin-detail-link { display: grid; gap: 4px; color: inherit; text-decoration: none; }
+.admin-detail-link strong { color: var(--cyan); font-weight: 800; }
+.admin-detail-link span { color: var(--muted); font-size: 13px; }
+.admin-detail-link:hover strong { color: var(--accent); }
 .admin-detail-line {
   display: flex;
   justify-content: space-between;
@@ -888,7 +972,7 @@
 .admin-detail-line strong { color: var(--ink); }
 .admin-row-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 
-.admin-payout-detail { display: grid; gap: 18px; }
+.admin-payout-detail { display: grid; gap: 20px; }
 .admin-payout-hero {
   padding: 24px;
   border: 2px solid var(--line-strong);
@@ -980,11 +1064,11 @@
 .admin-payout-columns {
   display: grid;
   grid-template-columns: minmax(0, 1.4fr) minmax(260px, .7fr);
-  gap: 16px;
+  gap: 20px;
   align-items: start;
 }
 .admin-payout-primary,
-.admin-payout-aside { display: grid; gap: 16px; }
+.admin-payout-aside { display: grid; gap: 20px; }
 .admin-payout-card {
   padding: 20px;
   border: 2px solid var(--line);
@@ -1081,7 +1165,7 @@
   font-size: 13px;
 }
 
-.admin-listing-detail { display: grid; gap: 18px; }
+.admin-listing-detail { display: grid; gap: 20px; }
 .admin-listing-hero {
   padding: 22px;
   border: 2px solid var(--line);
@@ -1169,7 +1253,7 @@
 .admin-listing-columns {
   display: grid;
   grid-template-columns: minmax(0, 1.5fr) minmax(280px, .75fr);
-  gap: 18px;
+  gap: 20px;
   align-items: start;
 }
 .admin-listing-primary,
@@ -1223,6 +1307,6 @@
   .admin-payout-summary,
   .admin-listing-summary,
   .admin-payout-meta { grid-template-columns: 1fr; }
-  .admin-inline-filter { grid-template-columns: 1fr; margin-inline: 12px; }
+  .admin-inline-filter { grid-template-columns: 1fr; }
   .admin-payout-reveal { flex-direction: column; align-items: stretch; }
 }

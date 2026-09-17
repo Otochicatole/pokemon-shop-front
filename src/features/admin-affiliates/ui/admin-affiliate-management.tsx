@@ -101,22 +101,102 @@ export function AdminAffiliateManagement() {
     <div className="affiliate-admin-layout">
       <AffiliateAdminNavigation active="overview" />
       <div className="affiliate-admin-content">
-        <AdminTabs id="affiliate-tabs" label="Gestión de afiliados" active={tab} onChange={(value) => setTab(value as AffiliateAdminTab)} tabs={[{ id: 'affiliates', label: 'Afiliados', count: rows.length }, { id: 'listings', label: 'Publicaciones', count: pending.length }]} />
+        <AdminTabs
+          id="affiliate-tabs"
+          label="Gestión de afiliados"
+          active={tab}
+          onChange={(value) => setTab(value as AffiliateAdminTab)}
+          tabs={[
+            { id: 'affiliates', label: 'Afiliados', count: rows.length },
+            { id: 'listings', label: 'Publicaciones', count: pending.length },
+          ]}
+        />
 
-    <AdminTabPanel tabsId="affiliate-tabs" tabId="affiliates" active={tab === 'affiliates'} className="admin-tabs-content">
-      <section className="admin-panel affiliate-admin-directory">
-        <div className="admin-panel-header"><div><span className="admin-panel-kicker">Vendedores habilitados</span><h2>Lista de afiliados</h2></div><span className="admin-count-badge">{rows.length}</span></div>
-        {affiliates.isLoading ? <div className="admin-loading">Cargando afiliados</div> : affiliates.isError ? <div className="affiliate-admin-inline-error" role="alert">{adminErrorMessage(affiliates.error)}</div> : <div className="admin-panel-body">{rows.length ? <ul className="admin-list affiliate-admin-directory-list">{rows.map((row) => <li key={row.id}><div className="admin-list-row affiliate-admin-row"><div><strong>{row.publicName}</strong><span>{row.user?.name ? `${row.user.name} · ` : ''}{row.user?.email ?? row.id}</span><small>{row.counts?.listings ?? 0} publicaciones · {row.counts?.sellerOrders ?? 0} ventas</small></div><div className="admin-row-actions"><span className={`admin-badge ${row.status === 'ACTIVE' ? 'admin-badge-green' : 'admin-badge-red'}`}>{row.status === 'ACTIVE' ? 'Activo' : 'Suspendido'}</span><Button variant="ghost" onClick={() => changeStatus.mutate({ id: row.id, status: row.status === 'ACTIVE' ? 'SUSPENDED' : 'ACTIVE', version: row.version })} disabled={busy}>{row.status === 'ACTIVE' ? 'Suspender' : 'Reactivar'}</Button></div></div></li>)}</ul> : <p className="admin-empty-copy">No hay afiliados registrados.</p>}</div>}
-      </section>
-    </AdminTabPanel>
+        <AdminTabPanel tabsId="affiliate-tabs" tabId="affiliates" active={tab === 'affiliates'} className="admin-tabs-content">
+          <section className="admin-panel affiliate-admin-directory">
+            <div className="admin-panel-header">
+              <div>
+                <span className="admin-panel-kicker">Vendedores habilitados</span>
+                <h2>Lista de afiliados</h2>
+              </div>
+              <span className="admin-count-badge">{rows.length}</span>
+            </div>
+            {affiliates.isLoading ? (
+              <div className="admin-loading">Cargando afiliados</div>
+            ) : affiliates.isError ? (
+              <div className="affiliate-admin-inline-error" role="alert">{adminErrorMessage(affiliates.error)}</div>
+            ) : (
+              <div className="admin-panel-body">
+                {rows.length ? (
+                  <ul className="admin-list affiliate-admin-directory-list">
+                    {rows.map((row) => (
+                      <li key={row.id}>
+                        <div className="admin-list-row affiliate-admin-row">
+                          <div>
+                            <strong>{row.publicName}</strong>
+                            <span>{row.user?.name ? `${row.user.name} · ` : ''}{row.user?.email ?? row.id}</span>
+                            <small>{row.counts?.listings ?? 0} publicaciones · {row.counts?.sellerOrders ?? 0} ventas</small>
+                          </div>
+                          <div className="admin-row-actions">
+                            <span className={`admin-badge ${row.status === 'ACTIVE' ? 'admin-badge-green' : 'admin-badge-red'}`}>{row.status === 'ACTIVE' ? 'Activo' : 'Suspendido'}</span>
+                            <Button variant="ghost" onClick={() => changeStatus.mutate({ id: row.id, status: row.status === 'ACTIVE' ? 'SUSPENDED' : 'ACTIVE', version: row.version })} disabled={busy}>
+                              {row.status === 'ACTIVE' ? 'Suspender' : 'Reactivar'}
+                            </Button>
+                          </div>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="admin-empty-copy">No hay afiliados registrados.</p>
+                )}
+              </div>
+            )}
+          </section>
+        </AdminTabPanel>
 
-    <AdminTabPanel tabsId="affiliate-tabs" tabId="listings" active={tab === 'listings'} className="admin-tabs-content">
-      <section className="admin-panel affiliate-admin-publications">
-        <div className="admin-panel-header"><div><span className="admin-panel-kicker">Control editorial</span><h2>Publicaciones pendientes</h2></div><span className="admin-count-badge">{pending.length}</span></div>
-        {listings.isLoading ? <div className="admin-loading">Cargando publicaciones</div> : listings.isError ? <div className="affiliate-admin-inline-error" role="alert">{adminErrorMessage(listings.error)}</div> : <div className="admin-panel-body">{pending.length ? <ul className="admin-list affiliate-admin-publications-list">{pending.map((row) => <li key={row.id}><div className="admin-list-row affiliate-admin-row"><div><button type="button" className="affiliate-admin-publication-name" onClick={() => openPreview(row)}><strong>{row.product.name}</strong><span>{row.affiliate?.publicName ?? 'Afiliado'} · Stock disponible {row.product.inventory?.available ?? 0} · {row.product.images.length} imágenes</span></button></div><div className="admin-row-actions"><Button variant="ghost" onClick={() => openPreview(row)} disabled={busy}><Eye size={15} />Vista previa</Button><Button variant="secondary" onClick={() => review.mutate({ id: row.id, version: row.product.version, decision: 'APPROVED' })} disabled={busy}><Check size={15} />Aprobar</Button><Button variant="ghost" onClick={() => { setReviewNote(''); setReviewTarget({ id: row.id, version: row.product.version, decision: 'CHANGES_REQUESTED' }); }} disabled={busy}><X size={15} />Pedir cambios</Button></div></div></li>)}</ul> : <p className="admin-empty-copy">No hay publicaciones esperando revisión.</p>}</div>}
-      </section>
-    </AdminTabPanel>
-
+        <AdminTabPanel tabsId="affiliate-tabs" tabId="listings" active={tab === 'listings'} className="admin-tabs-content">
+          <section className="admin-panel affiliate-admin-publications">
+            <div className="admin-panel-header">
+              <div>
+                <span className="admin-panel-kicker">Control editorial</span>
+                <h2>Publicaciones pendientes</h2>
+              </div>
+              <span className="admin-count-badge">{pending.length}</span>
+            </div>
+            {listings.isLoading ? (
+              <div className="admin-loading">Cargando publicaciones</div>
+            ) : listings.isError ? (
+              <div className="affiliate-admin-inline-error" role="alert">{adminErrorMessage(listings.error)}</div>
+            ) : (
+              <div className="admin-panel-body">
+                {pending.length ? (
+                  <ul className="admin-list affiliate-admin-publications-list">
+                    {pending.map((row) => (
+                      <li key={row.id}>
+                        <div className="admin-list-row affiliate-admin-row">
+                          <div>
+                            <button type="button" className="affiliate-admin-publication-name" onClick={() => openPreview(row)}>
+                              <strong>{row.product.name}</strong>
+                              <span>{row.affiliate?.publicName ?? 'Afiliado'} · Stock disponible {row.product.inventory?.available ?? 0} · {row.product.images.length} imágenes</span>
+                            </button>
+                          </div>
+                          <div className="admin-row-actions">
+                            <Button variant="ghost" onClick={() => openPreview(row)} disabled={busy}><Eye size={15} />Vista previa</Button>
+                            <Button variant="secondary" onClick={() => review.mutate({ id: row.id, version: row.product.version, decision: 'APPROVED' })} disabled={busy}><Check size={15} />Aprobar</Button>
+                            <Button variant="ghost" onClick={() => { setReviewNote(''); setReviewTarget({ id: row.id, version: row.product.version, decision: 'CHANGES_REQUESTED' }); }} disabled={busy}><X size={15} />Pedir cambios</Button>
+                          </div>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="admin-empty-copy">No hay publicaciones esperando revisión.</p>
+                )}
+              </div>
+            )}
+          </section>
+        </AdminTabPanel>
       </div>
     </div>
 

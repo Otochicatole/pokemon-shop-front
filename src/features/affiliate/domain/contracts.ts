@@ -1,11 +1,13 @@
 import { z } from 'zod';
+import { pokemonCardSchema, pokemonTypeSchema, productConditionSchema, productKindSchema } from '@/shared/api/contracts';
 
 export const affiliateStatusSchema = z.enum(['ACTIVE', 'SUSPENDED']);
 export const listingStatusSchema = z.enum(['DRAFT', 'PENDING_REVIEW', 'CHANGES_REQUESTED', 'REJECTED', 'APPROVED']);
 export const affiliateProductSchema = z.object({
-  id: z.string(), sku: z.string(), slug: z.string(), name: z.string(), description: z.string(), kind: z.string(), stockMode: z.string(),
+  id: z.string(), sku: z.string(), slug: z.string(), name: z.string(), description: z.string(), kind: productKindSchema, stockMode: z.enum(['UNIQUE', 'QUANTITY']),
   priceMinor: z.string(), status: z.string(), version: z.number(),
   inventory: z.object({ onHand: z.number(), reserved: z.number(), available: z.number(), version: z.number() }).nullable(),
+  pokemonCard: pokemonCardSchema.nullable().optional(),
   images: z.array(z.object({ id: z.string(), fileId: z.string(), url: z.string(), altText: z.string().nullable(), sortOrder: z.number() })),
   listing: z.object({ id: z.string(), status: listingStatusSchema, reviewNote: z.string().nullable(), submittedAt: z.string().nullable(), reviewedAt: z.string().nullable() }).nullable(),
   createdAt: z.string(), updatedAt: z.string(),
@@ -25,8 +27,60 @@ export const affiliateShippingRateSchema = z.object({ id: z.string(), name: z.st
 export const affiliateShippingZoneSchema = z.object({ id: z.string(), name: z.string(), active: z.boolean(), provinces: z.array(z.object({ id: z.string(), province: z.string() }).passthrough()), rates: z.array(affiliateShippingRateSchema) }).passthrough();
 export const affiliatePickupPointSchema = z.object({ id: z.string(), name: z.string(), address: z.string(), active: z.boolean() }).passthrough();
 export const affiliateLogisticsSchema = z.object({ zones: z.array(affiliateShippingZoneSchema), pickupPoints: z.array(affiliatePickupPointSchema) });
+
+export const affiliateListingEditorSchema = z.object({
+  name: z.string().trim().min(2, 'El nombre es obligatorio').max(180),
+  description: z.string().max(5000),
+  kind: productKindSchema,
+  stockMode: z.enum(['UNIQUE', 'QUANTITY']),
+  price: z.string().trim().regex(/^\d+(?:[.,]\d{1,2})?$/, 'Ingresá un precio válido'),
+  stock: z.number().int().min(0).max(1_000_000),
+  pokemonType: pokemonTypeSchema.optional(),
+  setName: z.string().max(120).optional(),
+  setCode: z.string().max(40).optional(),
+  cardNumber: z.string().max(30).optional(),
+  rarity: z.string().max(80).optional(),
+  language: z.string().max(40).optional(),
+  condition: productConditionSchema.optional(),
+  finish: z.string().max(50).optional(),
+  edition: z.string().max(80).optional(),
+  gradingCompany: z.string().max(80).optional(),
+  grade: z.string().max(30).optional(),
+  certificationNumber: z.string().max(100).optional(),
+}).superRefine((value, context) => {
+  const normalized = value.price.replace(',', '.');
+  const [integer, fraction = ''] = normalized.split('.');
+  const priceMinor = BigInt(integer || '0') * 100n + BigInt((fraction + '00').slice(0, 2));
+  if (priceMinor <= 0n) {
+    context.addIssue({ code: 'custom', path: ['price'], message: 'Ingresá un precio mayor a cero' });
+  }
+  if (value.kind === 'SINGLE_CARD') {
+    for (const key of ['setName', 'cardNumber', 'rarity', 'language', 'condition'] as const) {
+      if (!value[key]) context.addIssue({ code: 'custom', path: [key], message: 'Campo obligatorio para cartas' });
+    }
+  }
+  if (value.stockMode === 'UNIQUE' && value.stock > 1) {
+    context.addIssue({ code: 'custom', path: ['stock'], message: 'Una pieza única admite como máximo una unidad' });
+  }
+});
+
+export const tcgdexCardSummarySchema = z.object({
+  id: z.string(), name: z.string(), localId: z.string(), setCode: z.string(), imageUrl: z.string().url().nullable(),
+  setName: z.string().optional(), rarity: z.string().optional(), category: z.string().optional(), types: z.array(z.string()).optional(),
+  firstEdition: z.boolean().optional(), holo: z.boolean().optional(),
+});
+export const tcgdexCardSchema = tcgdexCardSummarySchema.extend({
+  setName: z.string(), description: z.string(), rarity: z.string(), category: z.string(), types: z.array(z.string()),
+  firstEdition: z.boolean(), holo: z.boolean(), effect: z.string(), language: z.literal('Español'),
+});
+export const tcgdexSearchEnvelopeSchema = z.object({ data: z.array(tcgdexCardSummarySchema), meta: z.record(z.string(), z.unknown()).optional() });
+export const tcgdexCardEnvelopeSchema = z.object({ data: z.object({ card: tcgdexCardSchema }), meta: z.record(z.string(), z.unknown()).optional() });
+
 export type AffiliateProfile = z.infer<typeof affiliateProfileSchema>;
 export type AffiliateListing = z.infer<typeof affiliateListingSchema>;
 export type AffiliateBalance = z.infer<typeof affiliateBalanceSchema>;
 export type AffiliateOrder = z.infer<typeof affiliateOrderSchema>;
 export type AffiliateLogistics = z.infer<typeof affiliateLogisticsSchema>;
+export type AffiliateListingEditorValues = z.infer<typeof affiliateListingEditorSchema>;
+export type TcgDexCardSummary = z.infer<typeof tcgdexCardSummarySchema>;
+export type TcgDexCard = z.infer<typeof tcgdexCardSchema>;

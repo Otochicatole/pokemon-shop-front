@@ -50,6 +50,9 @@ function errorMessage(error: unknown) {
 }
 
 function notificationHref(notification: Notification, role: Role) {
+  if (!notification.reference) {
+    return role === 'admin' ? '/admin' : '/account';
+  }
   switch (notification.reference.kind) {
     case 'ORDER':
       return `${role === 'admin' ? '/admin/orders' : '/account/orders'}/${encodeURIComponent(notification.reference.orderNumber)}`;
