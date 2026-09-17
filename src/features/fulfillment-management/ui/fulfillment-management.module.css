@@ -7,9 +7,17 @@
 
 .adminConfigCard { display: grid; gap: 16px; padding: 18px; border: 2px solid var(--line); background: rgba(16, 22, 29, .97); box-shadow: 5px 5px 0 #05070a; }
 
-.adminConfigCard header { display: flex; align-items: center; gap: 12px; }
+.adminConfigCard header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 
-.adminConfigCard header > div { min-width: 0; flex: 1; }
+.adminConfigCard header > div { min-width: 0; }
+
+.adminCardLead { display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1; }
+
+.adminCardLead > div { min-width: 0; }
+
+.adminCardActions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; margin-left: auto; }
+
+.adminDeleteButton:hover { border-color: var(--warm); color: var(--warm); }
 
 .adminConfigCard h2 { margin: 0; font: 700 13px/1.4 'Nunito', var(--font-geist), Arial, sans-serif; text-transform: uppercase; }
 
