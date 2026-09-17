@@ -134,6 +134,13 @@ button:disabled {
   min-height: calc(100vh - 118px);
 }
 
+@media (max-width: 760px) {
+  .site-main {
+    padding-top: 70px;
+    min-height: calc(100vh - 70px);
+  }
+}
+
 .support-page-container {
   min-height: calc(100dvh - 90px);
   padding: 0 4vw 24px;

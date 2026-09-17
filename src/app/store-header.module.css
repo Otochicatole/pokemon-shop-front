@@ -1,8 +1,17 @@
-/* Sticky must live on this wrapper: a sticky child cannot stick
-   past a parent that only wraps the header height. */
+/* Keep the store chrome pinned on mobile so opening the menu after
+   scroll never loses the header/nav under a body scroll-lock offset. */
 .storeHeader {
   width: 100%;
   position: sticky;
   top: 0;
   z-index: 100;
+}
+
+@media (max-width: 760px) {
+  .storeHeader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+  }
 }
