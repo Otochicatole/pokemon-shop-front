@@ -1,4 +1,5 @@
+import shared from '@/components/admin/admin-shared.module.css';
 
-import styles from './loading.module.css';
-export default function AdminLoading() { return <div className="admin-loading" role="status">Cargando módulo administrativo</div>; }
-
+export default function AdminLoading() {
+  return <div className={shared.adminLoading} role="status">Cargando módulo administrativo</div>;
+}

@@ -11,6 +11,7 @@ import { adminErrorMessage, adminFetch } from '@/shared/admin/client';
 import { AffiliateAdminNavigation, type AffiliateAdminSection } from './affiliate-admin-navigation';
 import styles from './admin-affiliate-operations.module.css';
 
+import shared from '@/components/admin/admin-shared.module.css';
 type Section = AffiliateAdminSection;
 type Page<T> = { items: T[]; page: number; pageSize: number; total: number; totalPages: number };
 type Seller = { id: string; publicName: string; status: 'ACTIVE' | 'SUSPENDED'; version: number; commissionBpsOverride?: number | null; user?: { id: string; email: string; name: string | null }; counts?: { listings: number; sellerOrders: number; issues?: number; payoutRequests?: number } };
@@ -57,10 +58,25 @@ function listingKindLabel(kind?: string) {
   return ({ SINGLE_CARD: 'Carta suelta', SEALED_PRODUCT: 'Producto sellado', ACCESSORY: 'Accesorio' } as Record<string, string>)[kind ?? ''] ?? (kind ? label(kind) : 'Sin tipo');
 }
 function listingStatusClass(status: string) {
-  return `admin-listing-status is-${status.toLowerCase().replaceAll('_', '-')}`;
+  const map: Record<string, string> = {
+    DRAFT: styles.isDraft,
+    PENDING_REVIEW: styles.isPendingReview,
+    CHANGES_REQUESTED: styles.isChangesRequested,
+    REJECTED: styles.isRejected,
+    APPROVED: styles.isApproved,
+  };
+  return [styles.adminListingStatus, map[status] ?? ''].filter(Boolean).join(' ');
 }
 function queryPage<T>(path: string) { return adminFetch<Page<T> | T[]>(path).then((result) => { const value = payload(result); return Array.isArray(value) ? { items: value, page: 1, pageSize: value.length, total: value.length, totalPages: 1 } : value; }); }
-function payoutStatusClass(status: string) { return `admin-payout-status is-${status.toLowerCase()}`; }
+function payoutStatusClass(status: string) {
+  const map: Record<string, string> = {
+    REQUESTED: styles.isRequested,
+    PROCESSING: styles.isProcessing,
+    PAID: styles.isPaid,
+    REJECTED: styles.isRejected,
+  };
+  return [styles.adminPayoutStatus, map[status] ?? ''].filter(Boolean).join(' ');
+}
 function ledgerBucket(value: string) { return ({ AVAILABLE: 'Disponible', RESERVED: 'Reservado', PENDING: 'Pendiente', PAID: 'Pagado' } as Record<string, string>)[value] ?? label(value); }
 function ledgerType(value: string) { return ({ PAYOUT_RESERVED: 'Reserva del retiro', PAYOUT_PAID: 'Retiro pagado', PAYOUT_RELEASED: 'Reserva liberada', SALE_RELEASED: 'Venta liberada' } as Record<string, string>)[value] ?? label(value); }
 
@@ -68,15 +84,15 @@ function Shell({ active, title, description, action, children }: { active: Secti
   return (
     <>
       <AdminPageHeader eyebrow="Marketplace" title={title} description={description} actions={action} />
-      <div className="affiliate-admin-layout">
+      <div className={styles.affiliateAdminLayout}>
         <AffiliateAdminNavigation active={active} />
-        <div className="affiliate-admin-content">{children}</div>
+        <div className={styles.affiliateAdminContent}>{children}</div>
       </div>
     </>
   );
 }
 function Feedback({ children, error = false }: { children: React.ReactNode; error?: boolean }) {
-  return <div className={`admin-feedback ${error ? 'is-error' : ''}`} role={error ? 'alert' : undefined}>{children}</div>;
+  return <div className={`${styles.adminFeedback} ${error ? styles.isError : ''}`} role={error ? 'alert' : undefined}>{children}</div>;
 }
 
 export function AdminAffiliateOperations({ section, id }: { section: Section; id?: string }) {
@@ -100,21 +116,21 @@ function Overview() {
       action={<Button variant="secondary" onClick={() => void query.refetch()} disabled={query.isFetching}><RefreshCw size={16} />Actualizar</Button>}
     >
       {query.isLoading ? <Feedback>Cargando resumen…</Feedback> : query.isError ? <Feedback error>{adminErrorMessage(query.error)}</Feedback> : query.data && (
-        <div className="admin-affiliate-dashboard">
-          <div className="admin-metric-grid">
-            <article className="admin-metric-card"><span>Afiliados</span><strong>{query.data.affiliates}</strong><small>Activos y suspendidos</small></article>
-            <article className="admin-metric-card"><span>Incidencias abiertas</span><strong>{query.data.queues.issues}</strong><small>Requieren resolución</small></article>
-            <article className="admin-metric-card"><span>Cancelaciones</span><strong>{query.data.queues.cancellations}</strong><small>Esperando decisión</small></article>
-            <article className="admin-metric-card"><span>Obligaciones</span><strong>{money(query.data.obligationsMinor)}</strong><small>Pendiente, disponible y reservado</small></article>
+        <div className={styles.adminAffiliateDashboard}>
+          <div className={styles.adminMetricGrid}>
+            <article className={styles.adminMetricCard}><span>Afiliados</span><strong>{query.data.affiliates}</strong><small>Activos y suspendidos</small></article>
+            <article className={styles.adminMetricCard}><span>Incidencias abiertas</span><strong>{query.data.queues.issues}</strong><small>Requieren resolución</small></article>
+            <article className={styles.adminMetricCard}><span>Cancelaciones</span><strong>{query.data.queues.cancellations}</strong><small>Esperando decisión</small></article>
+            <article className={styles.adminMetricCard}><span>Obligaciones</span><strong>{money(query.data.obligationsMinor)}</strong><small>Pendiente, disponible y reservado</small></article>
           </div>
-          <section className="admin-panel">
-            <div className="admin-panel-header">
+          <section className={shared.adminPanel}>
+            <div className={shared.adminPanelHeader}>
               <div>
-                <span className="admin-panel-kicker">Colas operativas</span>
+                <span className={shared.adminPanelKicker}>Colas operativas</span>
                 <h2>Atención prioritaria</h2>
               </div>
             </div>
-            <div className="admin-panel-body admin-affiliate-queue-links">
+            <div className={[shared.adminPanelBody, styles.adminAffiliateQueueLinks].filter(Boolean).join(' ')}>
               <Link href="/admin/affiliates/issues"><ShieldAlert size={18} /><span><strong>{query.data.queues.issues} incidencias abiertas</strong><small>Resolver, continuar o reembolsar</small></span></Link>
               <Link href="/admin/affiliates/cancellations"><X size={18} /><span><strong>{query.data.queues.cancellations} cancelaciones solicitadas</strong><small>Aprobar o rechazar con motivo</small></span></Link>
               <Link href="/admin/affiliates/payouts"><WalletCards size={18} /><span><strong>{query.data.queues.payouts} retiros por procesar</strong><small>Flujo solicitado, procesando y pagado</small></span></Link>
@@ -141,38 +157,38 @@ function Sellers({ id }: { id?: string }) {
       description="Listado filtrable de vendedores, estado, publicaciones, ventas y saldo."
       action={<Button variant="secondary" onClick={() => void query.refetch()} disabled={query.isFetching}><RefreshCw size={16} />Actualizar</Button>}
     >
-      <form className="admin-toolbar affiliate-admin-toolbar" onSubmit={(event) => { event.preventDefault(); setSubmitted(search.trim()); }}>
+      <form className={[shared.adminToolbar, styles.affiliateAdminToolbar].filter(Boolean).join(' ')} onSubmit={(event) => { event.preventDefault(); setSubmitted(search.trim()); }}>
         <TextField label="Buscar" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Nombre o email" />
         <Button type="submit" variant="secondary"><Search size={16} />Buscar</Button>
       </form>
-      <section className="admin-panel">
-        <div className="admin-panel-header">
+      <section className={shared.adminPanel}>
+        <div className={shared.adminPanelHeader}>
           <div>
-            <span className="admin-panel-kicker">Directorio</span>
+            <span className={shared.adminPanelKicker}>Directorio</span>
             <h2>Vendedores habilitados</h2>
           </div>
-          {!query.isLoading && !query.isError ? <span className="admin-count-badge">{query.data.items.length}</span> : null}
+          {!query.isLoading && !query.isError ? <span className={shared.adminCountBadge}>{query.data.items.length}</span> : null}
         </div>
         {query.isLoading ? <Feedback>Cargando afiliados…</Feedback> : query.isError ? <Feedback error>{adminErrorMessage(query.error)}</Feedback> : (
-          <div className="admin-panel-body">
-            <ul className="admin-list">
+          <div className={shared.adminPanelBody}>
+            <ul className={shared.adminList}>
               {query.data.items.map((row) => (
                 <li key={row.id}>
-                  <div className="admin-list-row">
+                  <div className={shared.adminListRow}>
                     <Link href={`/admin/affiliates/sellers/${row.id}`}>
                       <strong>{row.publicName}</strong>
                       <span>{row.user?.name ? `${row.user.name} · ` : ''}{row.user?.email}</span>
                       <small>{row.counts?.listings ?? 0} publicaciones · {row.counts?.sellerOrders ?? 0} ventas</small>
                     </Link>
-                    <div className="admin-row-actions">
-                      <span className={`admin-badge ${row.status === 'ACTIVE' ? 'admin-badge-green' : 'admin-badge-red'}`}>{row.status === 'ACTIVE' ? 'Activo' : 'Suspendido'}</span>
+                    <div className={shared.adminRowActions}>
+                      <span className={`${shared.adminBadge} ${row.status === 'ACTIVE'? shared.adminBadgeGreen : shared.adminBadgeRed}`}>{row.status === 'ACTIVE' ? 'Activo' : 'Suspendido'}</span>
                       <Button variant="ghost" onClick={() => update.mutate(row)} disabled={update.isPending}>{row.status === 'ACTIVE' ? 'Suspender' : 'Reactivar'}</Button>
                     </div>
                   </div>
                 </li>
               ))}
             </ul>
-            {query.data.items.length === 0 && <p className="admin-empty-copy">No encontramos afiliados.</p>}
+            {query.data.items.length === 0 && <p className={shared.adminEmptyCopy}>No encontramos afiliados.</p>}
           </div>
         )}
       </section>
@@ -204,23 +220,23 @@ function SellerDetail({ query }: { query: QueryState<{ affiliate: Seller; balanc
       description="Perfil, comisión, publicaciones, ventas, logística, saldo y retiros."
       action={<Link className="button button-secondary" href="/admin/affiliates/sellers"><ArrowLeft size={16} />Volver</Link>}
     >
-      <div className="admin-metric-grid">
-        <article className="admin-metric-card"><span>Estado</span><strong>{affiliate.status === 'ACTIVE' ? 'Activo' : 'Suspendido'}</strong><small>{affiliate.user?.email}</small></article>
-        <article className="admin-metric-card"><span>Comisión por defecto</span><strong>{affiliate.commissionBpsOverride === null || affiliate.commissionBpsOverride === undefined ? 'Global' : `${affiliate.commissionBpsOverride / 100}%`}</strong><small>Se congela en cada nueva suborden</small></article>
-        <article className="admin-metric-card"><span>Disponible</span><strong>{money(balance.AVAILABLE)}</strong><small>Saldo que puede retirar</small></article>
-        <article className="admin-metric-card"><span>Pendiente</span><strong>{money(balance.PENDING)}</strong><small>Ventas en período de cierre</small></article>
-        <article className="admin-metric-card"><span>Reservado</span><strong>{money(balance.RESERVED)}</strong><small>Retiros en proceso</small></article>
+      <div className={styles.adminMetricGrid}>
+        <article className={styles.adminMetricCard}><span>Estado</span><strong>{affiliate.status === 'ACTIVE' ? 'Activo' : 'Suspendido'}</strong><small>{affiliate.user?.email}</small></article>
+        <article className={styles.adminMetricCard}><span>Comisión por defecto</span><strong>{affiliate.commissionBpsOverride === null || affiliate.commissionBpsOverride === undefined ? 'Global' : `${affiliate.commissionBpsOverride / 100}%`}</strong><small>Se congela en cada nueva suborden</small></article>
+        <article className={styles.adminMetricCard}><span>Disponible</span><strong>{money(balance.AVAILABLE)}</strong><small>Saldo que puede retirar</small></article>
+        <article className={styles.adminMetricCard}><span>Pendiente</span><strong>{money(balance.PENDING)}</strong><small>Ventas en período de cierre</small></article>
+        <article className={styles.adminMetricCard}><span>Reservado</span><strong>{money(balance.RESERVED)}</strong><small>Retiros en proceso</small></article>
       </div>
-      <section className="admin-panel">
-        <div className="admin-panel-header">
+      <section className={shared.adminPanel}>
+        <div className={shared.adminPanelHeader}>
           <div>
-            <span className="admin-panel-kicker">Comercial</span>
+            <span className={shared.adminPanelKicker}>Comercial</span>
             <h2>Excepción individual de comisión</h2>
           </div>
         </div>
-        <div className="admin-panel-body affiliate-admin-section-stack">
+        <div className={[shared.adminPanelBody, styles.affiliateAdminSectionStack].filter(Boolean).join(' ')}>
           <form
-            className="admin-inline-filter"
+            className={styles.adminInlineFilter}
             onSubmit={(event) => {
               event.preventDefault();
               const value = currentCommission.trim() === '' ? null : Math.round(Number(currentCommission) * 100);
@@ -234,55 +250,55 @@ function SellerDetail({ query }: { query: QueryState<{ affiliate: Seller; balanc
           <p className="form-hint">Dejá vacío para volver a la comisión global. Las ventas históricas no se recalculan.</p>
         </div>
       </section>
-      <div className="admin-two-column">
-        <section className="admin-panel">
-          <div className="admin-panel-header">
+      <div className={styles.adminTwoColumn}>
+        <section className={shared.adminPanel}>
+          <div className={shared.adminPanelHeader}>
             <div>
-              <span className="admin-panel-kicker">Catálogo</span>
+              <span className={shared.adminPanelKicker}>Catálogo</span>
               <h2>Publicaciones ({listings.length})</h2>
             </div>
           </div>
-          <div className="admin-panel-body affiliate-admin-section-stack">
+          <div className={[shared.adminPanelBody, styles.affiliateAdminSectionStack].filter(Boolean).join(' ')}>
             {listings.length ? listings.map((item) => (
-              <Link className="admin-detail-link" href={`/admin/affiliates/listings/${item.id}`} key={item.id}>
+              <Link className={styles.adminDetailLink} href={`/admin/affiliates/listings/${item.id}`} key={item.id}>
                 <strong>{item.product.name}</strong>
                 <span>{label(item.status)} · {money(item.product.priceMinor)}</span>
               </Link>
-            )) : <p className="admin-empty-copy">Sin publicaciones.</p>}
+            )) : <p className={shared.adminEmptyCopy}>Sin publicaciones.</p>}
           </div>
         </section>
-        <section className="admin-panel">
-          <div className="admin-panel-header">
+        <section className={shared.adminPanel}>
+          <div className={shared.adminPanelHeader}>
             <div>
-              <span className="admin-panel-kicker">Operación</span>
+              <span className={shared.adminPanelKicker}>Operación</span>
               <h2>Ventas recientes ({orders.length})</h2>
             </div>
           </div>
-          <div className="admin-panel-body affiliate-admin-section-stack">
+          <div className={[shared.adminPanelBody, styles.affiliateAdminSectionStack].filter(Boolean).join(' ')}>
             {orders.length ? orders.map((item) => (
-              <Link className="admin-detail-link" href={`/admin/affiliates/orders/${item.id}`} key={item.id}>
+              <Link className={styles.adminDetailLink} href={`/admin/affiliates/orders/${item.id}`} key={item.id}>
                 <strong>{item.number}</strong>
                 <span>{label(item.status)} · {money(item.sellerNetMinor)}</span>
               </Link>
-            )) : <p className="admin-empty-copy">Sin ventas recientes.</p>}
+            )) : <p className={shared.adminEmptyCopy}>Sin ventas recientes.</p>}
           </div>
         </section>
       </div>
-      <section className="admin-panel">
-        <div className="admin-panel-header">
+      <section className={shared.adminPanel}>
+        <div className={shared.adminPanelHeader}>
           <div>
-            <span className="admin-panel-kicker">Finanzas</span>
+            <span className={shared.adminPanelKicker}>Finanzas</span>
             <h2>Historial de retiros</h2>
           </div>
         </div>
-        <div className="admin-panel-body">
+        <div className={shared.adminPanelBody}>
           {payouts.length ? payouts.map((item) => (
-            <div className="admin-detail-line" key={item.id}>
+            <div className={styles.adminDetailLine} key={item.id}>
               <span>{date(item.createdAt)}</span>
               <strong>{money(item.amountMinor)}</strong>
               <em>{label(item.status)}</em>
             </div>
-          )) : <p className="admin-empty-copy">Todavía no hay retiros.</p>}
+          )) : <p className={shared.adminEmptyCopy}>Todavía no hay retiros.</p>}
         </div>
       </section>
     </Shell>
@@ -387,10 +403,10 @@ function Listings({ id }: { id?: string }) {
       description="Todas las publicaciones y estados editoriales, con preview y acciones directas."
       action={<Button variant="secondary" onClick={() => void query.refetch()} disabled={query.isFetching}><RefreshCw size={16} />Actualizar</Button>}
     >
-      <section className="admin-panel">
-        <div className="admin-panel-header">
+      <section className={shared.adminPanel}>
+        <div className={shared.adminPanelHeader}>
           <div>
-            <span className="admin-panel-kicker">Control editorial</span>
+            <span className={shared.adminPanelKicker}>Control editorial</span>
             <h2>Publicaciones</h2>
           </div>
           <select aria-label="Filtrar por estado" value={status} onChange={(event) => setStatus(event.target.value)}>
@@ -401,18 +417,18 @@ function Listings({ id }: { id?: string }) {
           </select>
         </div>
         {query.isLoading ? <Feedback>Cargando publicaciones…</Feedback> : query.isError ? <Feedback error>{adminErrorMessage(query.error)}</Feedback> : (
-          <div className="admin-panel-body">
-            <ul className="admin-list affiliate-admin-publications-list">
+          <div className={shared.adminPanelBody}>
+            <ul className={[shared.adminList, styles.affiliateAdminPublicationsList].filter(Boolean).join(' ')}>
               {query.data.items.map((row) => (
                 <li key={row.id}>
-                  <div className="admin-list-row affiliate-admin-row">
+                  <div className={[shared.adminListRow, styles.affiliateAdminRow].filter(Boolean).join(' ')}>
                     <div>
-                      <Link className="affiliate-admin-publication-name" href={`/admin/affiliates/listings/${row.id}`}>
+                      <Link className={styles.affiliateAdminPublicationName} href={`/admin/affiliates/listings/${row.id}`}>
                         <strong>{row.product.name}</strong>
                         <span>{row.affiliate.publicName} · {label(row.status)} · {row.product.images.length} imágenes</span>
                       </Link>
                     </div>
-                    <div className="admin-row-actions">
+                    <div className={shared.adminRowActions}>
                       <Button variant="ghost" onClick={() => setPreview(row)}><Eye size={15} />Preview</Button>
                       <Link className="button button-ghost" href={`/admin/affiliates/listings/${row.id}`}>Revisar</Link>
                       {row.status === 'PENDING_REVIEW' && (
@@ -430,7 +446,7 @@ function Listings({ id }: { id?: string }) {
                 </li>
               ))}
             </ul>
-            {query.data.items.length === 0 && <p className="admin-empty-copy">No hay publicaciones para este filtro.</p>}
+            {query.data.items.length === 0 && <p className={shared.adminEmptyCopy}>No hay publicaciones para este filtro.</p>}
           </div>
         )}
       </section>
@@ -439,23 +455,23 @@ function Listings({ id }: { id?: string }) {
         title={preview?.product.name ?? 'Preview'}
         description={preview ? `Publicación de ${preview.affiliate.publicName}` : undefined}
         onClose={() => setPreview(null)}
-        className="admin-wide-dialog"
+        className={shared.adminWideDialog}
       >
         {preview && (
-          <div className="affiliate-admin-preview">
-            <div className="affiliate-admin-preview-media">
-              <div className="affiliate-admin-preview-image">
+          <div className={styles.affiliateAdminPreview}>
+            <div className={styles.affiliateAdminPreviewMedia}>
+              <div className={styles.affiliateAdminPreviewImage}>
                 {preview.product.images[0]
                   ? <Image src={preview.product.images[0].url} alt={preview.product.images[0].altText ?? preview.product.name} width={640} height={380} unoptimized />
                   : <span>Sin imágenes</span>}
               </div>
             </div>
-            <div className="affiliate-admin-preview-details">
+            <div className={styles.affiliateAdminPreviewDetails}>
               <h3>{preview.product.name}</h3>
               <p>{preview.product.description || 'Sin descripción.'}</p>
               <strong>{money(preview.product.priceMinor)}</strong>
               <span>Stock disponible: {preview.product.inventory?.available ?? 0}</span>
-              <div className="admin-dialog-actions">
+              <div className={shared.adminDialogActions}>
                 <Link className="button button-primary" href={`/admin/affiliates/listings/${preview.id}`}>Abrir ficha completa</Link>
               </div>
             </div>
@@ -512,13 +528,13 @@ function ListingDetail({
       description={`Publicación de ${item.affiliate.publicName} · control editorial`}
       action={<Link className="button button-secondary" href="/admin/affiliates/listings"><ArrowLeft size={16} />Volver</Link>}
     >
-      <div className="admin-listing-detail">
-        <section className="admin-listing-hero">
-          <div className="admin-listing-hero-top">
-            <span className="admin-listing-kicker">Revisión editorial</span>
+      <div className={styles.adminListingDetail}>
+        <section className={styles.adminListingHero}>
+          <div className={styles.adminListingHeroTop}>
+            <span className={styles.adminListingKicker}>Revisión editorial</span>
             <span className={listingStatusClass(item.status)}>{label(item.status)}</span>
           </div>
-          <div className="admin-listing-hero-copy">
+          <div className={styles.adminListingHeroCopy}>
             <div>
               <h2>{item.product.name}</h2>
               <p>
@@ -527,56 +543,56 @@ function ListingDetail({
                 {item.submittedAt ? ` · Enviada ${date(item.submittedAt)}` : ''}
               </p>
             </div>
-            <div className="admin-listing-price">
+            <div className={styles.adminListingPrice}>
               <span>Precio</span>
               <strong>{money(item.product.priceMinor)}</strong>
             </div>
           </div>
         </section>
 
-        <div className="admin-listing-summary">
-          <article className="admin-listing-summary-card">
+        <div className={styles.adminListingSummary}>
+          <article className={styles.adminListingSummaryCard}>
             <span>Tipo</span>
             <strong>{listingKindLabel(item.product.kind)}</strong>
           </article>
-          <article className="admin-listing-summary-card">
+          <article className={styles.adminListingSummaryCard}>
             <span>Stock disponible</span>
             <strong>{item.product.inventory?.available ?? 0}</strong>
           </article>
-          <article className="admin-listing-summary-card">
+          <article className={styles.adminListingSummaryCard}>
             <span>Imágenes</span>
             <strong>{images.length}</strong>
           </article>
-          <article className="admin-listing-summary-card">
+          <article className={styles.adminListingSummaryCard}>
             <span>Versión</span>
             <strong>{item.product.version}</strong>
           </article>
         </div>
 
-        <div className="admin-listing-columns">
-          <div className="admin-listing-primary">
-            <section className="admin-panel">
-              <div className="admin-panel-header">
+        <div className={styles.adminListingColumns}>
+          <div className={styles.adminListingPrimary}>
+            <section className={shared.adminPanel}>
+              <div className={shared.adminPanelHeader}>
                 <div>
-                  <span className="admin-panel-kicker">Vista previa</span>
+                  <span className={shared.adminPanelKicker}>Vista previa</span>
                   <h2>Contenido de la publicación</h2>
                 </div>
               </div>
-              <div className="admin-panel-body">
-                <div className="affiliate-admin-preview" style={{ marginTop: 0 }}>
-                  <div className="affiliate-admin-preview-media">
-                    <div className="affiliate-admin-preview-image">
+              <div className={shared.adminPanelBody}>
+                <div className={styles.affiliateAdminPreview} style={{ marginTop: 0 }}>
+                  <div className={styles.affiliateAdminPreviewMedia}>
+                    <div className={styles.affiliateAdminPreviewImage}>
                       {activeImage
                         ? <Image src={activeImage.url} alt={activeImage.altText ?? item.product.name} width={640} height={640} unoptimized />
                         : <span>Sin imágenes</span>}
                     </div>
                     {images.length > 1 && (
-                      <div className="affiliate-admin-preview-thumbnails" aria-label="Imágenes de la publicación">
+                      <div className={styles.affiliateAdminPreviewThumbnails} aria-label="Imágenes de la publicación">
                         {images.map((image, index) => (
                           <button
                             key={image.id}
                             type="button"
-                            className={image.id === activeImage?.id ? 'is-active' : ''}
+                            className={image.id === activeImage?.id? styles.isActive : ''}
                             onClick={() => setImageId(image.id)}
                             aria-label={`Ver imagen ${index + 1}`}
                           >
@@ -586,24 +602,24 @@ function ListingDetail({
                       </div>
                     )}
                   </div>
-                  <div className="affiliate-admin-preview-details">
+                  <div className={styles.affiliateAdminPreviewDetails}>
                     <div>
-                      <span className="admin-panel-kicker">Descripción</span>
-                      <p className="affiliate-admin-preview-description" style={{ margin: 0 }}>
+                      <span className={shared.adminPanelKicker}>Descripción</span>
+                      <p className={styles.affiliateAdminPreviewDescription} style={{ margin: 0 }}>
                         <span style={{ display: 'block', marginTop: 8, color: '#c5cfd7', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
                           {item.product.description.trim() || 'El afiliado no agregó una descripción.'}
                         </span>
                       </p>
                     </div>
-                    <dl className="affiliate-admin-preview-data">
-                      <div><dt>Precio</dt><dd className="affiliate-admin-preview-price">{money(item.product.priceMinor)}</dd></div>
+                    <dl className={styles.affiliateAdminPreviewData}>
+                      <div><dt>Precio</dt><dd className={styles.affiliateAdminPreviewPrice}>{money(item.product.priceMinor)}</dd></div>
                       <div><dt>Stock</dt><dd>{item.product.inventory?.available ?? 0} unidades</dd></div>
                       <div><dt>Tipo</dt><dd>{listingKindLabel(item.product.kind)}</dd></div>
                       <div><dt>Estado producto</dt><dd>{label(item.product.status)}</dd></div>
                     </dl>
                     {item.reviewNote && (
-                      <div className="admin-listing-note">
-                        <span className="admin-panel-kicker">Nota de revisión</span>
+                      <div className={styles.adminListingNote}>
+                        <span className={shared.adminPanelKicker}>Nota de revisión</span>
                         <p>{item.reviewNote}</p>
                       </div>
                     )}
@@ -613,15 +629,15 @@ function ListingDetail({
             </section>
           </div>
 
-          <aside className="admin-listing-aside">
-            <section className="admin-panel">
-              <div className="admin-panel-header">
+          <aside className={styles.adminListingAside}>
+            <section className={shared.adminPanel}>
+              <div className={shared.adminPanelHeader}>
                 <div>
-                  <span className="admin-panel-kicker">Decisión</span>
+                  <span className={shared.adminPanelKicker}>Decisión</span>
                   <h2>Acciones</h2>
                 </div>
               </div>
-              <div className="admin-panel-body admin-listing-actions">
+              <div className={[shared.adminPanelBody, styles.adminListingActions].filter(Boolean).join(' ')}>
                 {canReview ? (
                   <>
                     <p className="form-hint">Esta publicación está pendiente. Podés aprobarla, pedir cambios o rechazarla.</p>
@@ -649,7 +665,7 @@ function ListingDetail({
                     </Button>
                   </>
                 ) : (
-                  <div className="admin-listing-complete">
+                  <div className={styles.adminListingComplete}>
                     <Check size={16} />
                     <div>
                       <strong>Sin acción pendiente</strong>
@@ -677,7 +693,7 @@ function ListingDetail({
         onClose={closeReviewDialog}
       >
         <form
-          className="admin-form"
+          className={shared.adminForm}
           onSubmit={(event) => {
             event.preventDefault();
             if (!reviewDecision || reviewNote.trim().length < 3) return;
@@ -700,7 +716,7 @@ function ListingDetail({
             }
             required
           />
-          <div className="admin-dialog-actions">
+          <div className={shared.adminDialogActions}>
             <Button type="button" variant="secondary" onClick={closeReviewDialog} disabled={reviewPending}>
               Cancelar
             </Button>
@@ -739,8 +755,8 @@ function Orders({ id }: { id?: string }) {
       description="Subórdenes por vendedor con estado, importes, entrega, seguimiento y acciones permitidas."
       action={<Button variant="secondary" onClick={() => void query.refetch()} disabled={query.isFetching}><RefreshCw size={16} />Actualizar</Button>}
     >
-      <form className="admin-toolbar affiliate-admin-toolbar" onSubmit={(event) => { event.preventDefault(); setSubmitted(search.trim()); }}>
-        <TextField className="admin-search-field" label="Buscar" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Número o vendedor" />
+      <form className={[shared.adminToolbar, styles.affiliateAdminToolbar].filter(Boolean).join(' ')} onSubmit={(event) => { event.preventDefault(); setSubmitted(search.trim()); }}>
+        <TextField className={shared.adminSearchField} label="Buscar" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Número o vendedor" />
         <SelectField label="Estado" value={status} onChange={(event) => setStatus(event.target.value)}>
           <option value="">Todos los estados</option>
           {['PENDING_PAYMENT', 'PAID', 'PREPARING', 'READY_FOR_PICKUP', 'PICKED_UP', 'SHIPPED', 'COMPLETED', 'CANCELLATION_REQUESTED', 'DISPUTED', 'CANCELLED', 'REFUNDED'].map((value) => (
@@ -749,33 +765,33 @@ function Orders({ id }: { id?: string }) {
         </SelectField>
         <Button type="submit" variant="secondary"><Search size={16} />Buscar</Button>
       </form>
-      <section className="admin-panel">
-        <div className="admin-panel-header">
+      <section className={shared.adminPanel}>
+        <div className={shared.adminPanelHeader}>
           <div>
-            <span className="admin-panel-kicker">Marketplace</span>
+            <span className={shared.adminPanelKicker}>Marketplace</span>
             <h2>Subórdenes</h2>
           </div>
-          {!query.isLoading && !query.isError ? <span className="admin-count-badge">{query.data.items.length}</span> : null}
+          {!query.isLoading && !query.isError ? <span className={shared.adminCountBadge}>{query.data.items.length}</span> : null}
         </div>
         {query.isLoading ? <Feedback>Cargando ventas…</Feedback> : query.isError ? <Feedback error>{adminErrorMessage(query.error)}</Feedback> : (
-          <div className="admin-panel-body">
-            <ul className="admin-list">
+          <div className={shared.adminPanelBody}>
+            <ul className={shared.adminList}>
               {query.data.items.map((row) => (
                 <li key={row.id}>
-                  <div className="admin-list-row">
+                  <div className={shared.adminListRow}>
                     <Link href={`/admin/affiliates/orders/${row.id}`}>
                       <strong>{row.number}</strong>
                       <span>{row.sellerName} · {label(row.status)} · {money(row.sellerNetMinor)}</span>
                     </Link>
-                    <div className="admin-row-actions">
-                      <span className="admin-badge">{label(row.fulfillmentType ?? 'SHIPMENT')}</span>
+                    <div className={shared.adminRowActions}>
+                      <span className={shared.adminBadge}>{label(row.fulfillmentType ?? 'SHIPMENT')}</span>
                       <Link className="button button-ghost" href={`/admin/affiliates/orders/${row.id}`}>Ver detalle</Link>
                     </div>
                   </div>
                 </li>
               ))}
             </ul>
-            {query.data.items.length === 0 && <p className="admin-empty-copy">No hay ventas para este filtro.</p>}
+            {query.data.items.length === 0 && <p className={shared.adminEmptyCopy}>No hay ventas para este filtro.</p>}
           </div>
         )}
       </section>
@@ -801,44 +817,44 @@ function OrderDetail({ query, onTransition, onRefund, refundPending }: { query: 
       description={`${order.sellerName} · estado ${label(order.status)}`}
       action={<Link className="button button-secondary" href="/admin/affiliates/orders"><ArrowLeft size={16} />Volver</Link>}
     >
-      <div className="affiliate-admin-order-metrics">
+      <div className={styles.affiliateAdminOrderMetrics}>
         <div><span>Importe vendedor</span><strong>{money(order.sellerNetMinor)}</strong></div>
         <div><span>Subtotal</span><strong>{money(order.subtotalMinor)}</strong></div>
         <div><span>Envío</span><strong>{money(order.shippingMinor)}</strong></div>
         <div><span>Entrega</span><strong>{label(order.fulfillmentType ?? 'SHIPMENT')}</strong></div>
       </div>
-      <section className="admin-panel">
-        <div className="admin-panel-header">
+      <section className={shared.adminPanel}>
+        <div className={shared.adminPanelHeader}>
           <div>
-            <span className="admin-panel-kicker">Detalle</span>
+            <span className={shared.adminPanelKicker}>Detalle</span>
             <h2>Información de la venta</h2>
           </div>
         </div>
-        <div className="admin-panel-body affiliate-admin-section-stack">
+        <div className={[shared.adminPanelBody, styles.affiliateAdminSectionStack].filter(Boolean).join(' ')}>
           <p className="form-hint">Orden general: {order.parentOrder?.number ?? order.order?.number ?? '—'} · Pago: {label(order.parentOrder?.paymentStatus ?? '—')}</p>
-          <div className="affiliate-admin-section-stack">
+          <div className={styles.affiliateAdminSectionStack}>
             <h3>Productos</h3>
             {order.items?.map((item, index) => (
-              <div className="admin-detail-line" key={`${item.productName ?? item.name}-${index}`}>
+              <div className={styles.adminDetailLine} key={`${item.productName ?? item.name}-${index}`}>
                 <span>{item.productName ?? item.name} × {item.quantity}</span>
                 <strong>{money(item.lineTotalMinor)}</strong>
               </div>
             ))}
-            {!order.items?.length && <p className="admin-empty-copy">Sin ítems cargados.</p>}
+            {!order.items?.length && <p className={shared.adminEmptyCopy}>Sin ítems cargados.</p>}
           </div>
           {order.fulfillmentType === 'SHIPMENT' && (
             <p className="form-hint">Entrega: {[order.recipientName, order.addressLine1, order.addressLine2, order.city, order.province, order.postalCode].filter(Boolean).join(' · ') || 'Datos no disponibles hasta acreditar el pago'}</p>
           )}
           {order.fulfillmentType === 'PICKUP' && <p className="form-hint">Punto de retiro: {order.pickupPointAddress ?? '—'}</p>}
           <p className="form-hint">Seguimiento: {[order.carrier, order.trackingCode].filter(Boolean).join(' · ') || 'Sin datos cargados'}</p>
-          <div className="affiliate-admin-actions-row">
+          <div className={styles.affiliateAdminActionsRow}>
             {next && next !== 'COMPLETED' && <Button onClick={() => onTransition(next)}>Pasar a {label(next)}</Button>}
             {next === 'COMPLETED' && <Button onClick={() => onTransition(next)}>Completar venta administrativamente</Button>}
             {canRefund && <Button variant="danger" onClick={() => setRefundOpen((value) => !value)}>Registrar reembolso</Button>}
           </div>
           {refundOpen && canRefund && (
             <form
-              className="admin-form"
+              className={shared.adminForm}
               onSubmit={(event) => {
                 event.preventDefault();
                 if (refundAmount.trim() && refundReason.trim().length >= 3 && refundReference.trim().length >= 2) {
@@ -851,7 +867,7 @@ function OrderDetail({ query, onTransition, onRefund, refundPending }: { query: 
               <TextareaField label="Motivo" value={refundReason} onChange={(event) => setRefundReason(event.target.value)} minLength={3} maxLength={500} required />
               <TextField label="Referencia externa" value={refundReference} onChange={(event) => setRefundReference(event.target.value)} minLength={2} maxLength={150} required />
               <label className="checkbox-field"><input type="checkbox" checked={restock} onChange={(event) => setRestock(event.target.checked)} /> Reponer stock</label>
-              <div className="admin-dialog-actions">
+              <div className={shared.adminDialogActions}>
                 <Button type="button" variant="secondary" onClick={() => setRefundOpen(false)}>Cancelar</Button>
                 <Button type="submit" variant="danger" disabled={refundPending || refundAmount.trim().length === 0 || refundReason.trim().length < 3 || refundReference.trim().length < 2}>{refundPending ? 'Registrando…' : 'Confirmar reembolso'}</Button>
               </div>
@@ -860,15 +876,15 @@ function OrderDetail({ query, onTransition, onRefund, refundPending }: { query: 
         </div>
       </section>
       {order.statusHistory?.length ? (
-        <section className="admin-panel">
-          <div className="admin-panel-header">
+        <section className={shared.adminPanel}>
+          <div className={shared.adminPanelHeader}>
             <div>
-              <span className="admin-panel-kicker">Historial</span>
+              <span className={shared.adminPanelKicker}>Historial</span>
               <h2>Timeline</h2>
             </div>
           </div>
-          <div className="admin-panel-body">
-            <ol className="admin-timeline">
+          <div className={shared.adminPanelBody}>
+            <ol className={shared.adminTimeline}>
               {order.statusHistory.map((event) => (
                 <li key={event.id}>
                   <strong>{label(event.toStatus)}</strong>
@@ -900,19 +916,19 @@ function Queue({ section, id }: { section: 'issues' | 'cancellations'; id?: stri
         action={<Link className="button button-secondary" href={`/admin/affiliates/${section}`}><ArrowLeft size={16} />Volver</Link>}
       >
         {detail.isLoading ? <Feedback>Cargando…</Feedback> : detail.isError || !record ? <Feedback error>{detail.error ? adminErrorMessage(detail.error) : 'No encontrado'}</Feedback> : (
-          <section className="admin-panel">
-            <div className="admin-panel-header">
+          <section className={shared.adminPanel}>
+            <div className={shared.adminPanelHeader}>
               <div>
-                <span className="admin-panel-kicker">{isIssue ? 'Incidencia' : 'Cancelación'}</span>
+                <span className={shared.adminPanelKicker}>{isIssue ? 'Incidencia' : 'Cancelación'}</span>
                 <h2>{record.sellerOrder.number} · {record.affiliate.publicName}</h2>
               </div>
-              <span className="admin-badge">{label(record.status)}</span>
+              <span className={shared.adminBadge}>{label(record.status)}</span>
             </div>
-            <div className="admin-panel-body affiliate-admin-section-stack">
+            <div className={[shared.adminPanelBody, styles.affiliateAdminSectionStack].filter(Boolean).join(' ')}>
               <p>{record.reason}</p>
               <p className="form-hint">Creado: {date(record.createdAt)}</p>
               {(record.status === 'OPEN' || record.status === 'REQUESTED') && (
-                <div className="affiliate-admin-actions-row">
+                <div className={styles.affiliateAdminActionsRow}>
                   <Button variant="secondary" onClick={() => openResolution(record)}>{isIssue ? 'Resolver incidencia' : 'Decidir cancelación'}</Button>
                 </div>
               )}
@@ -930,27 +946,27 @@ function Queue({ section, id }: { section: 'issues' | 'cancellations'; id?: stri
       description={isIssue ? 'Cola abierta e historial de reclamos, con resolución contable y operativa completa.' : 'Solicitudes de cancelación versionadas con motivo obligatorio y resolución auditada.'}
       action={<Button variant="secondary" onClick={() => void query.refetch()} disabled={query.isFetching}><RefreshCw size={16} />Actualizar</Button>}
     >
-      <section className="admin-panel">
-        <div className="admin-panel-header">
+      <section className={shared.adminPanel}>
+        <div className={shared.adminPanelHeader}>
           <div>
-            <span className="admin-panel-kicker">Cola operativa</span>
+            <span className={shared.adminPanelKicker}>Cola operativa</span>
             <h2>{isIssue ? 'Incidencias abiertas e historial' : 'Solicitudes recibidas'}</h2>
           </div>
-          {!query.isLoading && !query.isError ? <span className="admin-count-badge">{query.data.items.length}</span> : null}
+          {!query.isLoading && !query.isError ? <span className={shared.adminCountBadge}>{query.data.items.length}</span> : null}
         </div>
         {query.isLoading ? <Feedback>Cargando…</Feedback> : query.isError ? <Feedback error>{adminErrorMessage(query.error)}</Feedback> : (
-          <div className="admin-panel-body">
-            <ul className="admin-list">
+          <div className={shared.adminPanelBody}>
+            <ul className={shared.adminList}>
               {query.data.items.map((item) => (
                 <li key={item.id}>
-                  <div className="admin-list-row">
+                  <div className={shared.adminListRow}>
                     <Link href={`/admin/affiliates/${section}/${item.id}`}>
                       <strong>{item.sellerOrder.number} · {item.affiliate.publicName}</strong>
                       <span>{item.reason}</span>
                       <small>{date(item.createdAt)} · {label(item.status)}</small>
                     </Link>
                     {item.status === 'OPEN' || item.status === 'REQUESTED' ? (
-                      <div className="admin-row-actions">
+                      <div className={shared.adminRowActions}>
                         <Button variant="secondary" onClick={() => openResolution(item)}>{isIssue ? 'Resolver' : 'Decidir'}</Button>
                       </div>
                     ) : null}
@@ -958,7 +974,7 @@ function Queue({ section, id }: { section: 'issues' | 'cancellations'; id?: stri
                 </li>
               ))}
             </ul>
-            {query.data.items.length === 0 && <p className="admin-empty-copy">No hay elementos en esta cola.</p>}
+            {query.data.items.length === 0 && <p className={shared.adminEmptyCopy}>No hay elementos en esta cola.</p>}
           </div>
         )}
       </section>
@@ -969,7 +985,7 @@ function Queue({ section, id }: { section: 'issues' | 'cancellations'; id?: stri
 
 function ResolutionDialog({ isIssue, resolution, note, setNote, decision, setDecision, refundAmountMinor, setRefundAmountMinor, externalReference, setExternalReference, resolve, onClose }: { isIssue: boolean; resolution: { id: string; version: number; kind: 'issue' | 'cancellation' } | null; note: string; setNote: (value: string) => void; decision: string; setDecision: (value: string) => void; refundAmountMinor: string; setRefundAmountMinor: (value: string) => void; externalReference: string; setExternalReference: (value: string) => void; resolve: { isPending: boolean; mutate: (input: { id: string; version: number; kind: 'issue' | 'cancellation'; decision: string; note: string; refundAmountMinor?: string; externalReference?: string }) => void }; onClose: () => void }) {
   const needsRefund = decision === 'PARTIAL_REFUND' || decision === 'FULL_REFUND' || (!isIssue && decision === 'APPROVED');
-  return <Dialog open={Boolean(resolution)} title={isIssue ? 'Resolver incidencia' : 'Resolver cancelación'} description="El motivo y cualquier devolución quedan registrados en la auditoría." onClose={onClose}><form className="admin-form" onSubmit={(event) => { event.preventDefault(); if (!resolution || note.trim().length < 3 || (needsRefund && (refundAmountMinor.trim().length === 0 || externalReference.trim().length < 2))) return; resolve.mutate({ ...resolution, decision, note: note.trim(), ...(needsRefund ? { refundAmountMinor: refundAmountMinor.trim(), externalReference: externalReference.trim() } : {}) }); }}><label className="field-label" htmlFor="affiliate-resolution-decision">Resolución</label><select id="affiliate-resolution-decision" value={decision} onChange={(event) => setDecision(event.target.value)}>{isIssue ? <><option value="CONTINUE">Continuar operación</option><option value="COMPLETE">Completar venta</option><option value="PARTIAL_REFUND">Completar con reembolso parcial</option><option value="FULL_REFUND">Reembolso total y cierre</option></> : <><option value="REJECTED">Rechazar cancelación</option><option value="APPROVED">Aprobar cancelación</option></>}</select><TextareaField label="Motivo" value={note} onChange={(event) => setNote(event.target.value)} minLength={3} maxLength={500} rows={5} required />{needsRefund && <><TextField label="Monto a reembolsar (centavos USD)" inputMode="numeric" value={refundAmountMinor} onChange={(event) => setRefundAmountMinor(event.target.value.replace(/[^0-9]/g, ''))} required /><TextField label="Referencia externa" value={externalReference} onChange={(event) => setExternalReference(event.target.value)} required /></>}<div className="admin-dialog-actions"><Button type="button" variant="secondary" onClick={onClose} disabled={resolve.isPending}>Cancelar</Button><Button type="submit" disabled={resolve.isPending || note.trim().length < 3 || (needsRefund && (refundAmountMinor.trim().length === 0 || externalReference.trim().length < 2))}>{resolve.isPending ? 'Guardando…' : 'Guardar resolución'}</Button></div></form></Dialog>;
+  return <Dialog open={Boolean(resolution)} title={isIssue ? 'Resolver incidencia' : 'Resolver cancelación'} description="El motivo y cualquier devolución quedan registrados en la auditoría." onClose={onClose}><form className={shared.adminForm} onSubmit={(event) => { event.preventDefault(); if (!resolution || note.trim().length < 3 || (needsRefund && (refundAmountMinor.trim().length === 0 || externalReference.trim().length < 2))) return; resolve.mutate({ ...resolution, decision, note: note.trim(), ...(needsRefund ? { refundAmountMinor: refundAmountMinor.trim(), externalReference: externalReference.trim() } : {}) }); }}><label className="field-label" htmlFor="affiliate-resolution-decision">Resolución</label><select id="affiliate-resolution-decision" value={decision} onChange={(event) => setDecision(event.target.value)}>{isIssue ? <><option value="CONTINUE">Continuar operación</option><option value="COMPLETE">Completar venta</option><option value="PARTIAL_REFUND">Completar con reembolso parcial</option><option value="FULL_REFUND">Reembolso total y cierre</option></> : <><option value="REJECTED">Rechazar cancelación</option><option value="APPROVED">Aprobar cancelación</option></>}</select><TextareaField label="Motivo" value={note} onChange={(event) => setNote(event.target.value)} minLength={3} maxLength={500} rows={5} required />{needsRefund && <><TextField label="Monto a reembolsar (centavos USD)" inputMode="numeric" value={refundAmountMinor} onChange={(event) => setRefundAmountMinor(event.target.value.replace(/[^0-9]/g, ''))} required /><TextField label="Referencia externa" value={externalReference} onChange={(event) => setExternalReference(event.target.value)} required /></>}<div className={shared.adminDialogActions}><Button type="button" variant="secondary" onClick={onClose} disabled={resolve.isPending}>Cancelar</Button><Button type="submit" disabled={resolve.isPending || note.trim().length < 3 || (needsRefund && (refundAmountMinor.trim().length === 0 || externalReference.trim().length < 2))}>{resolve.isPending ? 'Guardando…' : 'Guardar resolución'}</Button></div></form></Dialog>;
 }
 
 function Payouts({ id }: { id?: string }) {
@@ -992,22 +1008,22 @@ function PayoutDetailView({ id }: { id: string }) {
 function PayoutDetailContent({ detail, externalReference, setExternalReference, revealedDestination, revealPending, onReveal, processPending, onProcess }: { detail: PayoutDetail; externalReference: string; setExternalReference: (value: string) => void; revealedDestination: string | null; revealPending: boolean; onReveal: () => void; processPending: boolean; onProcess: (next: 'PROCESSING' | 'PAID' | 'REJECTED') => void }) {
   const { payout, availableMinor, ledger } = detail;
   const canProcess = payout.status === 'REQUESTED' || payout.status === 'PROCESSING';
-  return <div className="admin-payout-detail">
-    <section className="admin-payout-hero">
-      <div className="admin-payout-hero-top"><span className="admin-payout-kicker"><WalletCards size={16} /> Operación financiera</span><span className={payoutStatusClass(payout.status)}>{label(payout.status)}</span></div>
-      <div className="admin-payout-hero-copy"><div><h2>{payout.affiliate.publicName}</h2><p>Solicitud creada el {date(payout.createdAt)}</p></div><div className="admin-payout-amount"><span>Monto solicitado</span><strong>{money(payout.amountMinor)}</strong></div></div>
+  return <div className={styles.adminPayoutDetail}>
+    <section className={styles.adminPayoutHero}>
+      <div className={styles.adminPayoutHeroTop}><span className={styles.adminPayoutKicker}><WalletCards size={16} /> Operación financiera</span><span className={payoutStatusClass(payout.status)}>{label(payout.status)}</span></div>
+      <div className={styles.adminPayoutHeroCopy}><div><h2>{payout.affiliate.publicName}</h2><p>Solicitud creada el {date(payout.createdAt)}</p></div><div className={styles.adminPayoutAmount}><span>Monto solicitado</span><strong>{money(payout.amountMinor)}</strong></div></div>
     </section>
-    <div className="admin-payout-summary">
-      <article className="admin-payout-summary-card is-highlight"><span><CircleDollarSign size={15} /> Disponible del afiliado</span><strong>{money(availableMinor)}</strong><small>Saldo actual luego de reservar este retiro</small></article>
-      <article className="admin-payout-summary-card"><span><ArrowDownToLine size={15} /> Importe reservado</span><strong>{money(payout.amountMinor)}</strong><small>Solicitud asociada a este movimiento</small></article>
-      <article className="admin-payout-summary-card"><span><Landmark size={15} /> Cuenta de destino</span><strong>{payout.destinationLast4 ? `•••• ${payout.destinationLast4}` : 'Sin cuenta'}</strong><small>La cuenta completa permanece protegida</small></article>
+    <div className={styles.adminPayoutSummary}>
+      <article className={[styles.adminPayoutSummaryCard, styles.isHighlight].filter(Boolean).join(' ')}><span><CircleDollarSign size={15} /> Disponible del afiliado</span><strong>{money(availableMinor)}</strong><small>Saldo actual luego de reservar este retiro</small></article>
+      <article className={styles.adminPayoutSummaryCard}><span><ArrowDownToLine size={15} /> Importe reservado</span><strong>{money(payout.amountMinor)}</strong><small>Solicitud asociada a este movimiento</small></article>
+      <article className={styles.adminPayoutSummaryCard}><span><Landmark size={15} /> Cuenta de destino</span><strong>{payout.destinationLast4 ? `•••• ${payout.destinationLast4}` : 'Sin cuenta'}</strong><small>La cuenta completa permanece protegida</small></article>
     </div>
-    <div className="admin-payout-columns">
-      <div className="admin-payout-primary">
-        <section className="admin-payout-card"><div className="admin-payout-section-heading"><div className="admin-payout-icon"><CircleDollarSign size={18} /></div><div><span>Gestión</span><h3>Procesar retiro</h3></div></div><div className="admin-payout-meta"><div><span>Referencia registrada</span><strong>{payout.externalReference ?? 'Pendiente de cargar'}</strong></div><div><span>Creado</span><strong>{date(payout.createdAt)}</strong></div></div><div className="admin-payout-reveal"><div><span>Destino bancario</span><strong>{revealedDestination ?? (payout.destinationLast4 ? `Termina en ${payout.destinationLast4}` : 'No configurado')}</strong></div><Button variant="ghost" onClick={onReveal} disabled={revealPending || !payout.destinationLast4}><Eye size={15} />{revealPending ? 'Revelando…' : 'Revelar destino'}</Button></div>{canProcess && <div className="admin-payout-actions"><TextField label="Referencia externa del pago" value={externalReference} onChange={(event) => setExternalReference(event.target.value)} placeholder="Transferencia-2026-001" required /><div className="admin-row-actions">{payout.status === 'REQUESTED' && <Button onClick={() => onProcess('PROCESSING')} disabled={processPending || externalReference.trim().length < 2}>Pasar a procesando</Button>}{payout.status === 'PROCESSING' && <><Button onClick={() => onProcess('PAID')} disabled={processPending || externalReference.trim().length < 2}>Marcar pagado</Button><Button variant="danger" onClick={() => onProcess('REJECTED')} disabled={processPending || externalReference.trim().length < 2}>Rechazar</Button></>}</div></div>}{!canProcess && <div className="admin-payout-complete"><Check size={16} /> Este retiro ya fue {payout.status === 'PAID' ? 'pagado' : 'rechazado'}.</div>}</section>
-        <section className="admin-payout-card"><div className="admin-payout-section-heading"><div className="admin-payout-icon is-cyan"><Clock3 size={18} /></div><div><span>Contabilidad</span><h3>Movimientos del retiro</h3></div></div><div className="admin-payout-ledger">{ledger.map((entry) => <div className="admin-payout-ledger-row" key={entry.id}><div className="admin-payout-ledger-copy"><span className="admin-payout-ledger-bucket">{ledgerBucket(entry.bucket)}</span><strong>{ledgerType(entry.type)}</strong><small>{date(entry.createdAt)}</small></div><strong className={`admin-payout-ledger-amount ${entry.amountMinor.startsWith('-') ? 'is-negative' : 'is-positive'}`}>{money(entry.amountMinor)}</strong></div>)}</div></section>
+    <div className={styles.adminPayoutColumns}>
+      <div className={styles.adminPayoutPrimary}>
+        <section className={styles.adminPayoutCard}><div className={styles.adminPayoutSectionHeading}><div className={styles.adminPayoutIcon}><CircleDollarSign size={18} /></div><div><span>Gestión</span><h3>Procesar retiro</h3></div></div><div className={styles.adminPayoutMeta}><div><span>Referencia registrada</span><strong>{payout.externalReference ?? 'Pendiente de cargar'}</strong></div><div><span>Creado</span><strong>{date(payout.createdAt)}</strong></div></div><div className={styles.adminPayoutReveal}><div><span>Destino bancario</span><strong>{revealedDestination ?? (payout.destinationLast4 ? `Termina en ${payout.destinationLast4}` : 'No configurado')}</strong></div><Button variant="ghost" onClick={onReveal} disabled={revealPending || !payout.destinationLast4}><Eye size={15} />{revealPending ? 'Revelando…' : 'Revelar destino'}</Button></div>{canProcess && <div className={styles.adminPayoutActions}><TextField label="Referencia externa del pago" value={externalReference} onChange={(event) => setExternalReference(event.target.value)} placeholder="Transferencia-2026-001" required /><div className={shared.adminRowActions}>{payout.status === 'REQUESTED' && <Button onClick={() => onProcess('PROCESSING')} disabled={processPending || externalReference.trim().length < 2}>Pasar a procesando</Button>}{payout.status === 'PROCESSING' && <><Button onClick={() => onProcess('PAID')} disabled={processPending || externalReference.trim().length < 2}>Marcar pagado</Button><Button variant="danger" onClick={() => onProcess('REJECTED')} disabled={processPending || externalReference.trim().length < 2}>Rechazar</Button></>}</div></div>}{!canProcess && <div className={styles.adminPayoutComplete}><Check size={16} /> Este retiro ya fue {payout.status === 'PAID' ? 'pagado' : 'rechazado'}.</div>}</section>
+        <section className={styles.adminPayoutCard}><div className={styles.adminPayoutSectionHeading}><div className={[styles.adminPayoutIcon, styles.isCyan].filter(Boolean).join(' ')}><Clock3 size={18} /></div><div><span>Contabilidad</span><h3>Movimientos del retiro</h3></div></div><div className={styles.adminPayoutLedger}>{ledger.map((entry) => <div className={styles.adminPayoutLedgerRow} key={entry.id}><div className={styles.adminPayoutLedgerCopy}><span className={styles.adminPayoutLedgerBucket}>{ledgerBucket(entry.bucket)}</span><strong>{ledgerType(entry.type)}</strong><small>{date(entry.createdAt)}</small></div><strong className={`${styles.adminPayoutLedgerAmount} ${entry.amountMinor.startsWith('-') ? styles.isNegative : 'is-positive'}`}>{money(entry.amountMinor)}</strong></div>)}</div></section>
       </div>
-      <aside className="admin-payout-aside"><section className="admin-payout-card admin-payout-aside-card"><span className="admin-payout-aside-label">Estado de la operación</span><span className={payoutStatusClass(payout.status)}>{label(payout.status)}</span><p>El saldo disponible se calcula desde el ledger del afiliado y se actualiza con cada movimiento.</p></section><section className="admin-payout-card admin-payout-aside-card"><span className="admin-payout-aside-label">Controles de seguridad</span><div className="admin-payout-security-item"><Eye size={15} /><span>Destino enmascarado por defecto</span></div><div className="admin-payout-security-item"><Check size={15} /><span>Revelación auditada por administrador</span></div></section></aside>
+      <aside className={styles.adminPayoutAside}><section className={[styles.adminPayoutCard, styles.adminPayoutAsideCard].filter(Boolean).join(' ')}><span className={styles.adminPayoutAsideLabel}>Estado de la operación</span><span className={payoutStatusClass(payout.status)}>{label(payout.status)}</span><p>El saldo disponible se calcula desde el ledger del afiliado y se actualiza con cada movimiento.</p></section><section className={[styles.adminPayoutCard, styles.adminPayoutAsideCard].filter(Boolean).join(' ')}><span className={styles.adminPayoutAsideLabel}>Controles de seguridad</span><div className={styles.adminPayoutSecurityItem}><Eye size={15} /><span>Destino enmascarado por defecto</span></div><div className={styles.adminPayoutSecurityItem}><Check size={15} /><span>Revelación auditada por administrador</span></div></section></aside>
     </div>
   </div>;
 }
@@ -1018,12 +1034,12 @@ function PayoutsLegacy({ id }: { id?: string }) {
   const process = useMutation({ mutationFn: ({ row, next }: { row: Payout; next: 'PROCESSING' | 'PAID' | 'REJECTED' }) => { if (externalReference.trim().length < 2) throw new Error('Ingresá la referencia externa del pago'); return adminFetch(`/admin/affiliates/payouts/${row.id}/process`, { method: 'POST', body: JSON.stringify({ expectedVersion: row.version, status: next, externalReference: externalReference.trim(), note: 'Procesado desde el panel administrativo.' }) }); }, onSuccess: () => { toast.success('Retiro actualizado'); void client.invalidateQueries({ queryKey: ['admin', 'affiliate-payouts'] }); void detail.refetch(); }, onError: (error) => toast.error(adminErrorMessage(error)) });
   const reveal = useMutation({ mutationFn: (payoutId: string) => adminFetch<{ destination: string; expiresInSeconds: number }>(`/admin/affiliates/payouts/${payoutId}/reveal-destination`, { method: 'POST', body: JSON.stringify({}) }).then(payload), onSuccess: (result) => { setRevealedDestination(result.destination); toast.success(`Destino revelado por ${result.expiresInSeconds} segundos`); }, onError: (error) => toast.error(adminErrorMessage(error)) });
   useEffect(() => { if (!revealedDestination) return; const timer = window.setTimeout(() => setRevealedDestination(null), 60_000); return () => window.clearTimeout(timer); }, [revealedDestination]);
-  if (id) return <Shell active="payouts" title="Detalle de retiro" description="Destino enmascarado, revelado controlado, referencia externa y movimientos reservados." action={<Link className="button button-secondary" href="/admin/affiliates/payouts"><ArrowLeft size={16} />Volver</Link>}>{detail.isLoading ? <Feedback>Cargando…</Feedback> : detail.isError || !detail.data ? <Feedback error>{detail.error ? adminErrorMessage(detail.error) : 'No encontrado'}</Feedback> : <section className="admin-panel"><div className="admin-panel-body"><h2>{detail.data.payout.affiliate.publicName} · {money(detail.data.payout.amountMinor)}</h2><p>Estado: {label(detail.data.payout.status)} · Destino terminado en {detail.data.payout.destinationLast4 ?? '—'}</p><div className="admin-row-actions"><Button variant="ghost" onClick={() => reveal.mutate(detail.data!.payout.id)} disabled={reveal.isPending || !detail.data.payout.destinationLast4}><Eye size={15} />Revelar destino</Button>{revealedDestination && <strong className="admin-sensitive-value">{revealedDestination}</strong>}</div><p>Referencia registrada: {detail.data.payout.externalReference ?? '—'}</p><TextField label="Referencia externa del pago" value={externalReference} onChange={(event) => setExternalReference(event.target.value)} placeholder="Transferencia-2026-001" required /><div className="admin-row-actions">{detail.data.payout.status === 'REQUESTED' && <Button onClick={() => process.mutate({ row: detail.data.payout, next: 'PROCESSING' })} disabled={process.isPending || externalReference.trim().length < 2}>Pasar a procesando</Button>}{detail.data.payout.status === 'PROCESSING' && <><Button onClick={() => process.mutate({ row: detail.data.payout, next: 'PAID' })} disabled={process.isPending || externalReference.trim().length < 2}>Marcar pagado</Button><Button variant="danger" onClick={() => process.mutate({ row: detail.data.payout, next: 'REJECTED' })} disabled={process.isPending || externalReference.trim().length < 2}>Rechazar</Button></>}</div><h3>Movimientos</h3>{detail.data.ledger.map((entry) => <div className="admin-detail-line" key={entry.id}><span>{entry.bucket} · {entry.type}</span><strong>{money(entry.amountMinor)}</strong></div>)}</div></section>}</Shell>;
+  if (id) return <Shell active="payouts" title="Detalle de retiro" description="Destino enmascarado, revelado controlado, referencia externa y movimientos reservados." action={<Link className="button button-secondary" href="/admin/affiliates/payouts"><ArrowLeft size={16} />Volver</Link>}>{detail.isLoading ? <Feedback>Cargando…</Feedback> : detail.isError || !detail.data ? <Feedback error>{detail.error ? adminErrorMessage(detail.error) : 'No encontrado'}</Feedback> : <section className={shared.adminPanel}><div className={shared.adminPanelBody}><h2>{detail.data.payout.affiliate.publicName} · {money(detail.data.payout.amountMinor)}</h2><p>Estado: {label(detail.data.payout.status)} · Destino terminado en {detail.data.payout.destinationLast4 ?? '—'}</p><div className={shared.adminRowActions}><Button variant="ghost" onClick={() => reveal.mutate(detail.data!.payout.id)} disabled={reveal.isPending || !detail.data.payout.destinationLast4}><Eye size={15} />Revelar destino</Button>{revealedDestination && <strong className={styles.adminSensitiveValue}>{revealedDestination}</strong>}</div><p>Referencia registrada: {detail.data.payout.externalReference ?? '—'}</p><TextField label="Referencia externa del pago" value={externalReference} onChange={(event) => setExternalReference(event.target.value)} placeholder="Transferencia-2026-001" required /><div className={shared.adminRowActions}>{detail.data.payout.status === 'REQUESTED' && <Button onClick={() => process.mutate({ row: detail.data.payout, next: 'PROCESSING' })} disabled={process.isPending || externalReference.trim().length < 2}>Pasar a procesando</Button>}{detail.data.payout.status === 'PROCESSING' && <><Button onClick={() => process.mutate({ row: detail.data.payout, next: 'PAID' })} disabled={process.isPending || externalReference.trim().length < 2}>Marcar pagado</Button><Button variant="danger" onClick={() => process.mutate({ row: detail.data.payout, next: 'REJECTED' })} disabled={process.isPending || externalReference.trim().length < 2}>Rechazar</Button></>}</div><h3>Movimientos</h3>{detail.data.ledger.map((entry) => <div className={styles.adminDetailLine} key={entry.id}><span>{entry.bucket} · {entry.type}</span><strong>{money(entry.amountMinor)}</strong></div>)}</div></section>}</Shell>;
   return <Shell active="payouts" title="Retiros" description="Solicitudes con destino enmascarado y flujo en dos pasos: procesando y pagado o rechazado." action={<Button variant="secondary" onClick={() => void query.refetch()} disabled={query.isFetching}><RefreshCw size={16} />Actualizar</Button>}>
-    <section className="admin-panel">
-      <div className="admin-panel-header">
+    <section className={shared.adminPanel}>
+      <div className={shared.adminPanelHeader}>
         <div>
-          <span className="admin-panel-kicker">Finanzas</span>
+          <span className={shared.adminPanelKicker}>Finanzas</span>
           <h2>Historial de retiros</h2>
         </div>
         <select aria-label="Filtrar retiros" value={status} onChange={(event) => setStatus(event.target.value)}>
@@ -1032,24 +1048,24 @@ function PayoutsLegacy({ id }: { id?: string }) {
         </select>
       </div>
       {query.isLoading ? <Feedback>Cargando retiros…</Feedback> : query.isError ? <Feedback error>{adminErrorMessage(query.error)}</Feedback> : (
-        <div className="admin-panel-body">
-          <ul className="admin-list">
+        <div className={shared.adminPanelBody}>
+          <ul className={shared.adminList}>
             {query.data.items.map((row) => (
               <li key={row.id}>
-                <div className="admin-list-row">
+                <div className={shared.adminListRow}>
                   <Link href={`/admin/affiliates/payouts/${row.id}`}>
                     <strong>{row.affiliate.publicName} · {money(row.amountMinor)}</strong>
                     <span>Destino terminado en {row.destinationLast4 ?? '—'} · {date(row.createdAt)}</span>
                     <small>{label(row.status)}</small>
                   </Link>
-                  <div className="admin-row-actions">
+                  <div className={shared.adminRowActions}>
                     <Link className="button button-ghost" href={`/admin/affiliates/payouts/${row.id}`}>Ver detalle</Link>
                   </div>
                 </div>
               </li>
             ))}
           </ul>
-          {query.data.items.length === 0 && <p className="admin-empty-copy">No hay retiros para este filtro.</p>}
+          {query.data.items.length === 0 && <p className={shared.adminEmptyCopy}>No hay retiros para este filtro.</p>}
         </div>
       )}
     </section>
@@ -1086,30 +1102,30 @@ function Settings() {
   });
 
   return <Shell active="settings" title="Configuración de afiliados" description="Comisión global y plazo de cierre automático. Cada suborden conserva la comisión aplicada al momento de la compra.">
-    <section className="admin-panel affiliate-admin-settings-panel">
-      <div className="admin-panel-header affiliate-admin-settings-header">
+    <section className={[shared.adminPanel, styles.affiliateAdminSettingsPanel].filter(Boolean).join(' ')}>
+      <div className={[shared.adminPanelHeader, styles.affiliateAdminSettingsHeader].filter(Boolean).join(' ')}>
         <div>
-          <span className="admin-panel-kicker">Reglas comerciales</span>
+          <span className={shared.adminPanelKicker}>Reglas comerciales</span>
           <h2>Parámetros del programa</h2>
         </div>
         <Settings2 size={20} aria-hidden="true" />
       </div>
-      {query.isLoading ? <Feedback>Cargando configuración…</Feedback> : query.isError ? <Feedback error>{adminErrorMessage(query.error)}</Feedback> : query.data && <form className="affiliate-admin-settings-form" onSubmit={(event) => { event.preventDefault(); save.mutate(); }}>
-        <div className="affiliate-admin-settings-fields">
-          <div className="affiliate-admin-setting-card">
+      {query.isLoading ? <Feedback>Cargando configuración…</Feedback> : query.isError ? <Feedback error>{adminErrorMessage(query.error)}</Feedback> : query.data && <form className={styles.affiliateAdminSettingsForm} onSubmit={(event) => { event.preventDefault(); save.mutate(); }}>
+        <div className={styles.affiliateAdminSettingsFields}>
+          <div className={styles.affiliateAdminSettingCard}>
             <TextField label="Comisión global (%)" type="number" min="0" max="100" step="0.01" value={commission ?? String(query.data.commissionBps / 100)} onChange={(event) => setCommission(event.target.value)} />
-            <p className="affiliate-admin-setting-description">Porcentaje que recibe la plataforma en cada nueva venta de afiliado.</p>
+            <p className={styles.affiliateAdminSettingDescription}>Porcentaje que recibe la plataforma en cada nueva venta de afiliado.</p>
           </div>
-          <div className="affiliate-admin-setting-card">
+          <div className={styles.affiliateAdminSettingCard}>
             <TextField label="Días hasta cierre automático" type="number" min="1" max="90" value={days ?? String(query.data.autoCompleteDays)} onChange={(event) => setDays(event.target.value)} />
-            <p className="affiliate-admin-setting-description">Tiempo de espera antes de completar automáticamente una venta sin incidencias.</p>
+            <p className={styles.affiliateAdminSettingDescription}>Tiempo de espera antes de completar automáticamente una venta sin incidencias.</p>
           </div>
         </div>
-        <div className="affiliate-admin-settings-note">
+        <div className={styles.affiliateAdminSettingsNote}>
           <strong>Importante</strong>
           <p>La comisión queda congelada en cada suborden. Estos cambios solo afectan las nuevas ventas y no modifican el historial.</p>
         </div>
-        <div className="affiliate-admin-settings-actions">
+        <div className={styles.affiliateAdminSettingsActions}>
           <span>Revisá los valores antes de guardar.</span>
           <Button type="submit" disabled={save.isPending}>{save.isPending ? 'Guardando…' : 'Guardar configuración'}</Button>
         </div>

@@ -6,12 +6,12 @@ import styles from './ImageManager.module.css';
 
 export interface ManagedImage { id: string; url: string; altText: string | null; sortOrder: number; }
 export function ImageManager({ images, onMove, onRemove, onAltChange, disabled = false }: { images: ManagedImage[]; onMove: (id: string, direction: -1 | 1) => void; onRemove: (id: string) => void; onAltChange: (id: string, value: string) => void; disabled?: boolean }) {
-  if (!images.length) return <div className={`${styles.adminImageEmpty} admin-image-empty`}><ImageOff size={28} /><span>Este producto todavía no tiene imágenes.</span></div>;
+  if (!images.length) return <div className={styles.adminImageEmpty}><ImageOff size={28} /><span>Este producto todavía no tiene imágenes.</span></div>;
   return (
-    <ol className={`${styles.adminImageGrid} admin-image-grid`}>
+    <ol className={styles.adminImageGrid}>
       {images.map((image, index) => (
         <li key={image.id}>
-          <div className={`${styles.adminImagePreview} admin-image-preview`}>
+          <div className={styles.adminImagePreview}>
             <Image src={image.url} alt={image.altText ?? ''} width={320} height={400} unoptimized />
             {index === 0 && <span><Star size={12} />Portada</span>}
           </div>
@@ -29,4 +29,3 @@ export function ImageManager({ images, onMove, onRemove, onAltChange, disabled =
     </ol>
   );
 }
-

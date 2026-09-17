@@ -1,4 +1,36 @@
-/* fulfillment-management CSS Module */
-.container {
-  width: 100%;
+/* Migrated from admin.css */
+.adminCardSection { padding-top: 18px; }
+
+.adminSectionActions { display: flex; justify-content: flex-end; margin-bottom: 14px; }
+
+.adminConfigGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+
+.adminConfigCard { display: grid; gap: 16px; padding: 18px; border: 2px solid var(--line); background: rgba(16, 22, 29, .97); box-shadow: 5px 5px 0 #05070a; }
+
+.adminConfigCard header { display: flex; align-items: center; gap: 12px; }
+
+.adminConfigCard header > div { min-width: 0; flex: 1; }
+
+.adminConfigCard h2 { margin: 0; font: 700 13px/1.4 'Nunito', var(--font-geist), Arial, sans-serif; text-transform: uppercase; }
+
+.adminConfigCard header small, .adminConfigCard p { color: var(--muted); }
+
+.adminConfigCard p { margin: 0; line-height: 1.55; }
+
+.adminConfigIcon { width: 42px; height: 42px; display: grid; place-items: center; border: 2px solid var(--cyan); color: var(--cyan); }
+
+.adminConfigCard ul { margin: 0; padding: 0; border-top: 1px solid var(--line); list-style: none; }
+
+.adminConfigCard li { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+
+.adminRateList { border: 2px solid var(--line); }
+
+.adminRateList :global([class*="adminPanelHeader"]) { min-height: 48px; }
+
+.adminRateRow { display: grid; grid-template-columns: 1.4fr 1fr auto auto; align-items: end; gap: 10px; padding: 12px; border-top: 1px solid var(--line); }
+
+.adminTextDanger { min-height: 42px; border: 0; background: transparent; color: var(--warm); cursor: pointer; }
+
+@media (max-width: 680px) {
+  .adminRateRow { grid-template-columns: 1fr; align-items: stretch; }
 }

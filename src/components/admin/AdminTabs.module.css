@@ -4,3 +4,40 @@
   gap: 0;
   border-bottom: 2px solid var(--line);
 }
+
+.adminTabs button {
+  min-height: 48px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 16px;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  background: transparent;
+  color: var(--muted);
+  font: 700 12px/1.4 'Nunito', var(--font-geist), Arial, sans-serif;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: color .16s, border-color .16s, background .16s;
+}
+
+.adminTabs button:hover {
+  color: var(--ink);
+}
+
+.adminTabs button[aria-selected='true'] {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(255, 213, 47, .06);
+}
+
+.adminTabs button span {
+  min-width: 22px;
+  padding: 4px;
+  background: var(--line);
+  color: var(--ink);
+}
+
+.adminTabsContent {
+  padding-top: 18px;
+}

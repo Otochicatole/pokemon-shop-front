@@ -1,4 +1,60 @@
-/* admin-dashboard CSS Module */
-.container {
-  width: 100%;
+/* Migrated from admin.css */
+.adminRangePicker { display: flex; border: 2px solid var(--line); box-shadow: 3px 3px 0 #05070a; }
+
+.adminRangePicker button { min-height: 40px; padding: 0 12px; border: 0; border-right: 1px solid var(--line); background: #0c1219; color: var(--muted); font: 700 12px/1.4 'Nunito', var(--font-geist), Arial, sans-serif; cursor: pointer; transition: background .16s, color .16s; }
+
+.adminRangePicker button:last-child { border-right: 0; }
+
+.adminRangePicker button:hover { color: var(--ink); }
+
+.adminRangePicker button.isActive { background: var(--accent); color: #05070a; }
+
+.adminStats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-bottom: 24px; }
+
+.adminGrid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 16px; }
+
+.adminGridMain { grid-column: span 8; }
+
+.adminGridSide { grid-column: span 4; }
+
+.adminActivityPanel { margin-top: 18px; }
+
+.adminHealthStrip { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: 18px; border: 2px solid var(--line); background: linear-gradient(145deg, rgba(16, 24, 32, .96), #0c1219); box-shadow: 5px 5px 0 #05070a; }
+
+.adminHealthStrip > div { display: flex; align-items: center; gap: 12px; min-height: 82px; padding: 15px 18px; border-right: 1px solid var(--line); color: var(--muted); }
+
+.adminHealthStrip > div:last-child { border-right: 0; }
+
+.adminHealthStrip span, .adminHealthStrip strong { display: block; }
+
+.adminHealthStrip strong { margin-top: 5px; color: var(--ink); font: 700 14px/1.35 'Nunito', var(--font-geist), Arial, sans-serif; }
+
+.adminHealthStrip .isOk { color: var(--green); }
+
+.adminHealthStrip .isOff { color: var(--warm); }
+
+.adminHealthStrip > div:nth-child(3n) { border-right: 0; }
+
+.adminHealthStrip > div:nth-child(-n+3) { border-bottom: 1px solid var(--line); }
+
+.adminStatusCounts { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+
+.adminStatusCounts li { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+
+@media (max-width: 1180px) {
+  .adminStats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .adminGridMain,
+  .adminGridSide { grid-column: 1 / -1; }
+  .adminHealthStrip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .adminHealthStrip > div { border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .adminHealthStrip > div:nth-child(2n) { border-right: 0; }
+  .adminHealthStrip > div:nth-last-child(-n+2) { border-bottom: 0; }
+}
+
+@media (max-width: 680px) {
+  .adminStats { grid-template-columns: 1fr; }
+  .adminRangePicker { width: 100%; }
+  .adminRangePicker button { flex: 1; }
+  .adminHealthStrip > div { border-right: 0; border-bottom: 1px solid var(--line); }
+  .adminHealthStrip > div:last-child { border-bottom: 0; }
 }

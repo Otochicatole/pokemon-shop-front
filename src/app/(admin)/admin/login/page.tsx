@@ -2,6 +2,8 @@ import { redirect } from 'next/navigation';
 import { ShieldCheck } from 'lucide-react';
 import { AdminLoginForm, getAdminServerSession } from '@/features/admin-auth';
 
+import styles from './page.module.css';
+import shell from '@/components/admin/AdminShell.module.css';
 export const metadata = { title: 'Acceso administrativo' };
 export const dynamic = 'force-dynamic';
 
@@ -10,10 +12,10 @@ export default async function AdminLoginPage({ searchParams }: { searchParams: P
   if (admin) redirect('/admin');
   const query = await searchParams;
   return (
-    <main className="admin-login-page">
-      <section className="admin-login-intro">
-        <div className="admin-brand">
-          <span className="admin-brand-mark">
+    <main className={styles.adminLoginPage}>
+      <section className={styles.adminLoginIntro}>
+        <div className={shell.adminBrand}>
+          <span className={shell.adminBrandMark}>
             <ShieldCheck size={21} aria-hidden="true" />
           </span>
           <span>
@@ -27,9 +29,9 @@ export default async function AdminLoginPage({ searchParams }: { searchParams: P
           </h1>
           <p>Productos, stock, órdenes y pagos en una superficie de trabajo segura.</p>
         </div>
-        <span className="admin-login-signal">Sistema preparado</span>
+        <span className={styles.adminLoginSignal}>Sistema preparado</span>
       </section>
-      <div className="admin-login-panel">
+      <div className={styles.adminLoginPanel}>
         <AdminLoginForm returnTo={query.returnTo} />
       </div>
     </main>

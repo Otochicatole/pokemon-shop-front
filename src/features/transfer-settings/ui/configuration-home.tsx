@@ -30,24 +30,24 @@ const configurationItems = [
 export function ConfigurationHomeView() {
   return <>
     <AdminPageHeader eyebrow="Administración" title="Configuración" description="Gestioná las opciones generales que impactan en la experiencia de compra." />
-    <section className="admin-config-directory" aria-labelledby="admin-config-directory-title">
-      <header className="admin-config-directory-header">
+    <section className={styles.adminConfigDirectory} aria-labelledby="admin-config-directory-title">
+      <header className={styles.adminConfigDirectoryHeader}>
         <div>
-          <span className="admin-config-directory-kicker">Áreas disponibles</span>
+          <span className={styles.adminConfigDirectoryKicker}>Áreas disponibles</span>
           <h2 id="admin-config-directory-title">Elegí qué querés configurar</h2>
         </div>
-        <span className="admin-config-directory-count">{configurationItems.length} opciones</span>
+        <span className={styles.adminConfigDirectoryCount}>{configurationItems.length} opciones</span>
       </header>
-      <ul className="admin-config-directory-list">
+      <ul className={styles.adminConfigDirectoryList}>
         {configurationItems.map(({ href, category, title, description, icon: Icon }) => <li key={href}>
-          <Link className="admin-config-directory-link" href={href}>
-            <span className="admin-config-directory-icon"><Icon size={22} aria-hidden="true" /></span>
-            <span className="admin-config-directory-copy">
-              <span className="admin-config-directory-category">{category}</span>
+          <Link className={styles.adminConfigDirectoryLink} href={href}>
+            <span className={styles.adminConfigDirectoryIcon}><Icon size={22} aria-hidden="true" /></span>
+            <span className={styles.adminConfigDirectoryCopy}>
+              <span className={styles.adminConfigDirectoryCategory}>{category}</span>
               <strong>{title}</strong>
               <span>{description}</span>
             </span>
-            <span className="admin-config-directory-action">Administrar <ArrowRight size={18} aria-hidden="true" /></span>
+            <span className={styles.adminConfigDirectoryAction}>Administrar <ArrowRight size={18} aria-hidden="true" /></span>
           </Link>
         </li>)}
       </ul>

@@ -21,7 +21,7 @@ export function CursorPagination({
       : 'Fin de la lista';
 
   return (
-    <nav className={`${styles.adminPagination} admin-pagination`} aria-label="Paginación">
+    <nav className={styles.adminPagination} aria-label="Paginación">
       <button type="button" disabled={!canPrevious || loading} onClick={onPrevious}>
         <ChevronLeft size={16} />
         Anterior

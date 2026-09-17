@@ -15,10 +15,10 @@ export function NotificationBell({ variant = 'store' }: { variant?: 'store' | 'a
     ? `Notificaciones: ${notificationUnreadCount} sin leer`
     : 'Notificaciones: sin novedades';
   const Icon = notificationUnreadCount > 0 ? BellRing : Bell;
-  const variantClass = variant === 'store' ? styles.notificationLinkStore : '';
+  const variantClass = variant === 'store' ? styles.notificationLinkStore : styles.supportNotificationLinkAdmin;
   return <Link
     href={href}
-    className={`${styles.notificationLink} ${variantClass} support-notification-link support-notification-link-${variant} ${notificationUnreadCount > 0 ? `${styles.hasUnread} has-unread` : ''}`}
+    className={`${styles.notificationLink} ${variantClass} ${notificationUnreadCount > 0 ? styles.hasUnread : ''}`}
     aria-label={label}
     title={connectionState === 'reconnecting' ? `${label}. Reconectando…` : label}
   >

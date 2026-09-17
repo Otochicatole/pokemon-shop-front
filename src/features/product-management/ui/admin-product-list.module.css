@@ -1,4 +1,2 @@
-/* admin-product-list CSS Module */
-.container {
-  width: 100%;
-}
+/* Migrated from admin.css */
+.productDelete:hover { border-color: var(--warm); color: var(--warm); }

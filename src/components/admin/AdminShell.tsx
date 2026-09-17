@@ -63,23 +63,57 @@ export function AdminShell({ adminName, adminEmail, navigation, onLogout, childr
     document.addEventListener('keydown', close);
     return () => { document.removeEventListener('keydown', close); document.body.style.overflow = overflow; previous?.focus(); };
   }, [menuOpen]);
-  return <div className={`${styles.adminShell} admin-shell`}>
-    <a className="admin-skip-link" href="#admin-content">Saltar al contenido</a>
-    {menuOpen && <button className="admin-sidebar-backdrop" aria-label="Cerrar navegación" onClick={() => setMenuOpen(false)} />}
-    <aside ref={sidebarRef} className={`${styles.adminSidebar} admin-sidebar ${menuOpen ? 'is-open' : ''}`} aria-label="Navegación administrativa">
-      <div className="admin-brand"><span className="admin-brand-mark"><ShieldCheck size={21} /></span><span>Card Shop<small>Control central</small></span><button type="button" className="admin-sidebar-close" onClick={() => setMenuOpen(false)} aria-label="Cerrar menú"><X size={20} /></button></div>
-      <nav className="admin-navigation">
-        {navigation.map((item) => {
-          const active = item.href === '/admin' ? pathname === item.href : pathname.startsWith(item.href);
-          return <Link key={item.href} href={item.href} onClick={closeMenu} aria-current={active ? 'page' : undefined} className={active ? 'is-active' : ''}><span aria-hidden="true">{item.icon}</span>{item.label}</Link>;
-        })}
-      </nav>
-      <div className="admin-profile"><div><strong>{adminName}</strong><span>{adminEmail}</span></div><button type="button" onClick={() => void onLogout()}><LogOut size={16} />Cerrar sesión</button></div>
-    </aside>
-    <div className={`${styles.adminWorkspace} admin-workspace`}>
-      <header className="admin-topbar"><button type="button" className="admin-menu-button" onClick={() => setMenuOpen(true)} aria-expanded={menuOpen} aria-label="Abrir menú"><Menu size={20} /></button><nav className="admin-breadcrumbs" aria-label="Migas de pan"><Link href="/admin">Admin</Link>{crumbs.map((crumb, index) => <span key={crumb.href}><b aria-hidden="true">/</b>{index === crumbs.length - 1 ? <strong aria-current="page">{crumb.label}</strong> : <Link href={crumb.href}>{crumb.label}</Link>}</span>)}</nav><div className="admin-topbar-actions"><NotificationBell variant="admin" /><Link href="/" target="_blank" rel="noreferrer">Ver tienda ↗</Link></div></header>
-      <main id="admin-content" className={`${styles.adminContent} admin-content`}>{children}</main>
+  return (
+    <div className={styles.adminShell}>
+      <a className={styles.adminSkipLink} href="#admin-content">Saltar al contenido</a>
+      {menuOpen && <button className={styles.adminSidebarBackdrop} aria-label="Cerrar navegación" onClick={() => setMenuOpen(false)} />}
+      <aside ref={sidebarRef} className={`${styles.adminSidebar} ${menuOpen ? styles.isOpen : ''}`} aria-label="Navegación administrativa">
+        <div className={styles.adminBrand}>
+          <span className={styles.adminBrandMark}><ShieldCheck size={21} /></span>
+          <span>Card Shop<small>Control central</small></span>
+          <button type="button" className={styles.adminSidebarClose} onClick={() => setMenuOpen(false)} aria-label="Cerrar menú"><X size={20} /></button>
+        </div>
+        <nav className={styles.adminNavigation}>
+          {navigation.map((item) => {
+            const active = item.href === '/admin' ? pathname === item.href : pathname.startsWith(item.href);
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={closeMenu}
+                aria-current={active ? 'page' : undefined}
+                className={active ? styles.isActive : undefined}
+              >
+                <span aria-hidden="true">{item.icon}</span>
+                {item.label}
+              </Link>
+            );
+          })}
+        </nav>
+        <div className={styles.adminProfile}>
+          <div><strong>{adminName}</strong><span>{adminEmail}</span></div>
+          <button type="button" onClick={() => void onLogout()}><LogOut size={16} />Cerrar sesión</button>
+        </div>
+      </aside>
+      <div className={styles.adminWorkspace}>
+        <header className={styles.adminTopbar}>
+          <button type="button" className={styles.adminMenuButton} onClick={() => setMenuOpen(true)} aria-expanded={menuOpen} aria-label="Abrir menú"><Menu size={20} /></button>
+          <nav className={styles.adminBreadcrumbs} aria-label="Migas de pan">
+            <Link href="/admin">Admin</Link>
+            {crumbs.map((crumb, index) => (
+              <span key={crumb.href}>
+                <b aria-hidden="true">/</b>
+                {index === crumbs.length - 1 ? <strong aria-current="page">{crumb.label}</strong> : <Link href={crumb.href}>{crumb.label}</Link>}
+              </span>
+            ))}
+          </nav>
+          <div className={styles.adminTopbarActions}>
+            <NotificationBell variant="admin" />
+            <Link href="/" target="_blank" rel="noreferrer">Ver tienda ↗</Link>
+          </div>
+        </header>
+        <main id="admin-content" className={styles.adminContent}>{children}</main>
+      </div>
     </div>
-  </div>;
+  );
 }
-

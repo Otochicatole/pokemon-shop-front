@@ -1,4 +1,63 @@
-/* admin-support-inbox CSS Module */
-.container {
-  width: 100%;
+/* Migrated from admin.css */
+.adminSupportSummary { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin-bottom: 18px; border: 2px solid var(--line); background: #0c1219; }
+
+.adminSupportSummary > div { min-height: 78px; display: flex; align-items: center; gap: 12px; padding: 15px 18px; border-right: 1px solid var(--line); color: var(--cyan); }
+
+.adminSupportSummary > div:last-child { border-right: 0; }
+
+.adminSupportSummary span,
+.adminSupportSummary strong { display: block; }
+
+.adminSupportSummary span { color: var(--muted); font-size: 13px; }
+
+.adminSupportSummary strong { margin-top: 5px; color: var(--ink); font: 700 14px/1.4 'Nunito', var(--font-geist), Arial, sans-serif; text-transform: uppercase; }
+
+.adminSupportToolbar { display: grid; grid-template-columns: repeat(2, minmax(180px, 260px)); }
+
+.adminSupportToolbar :global(.component-field) { width: 100%; min-width: 0; }
+
+.adminSupportSubject { min-width: 0; max-width: 520px; }
+
+.adminSupportSubject small { overflow: hidden; max-width: 460px; text-overflow: ellipsis; white-space: nowrap; }
+
+.adminSupportUnread { min-width: 27px; height: 27px; display: inline-grid; place-items: center; padding: 0 6px; border: 2px solid var(--warm); background: rgba(255, 91, 85, .14); color: #ffaaa6; font: 700 12px/1.4 'Nunito', var(--font-geist), Arial, sans-serif; }
+
+.adminSupportNewDialog { width: min(100%, 680px); max-height: min(90vh, 860px); overflow-y: auto; }
+
+.adminSupportSearchState { margin: -7px 0 0; color: var(--muted); font-size: 13px; }
+
+.adminSupportCustomerResults { max-height: 210px; overflow-y: auto; margin: -7px 0 0; padding: 0; border: 2px solid var(--line); list-style: none; }
+
+.adminSupportCustomerResults li + li { border-top: 1px solid var(--line); }
+
+.adminSupportCustomerResults button { width: 100%; display: block; padding: 12px 14px; border: 0; background: #0c1219; color: var(--ink); text-align: left; }
+
+.adminSupportCustomerResults button:hover,
+.adminSupportCustomerResults button:focus-visible { background: rgba(83, 190, 229, .1); color: var(--cyan); }
+
+.adminSupportCustomerResults strong,
+.adminSupportCustomerResults span { display: block; }
+
+.adminSupportCustomerResults span { margin-top: 3px; color: var(--muted); font-size: 12px; }
+
+.adminSupportSelectedCustomer { display: flex; align-items: center; gap: 12px; padding: 13px; border: 2px solid var(--cyan); background: rgba(83, 190, 229, .08); color: var(--cyan); }
+
+.adminSupportSelectedCustomer > div { min-width: 0; flex: 1; }
+
+.adminSupportSelectedCustomer strong,
+.adminSupportSelectedCustomer span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.adminSupportSelectedCustomer strong { color: var(--ink); }
+
+.adminSupportSelectedCustomer span { margin-top: 3px; color: var(--muted); font-size: 12px; }
+
+.adminSupportSelectedCustomer button { border: 0; background: transparent; color: var(--cyan); font: 700 12px/1.4 'Nunito', var(--font-geist), Arial, sans-serif; text-transform: uppercase; }
+
+@media (max-width: 680px) {
+  .adminSupportSummary { grid-template-columns: 1fr; }
+  .adminSupportSummary > div { border-right: 0; border-bottom: 1px solid var(--line); }
+  .adminSupportSummary > div:last-child { border-bottom: 0; }
+  .adminSupportToolbar { grid-template-columns: 1fr; }
+  .adminSupportSubject { min-width: 0; }
+  .adminSupportSubject small { max-width: 100%; }
 }

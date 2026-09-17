@@ -1,4 +1,84 @@
-/* admin-order-detail CSS Module */
-.container {
-  width: 100%;
+/* Migrated from admin.css */
+.adminSellerOrdersPanel { margin-bottom: 18px; overflow: hidden; }
+
+.sellerOrderAdminHeader { min-height: 84px; padding: 17px 20px; }
+
+.sellerOrderAdminHeader > div { min-width: 0; }
+
+.sellerOrderAdminHeader p { margin: 6px 0 0; color: var(--muted); font-size: 13px; line-height: 1.45; }
+
+.sellerOrderAdminList { display: grid; gap: 12px; padding: 16px; }
+
+.sellerOrderAdminCard { position: relative; display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr) minmax(0, auto); align-items: center; gap: 24px; min-width: 0; padding: 20px 20px 20px 24px; border: 1px solid var(--line); background: #0c131b; box-shadow: inset 4px 0 0 var(--cyan); transition: border-color .16s ease, background .16s ease, transform .16s ease; }
+
+.sellerOrderAdminCard.isStore { box-shadow: inset 4px 0 0 var(--accent); }
+
+.sellerOrderAdminCard.hasNoActions { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); }
+
+.sellerOrderAdminCard:hover { border-color: var(--line-strong); background: #101923; transform: translateY(-1px); }
+
+.sellerOrderAdminIdentity { min-width: 0; display: flex; align-items: center; gap: 14px; }
+
+.sellerOrderAdminIdentity > div { min-width: 0; }
+
+.sellerOrderAdminIcon { width: 46px; height: 46px; flex: 0 0 46px; display: grid; place-items: center; border: 1px solid currentColor; background: rgba(83, 190, 229, .08); color: var(--cyan); }
+
+.sellerOrderAdminCard.isStore .sellerOrderAdminIcon { background: rgba(255, 213, 47, .08); color: var(--accent); }
+
+.sellerOrderAdminType { display: block; margin-bottom: 6px; color: var(--cyan); font: 700 11px/1.4 'Nunito', var(--font-geist), Arial, sans-serif; letter-spacing: .05em; text-transform: uppercase; }
+
+.sellerOrderAdminCard.isStore .sellerOrderAdminType { color: var(--accent); }
+
+.sellerOrderAdminIdentity h3 { overflow: hidden; margin: 0; color: var(--ink); font-size: 16px; line-height: 1.35; text-overflow: ellipsis; white-space: nowrap; }
+
+.sellerOrderAdminNumber { display: block; overflow: hidden; margin-top: 5px; color: var(--muted); font: 12px/1.4 ui-monospace, SFMono-Regular, Consolas, monospace; text-overflow: ellipsis; white-space: nowrap; }
+
+.sellerOrderAdminSummary { min-width: 0; display: grid; grid-template-columns: minmax(116px, 1fr) minmax(120px, 1fr) minmax(120px, .9fr); align-items: stretch; border: 1px solid var(--line); background: rgba(7, 10, 15, .42); }
+
+.sellerOrderAdminSummaryItem { min-width: 0; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 7px; padding: 11px 13px; border-right: 1px solid var(--line); }
+
+.sellerOrderAdminSummaryItem:last-child { border-right: 0; }
+
+.sellerOrderAdminSummaryItem > span:first-child { color: var(--muted); font: 700 11px/1.4 'Nunito', var(--font-geist), Arial, sans-serif; text-transform: uppercase; white-space: nowrap; }
+
+.sellerOrderAdminSummaryItem > strong { color: var(--ink); font-size: 14px; white-space: nowrap; }
+
+.sellerOrderAdminSummaryItem:nth-child(2) > strong { color: var(--accent); font: 700 13px/1.4 'Nunito', var(--font-geist), Arial, sans-serif; }
+
+.sellerOrderAdminProducts strong { display: inline-flex; align-items: center; gap: 6px; color: #c8d4dc; font-size: 12px; }
+
+.sellerOrderAdminProducts svg { color: var(--muted); }
+
+.sellerOrderAdminActions { min-width: 0; display: flex; flex-direction: column; align-items: stretch; gap: 8px; }
+
+.sellerOrderAdminActions :global(.button) { width: 100%; min-height: 42px; padding-inline: 14px; white-space: nowrap; }
+
+@media (max-width: 1320px) {
+  .sellerOrderAdminCard,
+  .sellerOrderAdminCard.hasNoActions { grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); }
+  .sellerOrderAdminActions { min-width: 0; grid-column: 1 / -1; flex-direction: row; justify-content: flex-end; flex-wrap: wrap; padding-top: 16px; border-top: 1px solid var(--line); }
+  .sellerOrderAdminActions :global(.button) { width: auto; min-width: 0; flex: 1 1 160px; }
+}
+
+.adminOrderActions { display: flex; flex-wrap: wrap; gap: 9px; margin-bottom: 18px; }
+
+.adminReceiptReview { display: flex; align-items: center; justify-content: space-between; gap: 15px; margin: 12px 0 18px; padding: 14px; border: 2px solid var(--accent); background: rgba(255, 213, 47, .08); }
+
+.adminReceiptReview > div, .adminReceiptActions { display: flex; align-items: center; gap: 8px; }
+
+@media (max-width: 680px) {
+  .adminReceiptReview { align-items: stretch; flex-direction: column; }
+  .adminReceiptReview > div { width: 100%; }
+  .adminReceiptReview :global(.button) { flex: 1; }
+  .sellerOrderAdminHeader { align-items: flex-start; flex-direction: column; padding: 16px; }
+  .sellerOrderAdminList { padding: 12px; }
+  .sellerOrderAdminCard,
+  .sellerOrderAdminCard.hasNoActions { grid-template-columns: 1fr; gap: 16px; padding: 18px 16px 18px 20px; }
+  .sellerOrderAdminIdentity h3,
+  .sellerOrderAdminNumber { white-space: normal; overflow-wrap: anywhere; }
+  .sellerOrderAdminSummary { grid-template-columns: 1fr; }
+  .sellerOrderAdminSummaryItem { min-height: 62px; border-right: 0; border-bottom: 1px solid var(--line); }
+  .sellerOrderAdminSummaryItem:last-child { border-bottom: 0; }
+  .sellerOrderAdminActions { grid-column: auto; flex-direction: column; padding-top: 16px; }
+  .sellerOrderAdminActions :global(.button) { width: 100%; min-width: 0; }
 }

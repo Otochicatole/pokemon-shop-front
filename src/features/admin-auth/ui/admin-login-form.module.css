@@ -1,4 +1,15 @@
-/* admin-login-form CSS Module */
-.container {
-  width: 100%;
+/* Migrated from admin.css */
+.adminLoginCard { width: min(100%, 480px); padding: clamp(24px, 4vw, 42px); border: 2px solid var(--line-strong); background: linear-gradient(145deg, rgba(22, 30, 39, .98), rgba(16, 22, 29, .98)); box-shadow: 8px 8px 0 #05070a; }
+
+.adminLoginCard h2 { margin: 8px 0 28px; font: 800 28px/1.25 'Nunito', var(--font-geist), Arial, sans-serif; letter-spacing: -.02em; text-transform: none; text-shadow: none; }
+
+.adminLoginCard form { display: grid; gap: 16px; }
+
+.adminLoginCard :global(.button) { width: 100%; margin-top: 8px; }
+
+.adminLoginCard footer { margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; line-height: 1.55; }
+
+@media (max-width: 680px) {
+  .adminLoginCard { padding: 24px 18px; }
+  .adminLoginCard h2 { font-size: 21px; }
 }

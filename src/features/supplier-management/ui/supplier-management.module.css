@@ -1,4 +1,24 @@
-/* supplier-management CSS Module */
-.container {
-  width: 100%;
+/* Migrated from admin.css */
+.supplierToolbar { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, .75fr); align-items: end; }
+
+.supplierToolbar :global(.component-field),
+.supplierToolbar :global([class*="adminSearchField"]) { width: 100%; min-width: 0; flex: initial; }
+
+.supplierToolbar select { width: 100%; min-width: 0; }
+
+.supplierContact { display: inline-flex; align-items: center; gap: 6px; }
+
+.supplierToggle.isActive { color: var(--warm); }
+
+.supplierToggle.isInactive { color: var(--green); }
+
+.supplierToggle:hover { border-color: currentColor; }
+
+@media (max-width: 900px) {
+  .supplierToolbar,
+  .newsToolbar { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 680px) {
+  .supplierToolbar { grid-template-columns: 1fr; }
 }

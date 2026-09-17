@@ -2,7 +2,7 @@ import styles from './SwitchField.module.css';
 
 export function SwitchField({ label, checked, onChange, description, disabled = false }: { label: string; checked: boolean; onChange: (checked: boolean) => void; description?: string; disabled?: boolean }) {
   return (
-    <label className={`${styles.adminSwitch} admin-switch`}>
+    <label className={styles.adminSwitch}>
       <button type="button" role="switch" aria-label={label} aria-checked={checked} disabled={disabled} onClick={() => onChange(!checked)}>
         <span />
       </button>
@@ -13,4 +13,3 @@ export function SwitchField({ label, checked, onChange, description, disabled = 
     </label>
   );
 }
-

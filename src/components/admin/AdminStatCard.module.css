@@ -30,22 +30,26 @@
   align-items: center;
   gap: 8px;
   color: currentColor;
-  font: 700 12px/1.4 'Nunito', var(--font-geist), Arial, sans-serif;
-  letter-spacing: .04em;
+  font: 700 12px/1.5 'Nunito', var(--font-geist), Arial, sans-serif;
   text-transform: uppercase;
 }
 
-.adminStatCard > :global(strong) {
+.adminStatCard > strong {
   display: block;
   margin-top: 18px;
   color: var(--ink);
-  font: 800 28px/1.2 'Nunito', var(--font-geist), Arial, sans-serif;
-  letter-spacing: -.02em;
+  font: 800 26px/1.2 'Nunito', var(--font-geist), Arial, sans-serif;
 }
 
-.adminStatCard > :global(small) {
+.adminStatCard > small {
   display: block;
   margin-top: 9px;
   color: var(--muted);
   font-size: 13px;
 }
+
+.toneYellow { color: var(--accent); }
+.toneCyan { color: var(--cyan); }
+.toneGreen { color: var(--green); }
+.toneRed { color: var(--warm); }
+.tonePurple { color: var(--purple); }

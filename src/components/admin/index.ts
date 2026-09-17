@@ -9,3 +9,4 @@ export * from './SwitchField';
 export * from './MoneyField';
 export * from './ConfirmDialog';
 export * from './ImageManager';
+export { adminShared } from './admin-shared';

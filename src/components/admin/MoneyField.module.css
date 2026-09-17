@@ -14,5 +14,9 @@
   border-right: 0;
   background: var(--accent);
   color: #05070a;
-  font: 800 13px 'Nunito', var(--font-geist), Arial, sans-serif;
+  font: 700 12px/1.4 'Nunito', var(--font-geist), Arial, sans-serif;
+}
+
+.adminMoneyInput input {
+  width: 100%;
 }

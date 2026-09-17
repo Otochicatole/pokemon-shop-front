@@ -1,4 +1,27 @@
-/* page page/layout styles */
-.container {
-  width: 100%;
+/* Migrated from admin.css */
+.adminLoginPage { min-height: 100vh; display: grid; grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); background-image: radial-gradient(#1c2732 1px, transparent 1px); background-size: 18px 18px; }
+
+.adminLoginIntro { min-height: 100vh; display: flex; flex-direction: column; justify-content: space-between; padding: clamp(30px, 5vw, 80px); border-right: 2px solid var(--line-strong); background: linear-gradient(145deg, rgba(22, 34, 45, .55), rgba(16, 22, 29, .98) 42%, rgba(7, 10, 15, .98)); }
+
+.adminLoginIntro h1 { max-width: 620px; margin: auto 0 24px; font: 800 clamp(34px, 5vw, 58px)/1.15 'Nunito', var(--font-geist), Arial, sans-serif; letter-spacing: -.03em; text-transform: none; text-shadow: none; }
+
+.adminLoginIntro h1 span { color: var(--accent); }
+
+.adminLoginIntro p { max-width: 520px; color: #b8c4cc; font-size: 17px; line-height: 1.6; }
+
+.adminLoginSignal { display: flex; align-items: center; gap: 10px; color: var(--green); font: 700 12px/1.4 'Nunito', var(--font-geist), Arial, sans-serif; letter-spacing: .06em; text-transform: uppercase; }
+
+.adminLoginSignal::before { content: ''; width: 10px; height: 10px; background: var(--green); box-shadow: 0 0 12px var(--green); animation: admin-blink 1.2s steps(1, end) infinite; }
+
+.adminLoginPanel { display: grid; place-items: center; padding: 30px; }
+
+@media (max-width: 900px) {
+  .adminLoginPage { grid-template-columns: 1fr; }
+  .adminLoginIntro { min-height: 280px; padding: 34px 24px; border-right: 0; border-bottom: 2px solid var(--line-strong); }
+  .adminLoginIntro h1 { margin: 50px 0 16px; font-size: clamp(30px, 8vw, 48px); }
+  .adminLoginPanel { min-height: 0; padding: 28px 18px 48px; }
+}
+
+@media (max-width: 680px) {
+  .adminLoginPanel { min-height: 0; padding: 22px 15px 54px; }
 }

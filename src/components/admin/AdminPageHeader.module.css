@@ -10,7 +10,7 @@
 
 .adminPageHeader h1 {
   margin: 8px 0 0;
-  font: 700 clamp(26px, 3vw, 36px) / 1.25 'Nunito', var(--font-geist), Arial, sans-serif;
+  font: 700 clamp(26px, 3vw, 36px)/1.25 'Nunito', var(--font-geist), Arial, sans-serif;
   letter-spacing: -.02em;
   text-transform: none;
   text-shadow: none;
@@ -29,7 +29,7 @@
   align-items: center;
   gap: 8px;
   color: var(--accent);
-  font: 700 12px / 1.5 'Nunito', var(--font-geist), Arial, sans-serif;
+  font: 700 12px/1.5 'Nunito', var(--font-geist), Arial, sans-serif;
   letter-spacing: .06em;
   text-transform: uppercase;
 }
@@ -46,6 +46,10 @@
   .adminPageHeader {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .adminPageHeader h1 {
+    font-size: 25px;
   }
 
   .adminPageActions {

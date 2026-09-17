@@ -1,0 +1,7 @@
+@keyframes admin-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes admin-blink {
+  50% { opacity: .25; }
+}

@@ -8,9 +8,9 @@ export function MoneyField({ label, error, id, ...props }: Omit<InputHTMLAttribu
   const inputId = id ?? `money-${generatedId}`;
   const errorId = `${inputId}-error`;
   return (
-    <label className={`${styles.adminMoneyField} component-field admin-money-field`} htmlFor={inputId}>
+    <label className={`${styles.adminMoneyField} component-field`} htmlFor={inputId}>
       <span>{label}</span>
-      <span className={`${styles.adminMoneyInput} admin-money-input`}>
+      <span className={styles.adminMoneyInput}>
         <b>USD</b>
         <input id={inputId} type="number" min="0" step="0.01" inputMode="decimal" aria-invalid={Boolean(error)} aria-describedby={error ? errorId : undefined} {...props} />
       </span>
@@ -18,4 +18,3 @@ export function MoneyField({ label, error, id, ...props }: Omit<InputHTMLAttribu
     </label>
   );
 }
-

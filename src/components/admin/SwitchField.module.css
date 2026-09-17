@@ -6,6 +6,35 @@
   min-width: 0;
 }
 
+.adminSwitch > button {
+  width: 48px;
+  height: 26px;
+  flex: 0 0 48px;
+  position: relative;
+  border: 2px solid var(--line-strong);
+  background: #080c11;
+}
+
+.adminSwitch > button span {
+  width: 16px;
+  height: 16px;
+  position: absolute;
+  left: 3px;
+  top: 3px;
+  background: var(--muted);
+  transition: transform .15s;
+}
+
+.adminSwitch > button[aria-checked='true'] {
+  border-color: var(--green);
+  background: rgba(121, 201, 107, .16);
+}
+
+.adminSwitch > button[aria-checked='true'] span {
+  background: var(--green);
+  transform: translateX(21px);
+}
+
 .adminSwitch > span {
   min-width: 0;
 }
@@ -22,9 +51,8 @@
 }
 
 .adminSwitch small {
-  margin-top: 4px;
+  margin-top: 3px;
   color: var(--muted);
   font-size: 12px;
   line-height: 1.45;
 }
-

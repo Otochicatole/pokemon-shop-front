@@ -19,7 +19,7 @@ export function AdminTabs({ tabs, active, onChange, label = 'Secciones', id = 'a
     if (tab) { onChange(tab.id); buttons.current[next]?.focus(); }
   };
   return (
-    <div className={`${styles.adminTabs} admin-tabs`} role="tablist" aria-label={label}>
+    <div className={styles.adminTabs} role="tablist" aria-label={label}>
       {tabs.map((tab, index) => (
         <button
           ref={(node) => { buttons.current[index] = node; }}
@@ -43,6 +43,15 @@ export function AdminTabs({ tabs, active, onChange, label = 'Secciones', id = 'a
 
 export function AdminTabPanel({ tabsId = 'admin-tabs', tabId, active, children, className = '' }: { tabsId?: string; tabId: string; active: boolean; children: ReactNode; className?: string }) {
   if (!active) return null;
-  return <section id={`${tabsId}-panel-${tabId}`} role="tabpanel" aria-labelledby={`${tabsId}-tab-${tabId}`} tabIndex={0} className={className}>{children}</section>;
+  return (
+    <section
+      id={`${tabsId}-panel-${tabId}`}
+      role="tabpanel"
+      aria-labelledby={`${tabsId}-tab-${tabId}`}
+      tabIndex={0}
+      className={[styles.adminTabsContent, className].filter(Boolean).join(' ')}
+    >
+      {children}
+    </section>
+  );
 }
-

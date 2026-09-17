@@ -909,7 +909,7 @@
 .affiliateSpin { animation: affiliateSpin 1s linear infinite; }
 @keyframes affiliateSpin { to { transform: rotate(360deg); } }
 
-.affiliatePanel :global(.admin-image-grid) {
+.affiliatePanel :global([class*="adminImageGrid"]) {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
   gap: 13px;
@@ -917,20 +917,20 @@
   padding: 0;
   list-style: none;
 }
-.affiliatePanel :global(.admin-image-grid > li) {
+.affiliatePanel :global([class*="adminImageGrid"] > li) {
   padding: 10px;
   border: 2px solid var(--line);
   background: #0a0f15;
 }
-.affiliatePanel :global(.admin-image-preview) {
+.affiliatePanel :global([class*="adminImagePreview"]) {
   position: relative;
   aspect-ratio: 4 / 5;
   overflow: hidden;
   border: 1px solid var(--line);
   background: #05070a;
 }
-.affiliatePanel :global(.admin-image-preview img) { width: 100%; height: 100%; object-fit: contain; }
-.affiliatePanel :global(.admin-image-preview > span) {
+.affiliatePanel :global([class*="adminImagePreview"] img) { width: 100%; height: 100%; object-fit: contain; }
+.affiliatePanel :global([class*="adminImagePreview"] > span) {
   position: absolute;
   left: 6px;
   top: 6px;
@@ -943,7 +943,7 @@
   font: 700 12px/1.4 'Nunito', var(--font-geist), Arial, sans-serif;
   text-transform: uppercase;
 }
-.affiliatePanel :global(.admin-image-grid label) {
+.affiliatePanel :global([class*="adminImageGrid"] label) {
   display: grid;
   gap: 5px;
   margin-top: 9px;
@@ -951,18 +951,18 @@
   font-size: 13px;
   text-transform: none;
 }
-.affiliatePanel :global(.admin-image-grid input) {
+.affiliatePanel :global([class*="adminImageGrid"] input) {
   width: 100%;
   min-height: 38px;
   padding: 0 8px;
 }
-.affiliatePanel :global(.admin-image-grid li > div:last-child) {
+.affiliatePanel :global([class*="adminImageGrid"] li > div:last-child) {
   display: flex;
   justify-content: flex-end;
   gap: 5px;
   margin-top: 8px;
 }
-.affiliatePanel :global(.admin-image-grid button) {
+.affiliatePanel :global([class*="adminImageGrid"] button) {
   width: 36px;
   height: 34px;
   display: grid;
@@ -971,8 +971,8 @@
   background: var(--surface);
   color: var(--ink);
 }
-.affiliatePanel :global(.admin-image-grid button:last-child) { color: var(--warm); }
-.affiliatePanel :global(.admin-image-empty) {
+.affiliatePanel :global([class*="adminImageGrid"] button:last-child) { color: var(--warm); }
+.affiliatePanel :global([class*="adminImageEmpty"]) {
   min-height: 150px;
   display: grid;
   place-items: center;

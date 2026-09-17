@@ -1,4 +1,21 @@
-/* affiliate-admin-navigation CSS Module */
-.container {
-  width: 100%;
+/* Migrated from admin.css */
+.affiliateAdminNavigation { position: sticky; top: 24px; padding: 16px; border: 2px solid var(--line); background: rgba(10, 15, 21, .97); box-shadow: 5px 5px 0 #05070a; }
+
+.affiliateAdminNavigationHeading { display: grid; gap: 6px; padding: 6px 10px 16px; border-bottom: 2px solid var(--line); }
+
+.affiliateAdminNavigationHeading :global([class*="adminPanelKicker"]) { margin-bottom: 0; }
+
+.affiliateAdminNavigationHeading strong { color: var(--ink); font: 700 13px/1.4 'Nunito', var(--font-geist), Arial, sans-serif; text-transform: uppercase; }
+
+.affiliateAdminNavigation nav { display: grid; gap: 6px; padding-top: 12px; }
+
+.affiliateAdminNavigation a { display: flex; align-items: center; min-height: 42px; padding: 0 12px; border: 1px solid transparent; color: var(--muted); font: 700 12px/1.4 'Nunito', var(--font-geist), Arial, sans-serif; text-transform: uppercase; transition: border-color .16s, background .16s, color .16s; }
+
+.affiliateAdminNavigation a:hover, .affiliateAdminNavigation a.isActive { border-color: var(--accent); background: rgba(255, 213, 47, .08); color: var(--accent); }
+
+@media (max-width: 900px) {
+  .affiliateAdminNavigation { position: static; padding: 12px; }
+  .affiliateAdminNavigationHeading { padding: 4px 8px 12px; }
+  .affiliateAdminNavigation nav { display: flex; overflow-x: auto; gap: 4px; padding-top: 10px; }
+  .affiliateAdminNavigation a { flex: 0 0 auto; white-space: nowrap; }
 }

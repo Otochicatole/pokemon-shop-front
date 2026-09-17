@@ -34,7 +34,8 @@ import {
   markNotificationRead,
 } from '../infrastructure/api';
 import styles from './notifications-center.module.css';
-
+import shared from '@/components/admin/admin-shared.module.css';
+import headerStyles from '@/components/admin/AdminPageHeader.module.css';
 type Role = 'user' | 'admin';
 type Filter = 'ALL' | 'UNREAD';
 type Category = 'support' | 'order' | 'payment' | 'affiliate';
@@ -183,9 +184,9 @@ export function NotificationsCenter({ role }: { role: Role }) {
       </Link>
     )}
 
-    <header className={isAdmin ? 'admin-page-header' : styles.heading}>
+    <header className={isAdmin ? headerStyles.adminPageHeader : styles.heading}>
       <div>
-        <p className={isAdmin ? 'admin-eyebrow' : 'eyebrow'}>{isAdmin ? 'Operaciones' : 'Centro de avisos'}</p>
+        <p className={isAdmin ? headerStyles.adminEyebrow : styles.eyebrow}>{isAdmin ? 'Operaciones' : 'Centro de avisos'}</p>
         <h1>Notificaciones</h1>
         <p>
           {isAdmin
@@ -193,7 +194,7 @@ export function NotificationsCenter({ role }: { role: Role }) {
             : 'Todo lo importante sobre tus órdenes, pagos, afiliado y soporte aparece acá.'}
         </p>
       </div>
-      <div className={isAdmin ? 'admin-page-actions' : styles.actions}>
+      <div className={isAdmin ? headerStyles.adminPageActions : styles.actions}>
         <Button variant="secondary" onClick={() => markAll.mutate()} disabled={markAll.isPending || !hasUnread}>
           <CheckCheck size={16} aria-hidden="true" />
           Marcar todas como leídas
@@ -201,14 +202,14 @@ export function NotificationsCenter({ role }: { role: Role }) {
       </div>
     </header>
 
-    <section className={`${styles.panel} ${isAdmin ? 'admin-panel' : ''}`} aria-labelledby="notifications-list">
-      <div className={isAdmin ? 'admin-panel-header' : styles.panelHeading}>
+    <section className={`${styles.panel} ${isAdmin? shared.adminPanel : ''}`} aria-labelledby="notifications-list">
+      <div className={isAdmin ? shared.adminPanelHeader : styles.panelHeading}>
         <div className={styles.panelTitle}>
           {!isAdmin && <span className={styles.iconBox}><Bell size={18} aria-hidden="true" /></span>}
           <div>
             {isAdmin ? (
               <>
-                <span className="admin-panel-kicker">Bandeja operativa</span>
+                <span className={shared.adminPanelKicker}>Bandeja operativa</span>
                 <h2 id="notifications-list">Inbox del equipo</h2>
               </>
             ) : (

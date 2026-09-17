@@ -1,4 +1,24 @@
-/* audit-log CSS Module */
-.container {
-  width: 100%;
+/* Migrated from admin.css */
+.auditToolbar { display: grid; grid-template-columns: minmax(170px, 1.15fr) minmax(170px, 1fr) minmax(150px, .9fr) minmax(220px, 1.25fr) repeat(2, minmax(150px, .9fr)); align-items: end; }
+
+.auditToolbar :global(.component-field) { width: 100%; min-width: 0; flex: initial; }
+
+.auditToolbar input { width: 100%; min-width: 0; }
+
+@media (max-width: 1320px) {
+  .auditToolbar { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+.adminJsonView { max-height: 60vh; overflow: auto; margin: 18px 0 0; padding: 16px; border: 2px solid var(--line); background: #05070a; color: #bfe8f7; font: 12px/1.6 ui-monospace, SFMono-Regular, Consolas, monospace; white-space: pre-wrap; word-break: break-word; }
+
+@media (max-width: 1180px) {
+  .auditToolbar { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 900px) {
+  .auditToolbar { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 680px) {
+  .auditToolbar { display: grid; grid-template-columns: 1fr; }
 }

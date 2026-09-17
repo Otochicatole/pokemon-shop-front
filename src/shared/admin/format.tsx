@@ -1,6 +1,6 @@
 import type { Money } from '@/shared/api/contracts';
 import { formatMoney } from '@/shared/lib/format';
-import styles from './format.module.css';
+import { adminShared } from '@/components/admin/admin-shared';
 
 const labels: Record<string, string> = {
   DRAFT: 'Borrador', PUBLISHED: 'Publicado', ARCHIVED: 'Archivado',
@@ -28,9 +28,18 @@ export function adminStatusTone(value: string): 'yellow' | 'cyan' | 'green' | 'r
   return 'muted';
 }
 
+const badgeToneClass = {
+  yellow: adminShared.badgeYellow,
+  cyan: adminShared.badgeCyan,
+  green: adminShared.badgeGreen,
+  red: adminShared.badgeRed,
+  purple: adminShared.badgePurple,
+  muted: adminShared.badgeMuted,
+} as const;
+
 export function AdminBadge({ value }: { value: string }) {
   const tone = adminStatusTone(value);
-  return <span className={`admin-badge admin-badge-${tone}`}>{adminLabel(value)}</span>;
+  return <span className={`${adminShared.adminBadge} ${badgeToneClass[tone]}`}>{adminLabel(value)}</span>;
 }
 
 export function adminMoney(value?: Money | null) {

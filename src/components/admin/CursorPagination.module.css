@@ -5,3 +5,39 @@
   gap: 12px;
   margin-top: 18px;
 }
+
+.adminPagination button {
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 12px;
+  border: 2px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  font: 700 12px/1.4 'Nunito', var(--font-geist), Arial, sans-serif;
+  text-transform: uppercase;
+  transition: border-color .16s, color .16s, transform .16s, box-shadow .16s;
+}
+
+.adminPagination button:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 #05070a;
+}
+
+.adminPagination span {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+@media (max-width: 680px) {
+  .adminPagination {
+    justify-content: space-between;
+  }
+
+  .adminPagination > span {
+    display: none;
+  }
+}

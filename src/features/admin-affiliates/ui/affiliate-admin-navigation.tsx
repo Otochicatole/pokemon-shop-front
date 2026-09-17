@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import styles from './affiliate-admin-navigation.module.css';
 
+import shared from '@/components/admin/admin-shared.module.css';
 export type AffiliateAdminSection = 'overview' | 'sellers' | 'listings' | 'orders' | 'issues' | 'cancellations' | 'payouts' | 'settings';
 
 const sections: Array<{ key: AffiliateAdminSection; label: string; href: string }> = [
@@ -15,13 +16,13 @@ const sections: Array<{ key: AffiliateAdminSection; label: string; href: string 
 ];
 
 export function AffiliateAdminNavigation({ active }: { active: AffiliateAdminSection }) {
-  return <aside className="affiliate-admin-navigation" aria-label="Navegación del módulo de afiliados">
-    <div className="affiliate-admin-navigation-heading">
-      <span className="admin-panel-kicker">Marketplace</span>
+  return <aside className={styles.affiliateAdminNavigation} aria-label="Navegación del módulo de afiliados">
+    <div className={styles.affiliateAdminNavigationHeading}>
+      <span className={shared.adminPanelKicker}>Marketplace</span>
       <strong>Gestión de afiliados</strong>
     </div>
     <nav>
-      {sections.map((section) => <Link key={section.key} href={section.href} className={section.key === active ? 'is-active' : ''} aria-current={section.key === active ? 'page' : undefined}>{section.label}</Link>)}
+      {sections.map((section) => <Link key={section.key} href={section.href} className={section.key === active? styles.isActive : ''} aria-current={section.key === active ? 'page' : undefined}>{section.label}</Link>)}
     </nav>
   </aside>;
 }

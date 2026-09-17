@@ -9,11 +9,11 @@ export interface AdminTableColumn<T> {
 }
 
 export function AdminDataTable<T>({ columns, rows, rowKey, empty = 'No hay resultados para mostrar.', caption }: { columns: AdminTableColumn<T>[]; rows: T[]; rowKey: (row: T) => string; empty?: ReactNode; caption?: string }) {
-  if (!rows.length) return <div className={`${styles.adminTableEmpty} admin-table-empty`}>{empty}</div>;
+  if (!rows.length) return <div className={styles.adminTableEmpty}>{empty}</div>;
   return (
-    <div className={`${styles.adminTableWrap} admin-table-wrap`}>
-      <table className={`${styles.adminDataTable} admin-data-table`}>
-        {caption && <caption className="sr-only">{caption}</caption>}
+    <div className={styles.adminTableWrap}>
+      <table className={styles.adminDataTable}>
+        {caption && <caption className={styles.srOnly}>{caption}</caption>}
         <thead>
           <tr>{columns.map((column) => <th key={column.key} scope="col" style={{ textAlign: column.align ?? 'left' }}>{column.header}</th>)}</tr>
         </thead>
@@ -28,4 +28,3 @@ export function AdminDataTable<T>({ columns, rows, rowKey, empty = 'No hay resul
     </div>
   );
 }
-

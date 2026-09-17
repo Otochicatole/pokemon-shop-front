@@ -16,11 +16,12 @@
 
 .supportNotificationLinkStore:hover,
 .supportNotificationLinkStore:focus-visible,
-.supportNotificationLinkStore.hasUnread,
-.supportNotificationLinkStore:global(.has-unread) {
+.supportNotificationLinkStore.hasUnread {
   border-color: var(--purple);
   color: var(--purple);
 }
+
+.hasUnread {}
 
 .supportNotificationLinkStore span {
   min-width: 18px;

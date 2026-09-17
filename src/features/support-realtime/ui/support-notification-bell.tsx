@@ -18,7 +18,7 @@ export function SupportNotificationBell({ variant = 'store' }: { variant?: 'stor
   const variantClass = variant === 'store' ? styles.supportNotificationLinkStore : '';
   return <Link
     href={href}
-    className={`${styles.supportNotificationLink} ${variantClass} support-notification-link support-notification-link-${variant} ${unreadCount > 0 ? `${styles.hasUnread} has-unread` : ''}`}
+    className={`${styles.supportNotificationLink} ${variantClass} ${unreadCount > 0 ? styles.hasUnread : ''}`}
     aria-label={label}
     title={connectionState === 'reconnecting' ? `${label}. Reconectando…` : label}
   >

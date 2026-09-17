@@ -1,5 +1,5 @@
 import type { SupportConversationStatus } from '../domain/contracts';
-import styles from './support-status.module.css';
+import { adminShared } from '@/components/admin/admin-shared';
 
 const labels: Record<SupportConversationStatus, string> = {
   OPEN: 'Abierta',
@@ -8,18 +8,19 @@ const labels: Record<SupportConversationStatus, string> = {
   CLOSED: 'Cerrada',
 };
 
-const tones: Record<SupportConversationStatus, string> = {
-  OPEN: 'cyan',
-  IN_PROGRESS: 'yellow',
-  RESOLVED: 'green',
-  CLOSED: 'muted',
-};
+const toneClass = {
+  cyan: adminShared.badgeCyan,
+  yellow: adminShared.badgeYellow,
+  green: adminShared.badgeGreen,
+  muted: adminShared.badgeMuted,
+} as const;
 
 export function supportStatusLabel(status: SupportConversationStatus) {
   return labels[status];
 }
 
 export function SupportStatusBadge({ status }: { status: SupportConversationStatus }) {
-  return <span className={`admin-badge admin-badge-${tones[status]}`}>{labels[status]}</span>;
+  const tone = { OPEN: 'cyan', IN_PROGRESS: 'yellow', RESOLVED: 'green', CLOSED: 'muted' }[status] as keyof typeof toneClass;
+  return <span className={`${adminShared.adminBadge} ${toneClass[tone]}`}>{labels[status]}</span>;
 }
 

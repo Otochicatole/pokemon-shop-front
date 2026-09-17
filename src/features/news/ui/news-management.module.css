@@ -1,79 +1,40 @@
-.newsToolbar {
-  display: grid;
-  grid-template-columns: minmax(0, 2fr) minmax(0, .75fr);
-  align-items: end;
+/* Migrated from admin.css */
+.newsToolbar { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, .75fr); align-items: end; }
+
+.newsToolbar :global(.component-field), .newsToolbar :global([class*="adminSearchField"]) { width: 100%; min-width: 0; flex: initial; }
+
+.newsToolbar select { width: 100%; min-width: 0; }
+
+.newsTablePrimary { min-width: 0; }
+
+.newsWindow { display: grid; gap: 4px; color: var(--muted); font-size: 13px; }
+
+.newsWindow span:first-child { color: var(--ink); }
+
+.newsToggle.isActive { color: var(--warm); }
+
+.newsToggle.isInactive { color: var(--green); }
+
+.newsToggle:hover { border-color: currentColor; }
+
+.newsDelete:hover { border-color: var(--warm); color: var(--warm); }
+
+.adminNewsDialog {
+  width: min(100%, 680px);
+  max-height: min(90vh, 860px);
+  overflow-y: auto;
 }
 
-.newsToolbar :global(.component-field),
-.newsToolbar :global(.admin-search-field) {
-  width: 100%;
-  min-width: 0;
-  flex: initial;
-}
-
-.newsToolbar select {
-  width: 100%;
-  min-width: 0;
-}
-
-.newsTablePrimary {
-  min-width: 0;
-}
-
-.newsWindow {
-  display: grid;
-  gap: 4px;
-  color: var(--muted);
-  font-size: 13px;
-}
-
-.newsWindow span:first-child {
-  color: var(--ink);
-}
-
-.newsToggle.isActive,
-.newsToggle:global(.is-active) {
-  color: var(--warm);
-}
-
-.newsToggle.isInactive,
-.newsToggle:global(.is-inactive) {
-  color: var(--green);
-}
-
-.newsToggle:hover {
-  border-color: currentColor;
-}
-
-.newsDelete:hover {
-  border-color: var(--warm);
-  color: var(--warm);
-}
-
-.newsDialogForm {
-  margin-top: 8px;
-}
-
-.newsFormGrid {
-  gap: 16px;
-}
-
-.newsSwitchField {
-  min-width: 0;
-  display: flex;
-  align-items: stretch;
-}
-
-.newsSwitchField :global(.admin-switch) {
-  width: 100%;
+:global([class*="adminRoot"]) :global(.dialog) h2,
+:global([class*="adminWideDialog"]) h2,
+.adminNewsDialog h2 {
+  font: 800 20px/1.3 'Nunito', var(--font-geist), Arial, sans-serif;
+  letter-spacing: -.02em;
+  text-transform: none;
+  text-shadow: none;
 }
 
 @media (max-width: 680px) {
-  .newsToolbar {
-    grid-template-columns: 1fr;
-  }
-
-  .newsFormGrid {
-    grid-template-columns: 1fr;
-  }
+  .adminNewsDialog { width: min(100%, 100%); }
+  .newsToolbar { grid-template-columns: 1fr; }
 }

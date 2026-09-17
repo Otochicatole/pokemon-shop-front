@@ -1,33 +1,86 @@
 .adminImageGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 16px;
-  list-style: none;
-  padding: 0;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 13px;
   margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.adminImageGrid > li {
+  padding: 10px;
+  border: 2px solid var(--line);
+  background: #0a0f15;
 }
 
 .adminImagePreview {
-  position: relative;
   aspect-ratio: 4 / 5;
-  border: 2px solid var(--line);
-  background: var(--surface);
+  position: relative;
   overflow: hidden;
+  border: 1px solid var(--line);
+  background: #05070a;
+}
+
+.adminImagePreview img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.adminImagePreview > span {
+  position: absolute;
+  left: 6px;
+  top: 6px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px;
+  background: var(--accent);
+  color: #05070a;
+  font: 700 12px/1.4 'Nunito', var(--font-geist), Arial, sans-serif;
+  text-transform: uppercase;
+}
+
+.adminImageGrid label {
+  display: grid;
+  gap: 5px;
+  margin-top: 9px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.adminImageGrid input {
+  width: 100%;
+  min-height: 38px;
+  padding: 0 8px;
+}
+
+.adminImageGrid li > div:last-child {
+  display: flex;
+  justify-content: flex-end;
+  gap: 5px;
+  margin-top: 8px;
+}
+
+.adminImageGrid button {
+  width: 36px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.adminImageGrid button:last-child {
+  color: var(--warm);
 }
 
 .adminImageEmpty {
+  min-height: 150px;
   display: grid;
   place-items: center;
-  gap: 12px;
-  padding: 40px 20px;
+  gap: 8px;
   border: 2px dashed var(--line);
   color: var(--muted);
-  text-align: center;
-}
-
-@media (max-width: 520px) {
-  .adminImageGrid {
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    gap: 12px;
-  }
 }
