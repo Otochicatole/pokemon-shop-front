@@ -7,7 +7,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Coins } from 'lucide-react';
 import { toast } from '@/components/feedback';
 import { useCartStore } from '@/features/cart/infrastructure/store';
-import { cartTotal } from '@/features/cart/domain/cart';
+import { cartTotal, storeCartTotal } from '@/features/cart/domain/cart';
 import { getProduct } from '@/features/catalog/infrastructure/api';
 import { formatMoney } from '@/shared/lib/format';
 import { BASE_CURRENCY } from '@/shared/lib/currency';
@@ -19,6 +19,18 @@ import type { CheckoutPreview, OrderInput } from '@/shared/api/contracts';
 import styles from './checkout-flow.module.css';
 
 type SellerDeliverySelection = { delivery: 'PICKUP' | 'SHIPMENT'; pickupPointId?: string; shippingRateId?: string };
+
+function estimateMaxRedeemablePoints(
+  available: number,
+  storeSubtotalMinor: bigint,
+  pointValueMinor: bigint,
+  maximumRedemptionPercent: number,
+) {
+  if (pointValueMinor <= 0n) return 0;
+  const cap = storeSubtotalMinor * BigInt(maximumRedemptionPercent) / 100n;
+  const byMoney = Number(cap / pointValueMinor);
+  return Math.max(0, Math.min(available, byMoney));
+}
 
 export function CheckoutFlow() {
   const router = useRouter();
@@ -101,13 +113,30 @@ export function CheckoutFlow() {
   const account = loyalty.data?.account;
   const estimatedMaxPoints = useMemo(() => {
     if (!program?.enabled || !account) return 0;
-    const subtotal = cartTotal(items);
-    const cap = subtotal * BigInt(program.maximumRedemptionPercent) / 100n;
-    const byMoney = Number(cap / BigInt(program.pointValue.amountMinor));
-    return Math.max(0, Math.min(account.available, byMoney));
-  }, [account, items, program]);
+    if (typeof quote?.loyalty.maximumRedeemablePoints === 'number') {
+      return Math.max(0, Math.min(account.available, quote.loyalty.maximumRedeemablePoints));
+    }
+    return estimateMaxRedeemablePoints(
+      account.available,
+      storeCartTotal(items),
+      BigInt(program.pointValue.amountMinor),
+      program.maximumRedemptionPercent,
+    );
+  }, [account, items, program, quote?.loyalty.maximumRedeemablePoints]);
   const pointsBelowMinimum = pointsToRedeem > 0 && pointsToRedeem < (program?.minimumRedemptionPoints ?? 0);
   const pointsAboveMaximum = pointsToRedeem > estimatedMaxPoints;
+  const storeSubtotalMinor = useMemo(() => storeCartTotal(items), [items]);
+  const minSubtotalToRedeemOnePoint = program
+    ? BigInt(program.pointValue.amountMinor) * 100n / BigInt(Math.max(1, program.maximumRedemptionPercent))
+      + ((BigInt(program.pointValue.amountMinor) * 100n) % BigInt(Math.max(1, program.maximumRedemptionPercent)) === 0n ? 0n : 1n)
+    : 0n;
+  const cartTooSmallForPoints = Boolean(
+    program?.enabled
+    && account
+    && account.available >= program.minimumRedemptionPoints
+    && estimatedMaxPoints < program.minimumRedemptionPoints
+    && storeSubtotalMinor > 0n,
+  );
 
   const resetQuote = () => setQuote(undefined);
   const update = (key: keyof typeof form) => (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -436,11 +465,20 @@ export function CheckoutFlow() {
               </div>
               <p className="form-hint">
                 Canje mínimo: {program.minimumRedemptionPoints} puntos. Cada punto descuenta {formatMoney(program.pointValue)} y podés cubrir hasta el{' '}
-                {program.maximumRedemptionPercent}% de los productos.{' '}
-                {syncingCart ? 'Actualizando precios…' : `Máximo para esta compra: ${estimatedMaxPoints} puntos.`}
+                {program.maximumRedemptionPercent}% de los productos de la tienda.{' '}
+                {syncingCart
+                  ? 'Actualizando precios…'
+                  : cartTooSmallForPoints
+                    ? `Con el subtotal actual no alcanza para canjear. Necesitás al menos ${formatMoney({ amountMinor: minSubtotalToRedeemOnePoint.toString(), currency: BASE_CURRENCY })} en productos de la tienda.`
+                    : `Máximo para esta compra: ${estimatedMaxPoints} puntos.`}
               </p>
               {pointsBelowMinimum && <p className={`${styles.loyaltyInlineError} loyalty-inline-error`}>Necesitás al menos {program.minimumRedemptionPoints} puntos para canjear.</p>}
               {pointsAboveMaximum && <p className={`${styles.loyaltyInlineError} loyalty-inline-error`}>Podés usar hasta {estimatedMaxPoints} puntos en esta compra.</p>}
+              {storeSubtotalMinor === 0n && Boolean(account?.available) && (
+                <p className={`${styles.loyaltyInlineError} loyalty-inline-error`}>
+                  Los puntos solo aplican a productos de la tienda, no a publicaciones de afiliados.
+                </p>
+              )}
             </>
           ) : (
             <p className="form-hint">El programa de puntos está temporalmente pausado. Tu saldo se conserva.</p>
