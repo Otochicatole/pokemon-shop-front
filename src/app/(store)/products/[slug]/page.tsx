@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { getProduct, pokemonTypeLabels } from '@/features/catalog';
 import { AddToCartButton } from '@/features/cart/ui/add-to-cart-button';
 import { formatMoney } from '@/shared/lib/format';
+import { config, absoluteUrl } from '@/shared/config/env';
 
 import styles from './page.module.css';
 import { ProductImageGallery } from './product-image-gallery';
@@ -12,7 +13,30 @@ import { ProductImageGallery } from './product-image-gallery';
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const product = await getProduct(slug).catch(() => null);
-  return { title: product?.name ?? 'Producto', description: product?.description };
+  if (!product) {
+    return { title: 'Producto no encontrado', robots: { index: false, follow: false } };
+  }
+  const description = product.description?.trim()
+    || `${product.name} en ${config.storeName}. Stock real y compra protegida.`;
+  const image = product.images[0]?.url;
+  return {
+    title: product.name,
+    description,
+    alternates: { canonical: `/products/${encodeURIComponent(product.slug)}` },
+    openGraph: {
+      type: 'website',
+      title: `${product.name} · ${config.storeName}`,
+      description,
+      url: `/products/${encodeURIComponent(product.slug)}`,
+      images: image ? [{ url: image, alt: product.images[0]?.altText ?? product.name }] : undefined,
+    },
+    twitter: {
+      card: image ? 'summary_large_image' : 'summary',
+      title: product.name,
+      description,
+      images: image ? [image] : undefined,
+    },
+  };
 }
 
 export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -24,6 +48,30 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
 
   return (
     <section className={`${styles.productDetail} page-container product-detail`}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'Product',
+            name: product.name,
+            description: product.description,
+            sku: product.sku,
+            image: product.images.map((image) => image.url),
+            brand: { '@type': 'Brand', name: product.seller.name },
+            offers: {
+              '@type': 'Offer',
+              url: absoluteUrl(`/products/${encodeURIComponent(product.slug)}`),
+              priceCurrency: product.price.currency,
+              price: (Number(product.price.amountMinor) / 100).toFixed(2),
+              availability: product.available > 0
+                ? 'https://schema.org/InStock'
+                : 'https://schema.org/OutOfStock',
+              seller: { '@type': 'Organization', name: product.seller.name },
+            },
+          }),
+        }}
+      />
       <Link href="/catalog" className={`${styles.backLink} back-link`}>← Volver al catálogo</Link>
       <div className={`${styles.detailGrid} detail-grid`}>
         <ProductImageGallery images={product.images} productName={product.name} sku={product.sku} />

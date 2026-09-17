@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowUpRight, ShieldCheck, Sparkles, Truck, Package, Layers3, Gem } from 'lucide-react';
 import { CatalogProductCard, listProducts } from '@/features/catalog';
@@ -5,8 +6,20 @@ import { SectionHeading, TexturePanel } from '@/components';
 import { CompanionBattle } from '@/features/home';
 import { LoyaltyPromo } from '@/features/loyalty';
 import { listPublicNews, NewsCarousel } from '@/features/news';
+import { absoluteUrl, config, siteDescription } from '@/shared/config/env';
 
 import styles from './page.module.css';
+
+export const metadata: Metadata = {
+  title: { absolute: `${config.storeName} · Cartas Pokémon y coleccionables` },
+  description: siteDescription,
+  alternates: { canonical: '/' },
+  openGraph: {
+    title: `${config.storeName} · Cartas Pokémon y coleccionables`,
+    description: siteDescription,
+    url: '/',
+  },
+};
 
 const collections = [
   {
@@ -53,6 +66,40 @@ export default async function Home() {
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@graph': [
+              {
+                '@type': 'Organization',
+                '@id': `${absoluteUrl()}/#organization`,
+                name: config.storeName,
+                url: absoluteUrl(),
+                logo: absoluteUrl('/logo.svg'),
+              },
+              {
+                '@type': 'WebSite',
+                '@id': `${absoluteUrl()}/#website`,
+                name: config.storeName,
+                url: absoluteUrl(),
+                description: siteDescription,
+                publisher: { '@id': `${absoluteUrl()}/#organization` },
+                inLanguage: 'es-AR',
+                potentialAction: {
+                  '@type': 'SearchAction',
+                  target: {
+                    '@type': 'EntryPoint',
+                    urlTemplate: `${absoluteUrl('/catalog')}?q={search_term_string}`,
+                  },
+                  'query-input': 'required name=search_term_string',
+                },
+              },
+            ],
+          }),
+        }}
+      />
       <section className={styles.hero} aria-label="Portada">
         <div className={styles.heroCopy}>
           {news.data.length ? (
@@ -141,7 +188,7 @@ export default async function Home() {
       <section className={styles.exploreSection}>
         <TexturePanel className={styles.explorePanel}>
           <div>
-            <p className="eyebrow">Mapa de la aventura // Card Shop</p>
+            <p className="eyebrow">Mapa de la aventura // {config.storeName}</p>
             <h2>Explorá por categoría</h2>
             <p>Cada zona esconde una colección diferente.</p>
           </div>

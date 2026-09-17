@@ -2,6 +2,7 @@ const trimTrailingSlash = (value: string) => value.replace(/\/+$/, '');
 
 export const config = {
   storeName: process.env.NEXT_PUBLIC_STORE_NAME ?? 'Nevadatcg',
+  siteUrl: trimTrailingSlash(process.env.NEXT_PUBLIC_SITE_URL ?? 'https://nevadatcg.store'),
   // Server-side / Next rewrite target (can be internal).
   backendUrl: trimTrailingSlash(process.env.BACKEND_URL ?? 'http://localhost:3000'),
   // Browser-facing API origin for the storefront (Google OAuth + user cookies).
@@ -9,6 +10,9 @@ export const config = {
   publicApiUrl: trimTrailingSlash(process.env.NEXT_PUBLIC_API_URL ?? ''),
   apiBase: '/api/v2',
 };
+
+export const siteDescription =
+  'Tienda de cartas Pokémon, productos sellados y accesorios. Stock real, envíos a todo el país y compra protegida.';
 
 /** Store/user API URL (browser → public API when configured). */
 export function apiRequestUrl(path: string) {
@@ -31,4 +35,9 @@ export function adminApiRequestUrl(path: string) {
 
 export function googleAuthUrl() {
   return apiRequestUrl('/auth/google');
+}
+
+export function absoluteUrl(path = '/') {
+  const normalized = path.startsWith('/') ? path : `/${path}`;
+  return `${config.siteUrl}${normalized === '/' ? '' : normalized}`;
 }

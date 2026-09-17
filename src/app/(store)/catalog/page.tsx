@@ -4,9 +4,20 @@ import { Suspense } from 'react';
 import { Gem, Layers3, Package } from 'lucide-react';
 import { PageHeading } from '@/components';
 import { CatalogBrowser } from '@/features/catalog';
+import { config } from '@/shared/config/env';
 import styles from './page.module.css';
 
-export const metadata: Metadata = { title: 'Catálogo' };
+export const metadata: Metadata = {
+  title: 'Catálogo',
+  description:
+    'Explorá cartas Pokémon sueltas, productos sellados y accesorios con stock real. Filtrá por tipo, set, rareza y más.',
+  alternates: { canonical: '/catalog' },
+  openGraph: {
+    title: `Catálogo · ${config.storeName}`,
+    description: 'Cartas, sellados y accesorios con stock real.',
+    url: '/catalog',
+  },
+};
 
 const shortcuts = [
   { href: '/catalog?kind=SINGLE_CARD', label: 'Cartas sueltas', icon: Layers3, tone: styles.shortcutYellow },
