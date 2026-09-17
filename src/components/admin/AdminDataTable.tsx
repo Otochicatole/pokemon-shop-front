@@ -7,6 +7,7 @@ export interface AdminTableColumn<T> {
   headerLabel?: string;
   render: (row: T) => ReactNode;
   align?: 'left' | 'right' | 'center';
+  className?: string;
 }
 
 export function AdminDataTable<T>({
@@ -32,7 +33,7 @@ export function AdminDataTable<T>({
         <thead>
           <tr>
             {columns.map((column) => (
-              <th key={column.key} scope="col" style={{ textAlign: column.align ?? 'left' }}>
+              <th key={column.key} scope="col" className={column.className} style={{ textAlign: column.align ?? 'left' }}>
                 {column.header}
               </th>
             ))}
@@ -44,6 +45,7 @@ export function AdminDataTable<T>({
               {columns.map((column) => (
                 <td
                   key={column.key}
+                  className={column.className}
                   data-label={column.headerLabel ?? (typeof column.header === 'string' ? column.header : column.key)}
                   style={{ textAlign: column.align ?? 'left' }}
                 >

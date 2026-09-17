@@ -70,6 +70,8 @@ export function AdminProductListView() {
   const deletableRows = unarchivableRows;
   const allPageSelected = rows.length > 0 && rows.every((row) => selectedIds.has(row.id));
   const somePageSelected = rows.some((row) => selectedIds.has(row.id));
+  const pageSelectedCount = rows.filter((row) => selectedIds.has(row.id)).length;
+  const selectAllState = allPageSelected ? 'all' : somePageSelected ? 'some' : 'none';
 
   const targetsFor = (action: BulkAction) => {
     if (action === 'publish') return publishableRows;
@@ -239,8 +241,9 @@ export function AdminProductListView() {
               {
                 key: 'select',
                 headerLabel: 'Seleccionar',
+                className: styles.selectCell,
                 header: (
-                  <label className={styles.selectAll}>
+                  <label className={styles.selectAll} data-state={selectAllState} title={allPageSelected ? 'Quitar selección de esta página' : 'Seleccionar todos en esta página'}>
                     <input
                       type="checkbox"
                       checked={allPageSelected}
@@ -251,9 +254,18 @@ export function AdminProductListView() {
                       disabled={busy || rows.length === 0}
                       aria-label="Seleccionar todos los productos de esta página"
                     />
+                    <span className={styles.selectAllMeta} aria-hidden="true">
+                      {pageSelectedCount > 0 ? (
+                        <span className={styles.selectAllCount}>
+                          {pageSelectedCount}/{rows.length}
+                        </span>
+                      ) : (
+                        <span className={styles.selectAllHint}>Todos</span>
+                      )}
+                    </span>
                   </label>
                 ),
-                align: 'center',
+                align: 'left',
                 render: (row) => (
                   <label className={styles.rowCheck}>
                     <input
