@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getProduct, pokemonTypeLabels } from '@/features/catalog';
@@ -7,6 +6,7 @@ import { AddToCartButton } from '@/features/cart/ui/add-to-cart-button';
 import { formatMoney } from '@/shared/lib/format';
 
 import styles from './page.module.css';
+import { ProductImageGallery } from './product-image-gallery';
 
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
@@ -19,7 +19,6 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   const { slug } = await params;
   const product = await getProduct(slug).catch(() => null);
   if (!product) notFound();
-  const image = product.images[0];
   const kindLabel = product.kind === 'SINGLE_CARD' ? 'Carta individual' : product.kind === 'SEALED_PRODUCT' ? 'Producto sellado' : 'Accesorio';
   const availabilityLabel = product.available > 0 ? `${product.available} unidades disponibles` : 'Sin stock disponible';
 
@@ -27,15 +26,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
     <section className={`${styles.productDetail} page-container product-detail`}>
       <Link href="/catalog" className={`${styles.backLink} back-link`}>← Volver al catálogo</Link>
       <div className={`${styles.detailGrid} detail-grid`}>
-        <div className={`${styles.detailGallery} detail-gallery`}>
-          <div className={`${styles.detailGalleryHeader} detail-gallery-header`}><span>PIEZA // {product.sku}</span><span>{product.images.length ? `${product.images.length} ${product.images.length === 1 ? 'vista' : 'vistas'}` : 'Vista única'}</span></div>
-          <figure className={`${styles.detailMainImage} detail-main-image`}>
-            <span className={`${styles.detailImageCorner} ${styles.detailImageCornerTl} detail-image-corner detail-image-corner-tl`} aria-hidden="true" />
-            <span className={`${styles.detailImageCorner} ${styles.detailImageCornerBr} detail-image-corner detail-image-corner-br`} aria-hidden="true" />
-            {image ? <Image src={image.url} alt={image.altText || product.name} fill priority sizes="(max-width: 900px) 100vw, 56vw" /> : <div className="image-placeholder large"><span>◈</span></div>}
-          </figure>
-          {product.images.length > 1 && <div className={`${styles.detailThumbnails} detail-thumbnails`} aria-label="Vistas del producto">{product.images.map((item, index) => <div className={`${styles.detailThumbnail} ${index === 0 ? `${styles.isActive} is-active` : ''} detail-thumbnail`} key={item.id}><Image src={item.url} alt={item.altText || `${product.name}, vista ${index + 1}`} fill sizes="80px" /></div>)}</div>}
-        </div>
+        <ProductImageGallery images={product.images} productName={product.name} sku={product.sku} />
         <div className={`${styles.detailCopy} detail-copy`}>
           <div className={`${styles.detailKicker} detail-kicker`}><span className="pixel-badge pixel-badge-yellow">{kindLabel}</span><span className={`${styles.detailCode} detail-code`}>SKU {product.sku}</span></div>
           <h1>{product.name}</h1>
