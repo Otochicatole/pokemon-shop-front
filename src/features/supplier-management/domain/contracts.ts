@@ -33,6 +33,33 @@ export const supplierActiveEnvelopeSchema = z.object({
   meta: z.record(z.string(), z.unknown()).optional(),
 });
 
+export const supplierPurchaseItemProductSchema = z.object({
+  id: z.string().uuid(),
+  sku: z.string(),
+  slug: z.string(),
+  name: z.string(),
+  description: z.string(),
+  kind: z.string(),
+  stockMode: z.string(),
+  status: z.string(),
+  price: moneySchema,
+  imageUrl: z.string().nullable(),
+  pokemonCard: z.object({
+    pokemonType: z.string().nullable(),
+    setName: z.string(),
+    setCode: z.string().nullable(),
+    cardNumber: z.string(),
+    rarity: z.string(),
+    language: z.string(),
+    condition: z.string(),
+    finish: z.string().nullable(),
+    edition: z.string().nullable(),
+    gradingCompany: z.string().nullable(),
+    grade: z.string().nullable(),
+    certificationNumber: z.string().nullable(),
+  }).nullable(),
+}).nullable().optional();
+
 export const supplierPurchaseItemSchema = z.object({
   id: z.string().uuid(),
   productId: z.string().uuid().nullable(),
@@ -41,6 +68,7 @@ export const supplierPurchaseItemSchema = z.object({
   quantity: z.number().int(),
   unitCost: moneySchema,
   lineTotal: moneySchema,
+  product: supplierPurchaseItemProductSchema,
 });
 
 export const supplierPurchaseSchema = z.object({
@@ -52,6 +80,7 @@ export const supplierPurchaseSchema = z.object({
   totalCost: moneySchema,
   createdAt: dateTime,
   updatedAt: dateTime,
+  createdBy: z.object({ id: z.string().uuid(), name: z.string().nullable(), email: z.string().email() }).nullable().optional(),
   items: z.array(supplierPurchaseItemSchema),
 });
 

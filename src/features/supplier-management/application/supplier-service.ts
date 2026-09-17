@@ -3,6 +3,7 @@ import {
   createSupplierPurchase,
   deleteSupplierPurchase,
   getSupplier,
+  getSupplierPurchase,
   listSupplierPurchases,
   listSuppliers,
   setSupplierActive,
@@ -17,5 +18,6 @@ export function registerSupplier(values: SupplierFormValues) { return createSupp
 export function editSupplier(id: string, version: number, values: SupplierFormValues) { return updateSupplier(id, version, values); }
 export function changeSupplierStatus(id: string, active: boolean, expectedVersion: number) { return setSupplierActive(id, active, expectedVersion); }
 export function listPurchases(supplierId: string, cursor?: string) { return listSupplierPurchases(supplierId, cursor); }
+export function loadPurchase(supplierId: string, purchaseId: string) { return getSupplierPurchase(supplierId, purchaseId); }
 export function registerPurchase(supplierId: string, values: PurchaseFormValues) { return createSupplierPurchase(supplierId, values); }
 export function removePurchase(supplierId: string, purchaseId: string) { return deleteSupplierPurchase(supplierId, purchaseId); }

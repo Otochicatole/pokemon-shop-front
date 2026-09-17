@@ -9,8 +9,9 @@ const labels: Record<string, string> = {
   PENDING_PAYMENT: 'Pago pendiente', PAYMENT_REVIEW: 'Comprobante en revisión', PAID: 'Pagada', PREPARING: 'Preparando', READY_FOR_PICKUP: 'Lista para retirar', PICKED_UP: 'Retirada', SHIPPED: 'Enviada', COMPLETED: 'Completada', CANCELLED: 'Cancelada', EXPIRED: 'Vencida', REFUND_RECORDED: 'Reembolso registrado', PAYMENT_REQUIRES_REVIEW: 'Pago requiere revisión', IN_FULFILLMENT: 'En preparación', PARTIALLY_COMPLETED: 'Parcialmente completada', ACTION_REQUIRED: 'Requiere acción',
   PENDING: 'Pendiente', UNDER_REVIEW: 'En revisión', APPROVED: 'Aprobado', REJECTED: 'Rechazado', FAILED: 'Fallido', REFUNDED: 'Reembolsado', DISPUTED: 'En disputa', REQUIRES_REVIEW: 'Requiere revisión',
   BANK_TRANSFER: 'Transferencia', MERCADO_PAGO: 'Mercado Pago', SHIPMENT: 'Envío', PICKUP: 'Retiro',
-  ACTIVE: 'Activo', SUSPENDED: 'Suspendido',
+  ACTIVE: 'Activo', INACTIVE: 'Inactivo', SUSPENDED: 'Suspendido',
   VERIFIED: 'Verificado', UNVERIFIED: 'Sin verificar',
+  NM: 'Near Mint', EXCELLENT: 'Excellent', GOOD: 'Good', PLAYED: 'Played', DAMAGED: 'Damaged',
   type: 'Tipo', zoneName: 'Zona', rateName: 'Tarifa', ratePrice: 'Precio de envío', shippingRateId: 'ID de tarifa', pickupPointId: 'ID de retiro',
   recipientName: 'Destinatario', recipientPhone: 'Teléfono', addressLine1: 'Dirección', addressLine2: 'Complemento', city: 'Ciudad', province: 'Provincia', postalCode: 'Código postal', name: 'Punto de retiro', address: 'Dirección de retiro',
 };

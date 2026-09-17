@@ -9,18 +9,11 @@
   min-width: 0;
 }
 
-.itemPanel {
-  margin-top: 12px;
-  padding: 14px;
-  border: 2px dashed var(--line);
-  background: rgba(8, 12, 18, .7);
-}
-
-.itemPanel h3 {
-  margin: 0 0 12px;
-  font: 700 13px/1.4 'Nunito', var(--font-geist), Arial, sans-serif;
-  text-transform: uppercase;
-  color: var(--muted);
+.rowActions {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
 }
 
 @media (max-width: 900px) {

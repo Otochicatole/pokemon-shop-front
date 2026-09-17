@@ -1,0 +1,114 @@
+.detailLayout {
+  display: grid;
+  grid-template-columns: minmax(260px, .8fr) minmax(0, 1.2fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.sidebar {
+  display: grid;
+  gap: 18px;
+}
+
+.itemsSection {
+  min-width: 0;
+}
+
+.itemsList {
+  display: grid;
+  gap: 14px;
+}
+
+.itemCard {
+  padding: 16px;
+  border: 2px solid var(--line);
+  background: rgba(10, 16, 22, .9);
+}
+
+.itemHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px dashed var(--line);
+}
+
+.itemTitle {
+  display: flex;
+  gap: 12px;
+  min-width: 0;
+}
+
+.itemTitle > div {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.itemTitle strong {
+  font: 700 11px/1.4 'Nunito', var(--font-geist), Arial, sans-serif;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.itemTitle h3 {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.itemImage,
+.itemImagePlaceholder {
+  width: 56px;
+  height: 76px;
+  flex: 0 0 auto;
+  border: 1px solid var(--line);
+  background: #05070a;
+  object-fit: contain;
+}
+
+.itemImagePlaceholder {
+  display: block;
+}
+
+.itemColumns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.itemColumns h4 {
+  margin: 0 0 10px;
+  font: 700 12px/1.4 'Nunito', var(--font-geist), Arial, sans-serif;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.totalRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 2px solid var(--line);
+  font: 700 13px/1.4 'Nunito', var(--font-geist), Arial, sans-serif;
+  text-transform: uppercase;
+}
+
+.errorActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+@media (max-width: 900px) {
+  .detailLayout {
+    grid-template-columns: 1fr;
+  }
+}

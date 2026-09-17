@@ -3,6 +3,7 @@ export {
   editSupplier,
   listPurchases,
   listSupplierDirectory,
+  loadPurchase,
   loadSupplier,
   registerPurchase,
   registerSupplier,

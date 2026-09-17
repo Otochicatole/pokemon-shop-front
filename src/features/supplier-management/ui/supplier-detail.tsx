@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, ChevronDown, ChevronRight, Plus, Trash2 } from 'lucide-react';
+import { ArrowLeft, Eye, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from '@/components/feedback';
 import { AdminDataTable, AdminPageHeader, Button, ConfirmDialog, CursorPagination } from '@/components';
@@ -17,7 +17,6 @@ export function SupplierDetailView({ id }: { id: string }) {
   const queryClient = useQueryClient();
   const [cursor, setCursor] = useState<string>();
   const [history, setHistory] = useState<Array<string | undefined>>([]);
-  const [expanded, setExpanded] = useState<Set<string>>(() => new Set());
   const [pendingDelete, setPendingDelete] = useState<SupplierPurchase | null>(null);
 
   const supplier = useQuery({ queryKey: ['admin', 'suppliers', id], queryFn: () => loadSupplier(id) });
@@ -37,15 +36,6 @@ export function SupplierDetailView({ id }: { id: string }) {
     },
     onError: (error) => toast.error(adminErrorMessage(error)),
   });
-
-  const toggle = (purchaseId: string) => {
-    setExpanded((current) => {
-      const next = new Set(current);
-      if (next.has(purchaseId)) next.delete(purchaseId);
-      else next.add(purchaseId);
-      return next;
-    });
-  };
 
   if (supplier.isLoading) return <div className={shared.adminLoading}>Cargando proveedor</div>;
   if (supplier.isError || !supplier.data) {
@@ -104,16 +94,6 @@ export function SupplierDetailView({ id }: { id: string }) {
                 rowKey={(purchase) => purchase.id}
                 empty="Todavía no hay compras registradas para este proveedor."
                 columns={[
-                  {
-                    key: 'expand',
-                    header: '',
-                    headerLabel: 'Detalle',
-                    render: (purchase) => (
-                      <button type="button" className={shared.adminIconButton} onClick={() => toggle(purchase.id)} aria-label={expanded.has(purchase.id) ? 'Ocultar ítems' : 'Ver ítems'}>
-                        {expanded.has(purchase.id) ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-                      </button>
-                    ),
-                  },
                   { key: 'date', header: 'Fecha', render: (purchase) => adminDate(purchase.purchasedAt, true) },
                   { key: 'items', header: 'Ítems', align: 'center', render: (purchase) => <strong>{purchase.itemCount}</strong> },
                   { key: 'total', header: 'Total costo', align: 'right', render: (purchase) => <span className={shared.adminMoney}>{adminMoney(purchase.totalCost)}</span> },
@@ -123,30 +103,22 @@ export function SupplierDetailView({ id }: { id: string }) {
                     header: 'Acción',
                     align: 'right',
                     render: (purchase) => (
-                      <button className={shared.adminIconButton} type="button" onClick={() => setPendingDelete(purchase)} aria-label="Eliminar compra">
-                        <Trash2 size={16} />
-                      </button>
+                      <div className={styles.rowActions}>
+                        <Link
+                          className={shared.adminIconButton}
+                          href={`/admin/suppliers/${id}/purchases/${purchase.id}`}
+                          aria-label="Ver detalle de compra"
+                        >
+                          <Eye size={16} />
+                        </Link>
+                        <button className={shared.adminIconButton} type="button" onClick={() => setPendingDelete(purchase)} aria-label="Eliminar compra">
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
                     ),
                   },
                 ]}
               />
-              {rows.filter((purchase) => expanded.has(purchase.id)).map((purchase) => (
-                <div key={`items-${purchase.id}`} className={styles.itemPanel}>
-                  <h3>Detalle · {adminDate(purchase.purchasedAt, true)}</h3>
-                  <AdminDataTable
-                    caption={`Ítems de compra ${purchase.id}`}
-                    rows={purchase.items}
-                    rowKey={(item) => item.id}
-                    columns={[
-                      { key: 'sku', header: 'SKU', render: (item) => <span className={shared.adminCode}>{item.productSku}</span> },
-                      { key: 'name', header: 'Producto', render: (item) => item.productName },
-                      { key: 'qty', header: 'Cant.', align: 'center', render: (item) => item.quantity },
-                      { key: 'unit', header: 'Costo unit.', align: 'right', render: (item) => adminMoney(item.unitCost) },
-                      { key: 'line', header: 'Subtotal', align: 'right', render: (item) => adminMoney(item.lineTotal) },
-                    ]}
-                  />
-                </div>
-              ))}
               <CursorPagination
                 canPrevious={history.length > 0}
                 canNext={Boolean(purchases.data?.meta.nextCursor)}
