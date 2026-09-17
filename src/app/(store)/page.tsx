@@ -3,9 +3,9 @@ import Link from 'next/link';
 import { ArrowUpRight, ShieldCheck, Sparkles, Truck, Package, Layers3, Gem } from 'lucide-react';
 import { CatalogProductCard, listProducts } from '@/features/catalog';
 import { SectionHeading, TexturePanel } from '@/components';
-import { CompanionBattle } from '@/features/home';
+import { HomeHero } from '@/features/home';
 import { LoyaltyPromo } from '@/features/loyalty';
-import { listPublicNews, NewsCarousel } from '@/features/news';
+import { listPublicNews } from '@/features/news';
 import { absoluteUrl, config, siteDescription } from '@/shared/config/env';
 
 import styles from './page.module.css';
@@ -44,19 +44,6 @@ const collections = [
     toneClass: styles.collectionLinkCyan,
   },
 ] as const;
-
-function HeroActions() {
-  return (
-    <div className={styles.heroActions}>
-      <Link className="button button-primary" href="/catalog">
-        Entrar a la tienda <ArrowUpRight size={16} aria-hidden="true" />
-      </Link>
-      <Link className={styles.textButton} href="/catalog?kind=SINGLE_CARD">
-        Atacar <Sparkles size={14} aria-hidden="true" />
-      </Link>
-    </div>
-  );
-}
 
 export default async function Home() {
   const [products, news] = await Promise.all([
@@ -100,31 +87,7 @@ export default async function Home() {
           }),
         }}
       />
-      <section className={styles.hero} aria-label="Portada">
-        <div className={styles.heroCopy}>
-          {news.data.length ? (
-            <>
-              <NewsCarousel items={news.data} variant="hero" />
-              <HeroActions />
-            </>
-          ) : (
-            <>
-              <p className="eyebrow">Ruta 10 // central de coleccionistas</p>
-              <h1>
-                Viví la aventura.
-                <br />
-                <em>Coleccioná.</em>
-              </h1>
-              <p className={styles.heroText}>
-                Cartas Pokémon, productos sellados y equipo para entrenadores. Explorá el catálogo y
-                encontrá tu próxima pieza favorita.
-              </p>
-              <HeroActions />
-            </>
-          )}
-        </div>
-        <CompanionBattle />
-      </section>
+      <HomeHero news={news.data} />
 
       <section className={styles.trustStrip} aria-label="Beneficios de la tienda">
         <span>

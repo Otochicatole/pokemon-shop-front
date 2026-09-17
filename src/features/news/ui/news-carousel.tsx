@@ -1,7 +1,7 @@
 'use client';
 
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { News } from '../domain/contracts';
 
 import styles from './news-carousel.module.css';
@@ -9,12 +9,17 @@ import styles from './news-carousel.module.css';
 type NewsCarouselProps = {
   items: News[];
   variant?: 'section' | 'hero';
+  onActiveChange?: (item: News) => void;
 };
 
-export function NewsCarousel({ items, variant = 'section' }: NewsCarouselProps) {
+export function NewsCarousel({ items, variant = 'section', onActiveChange }: NewsCarouselProps) {
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
+  const onActiveChangeRef = useRef(onActiveChange);
+  onActiveChangeRef.current = onActiveChange;
+  const activeIndex = items.length ? Math.min(index, items.length - 1) : 0;
+  const item = items[activeIndex];
 
   useEffect(() => {
     if (typeof window.matchMedia !== 'function') return;
@@ -30,9 +35,12 @@ export function NewsCarousel({ items, variant = 'section' }: NewsCarouselProps) 
     return () => window.clearInterval(timer);
   }, [items.length, paused, reducedMotion]);
 
-  if (!items.length) return null;
-  const activeIndex = Math.min(index, items.length - 1);
-  const item = items[activeIndex]!;
+  useEffect(() => {
+    if (item) onActiveChangeRef.current?.(item);
+  }, [item]);
+
+  if (!items.length || !item) return null;
+
   const move = (direction: -1 | 1) => setIndex((current) => (current + direction + items.length) % items.length);
   const Heading = variant === 'hero' ? 'h1' : 'h2';
   const variantClass = variant === 'hero' ? styles.newsCarouselHero : '';
@@ -96,4 +104,3 @@ export function NewsCarousel({ items, variant = 'section' }: NewsCarouselProps) 
     </section>
   );
 }
-

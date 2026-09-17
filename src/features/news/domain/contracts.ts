@@ -6,6 +6,7 @@ export const newsSchema = z.object({
   id: z.string().uuid(),
   title: z.string(),
   summary: z.string(),
+  coverUrl: z.string().nullable(),
 });
 
 export const publicNewsListSchema = z.object({
@@ -14,7 +15,9 @@ export const publicNewsListSchema = z.object({
 });
 
 export const adminNewsSchema = z.object({
-  id: z.string().uuid(), title: z.string(), summary: z.string(), sortOrder: z.number().int(), active: z.boolean(),
+  id: z.string().uuid(), title: z.string(), summary: z.string(),
+  coverFileId: z.string().uuid().nullable(), coverUrl: z.string().nullable(),
+  sortOrder: z.number().int(), active: z.boolean(),
   startsAt: dateTime.nullable(), endsAt: dateTime.nullable(), version: z.number().int(), createdAt: dateTime, updatedAt: dateTime,
 });
 

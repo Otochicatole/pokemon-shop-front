@@ -41,4 +41,17 @@ export async function deleteAdminNews(id: string, version: number) {
   return adminFetch(`/admin/news/${id}`, { method: 'DELETE', body: JSON.stringify({ expectedVersion: version }) });
 }
 
+export async function uploadAdminNewsCover(id: string, version: number, file: File) {
+  const body = new FormData();
+  body.append('expectedVersion', String(version));
+  body.append('cover', file);
+  const response = await adminFetch(`/admin/news/${id}/cover`, { method: 'POST', body }, adminNewsDetailEnvelopeSchema);
+  return response.data.news;
+}
+
+export async function clearAdminNewsCover(id: string, version: number) {
+  const response = await adminFetch(`/admin/news/${id}/cover`, { method: 'DELETE', body: JSON.stringify({ expectedVersion: version }) }, adminNewsDetailEnvelopeSchema);
+  return response.data.news;
+}
+
 export type { AdminNews };
