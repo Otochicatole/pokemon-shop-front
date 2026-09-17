@@ -23,7 +23,7 @@ import {
 } from '../domain/events';
 import { playSupportNotificationSound, unlockSupportNotificationSound } from '../infrastructure/notification-sound';
 import { getNotificationUnreadCount, getAdminNotificationUnreadCount } from '@/features/notifications/infrastructure/api';
-import { apiRequestUrl } from '@/shared/config/env';
+import { adminApiRequestUrl, apiRequestUrl } from '@/shared/config/env';
 
 interface SupportRealtimeContextValue {
   role: SupportRealtimeRole;
@@ -42,7 +42,12 @@ const SupportRealtimeContext = createContext<SupportRealtimeContextValue>({
 });
 
 function websocketUrl(role: SupportRealtimeRole) {
-  const url = new URL(apiRequestUrl('/notifications/ws'));
+  // Admin session cookies live on the store host (same-origin rewrite).
+  // User session cookies live on the public API host when configured.
+  const endpoint = role === 'admin'
+    ? adminApiRequestUrl('/notifications/ws')
+    : apiRequestUrl('/notifications/ws');
+  const url = new URL(endpoint, typeof window !== 'undefined' ? window.location.origin : 'http://localhost');
   url.protocol = url.protocol === 'https:' ? 'wss:' : 'ws:';
   url.searchParams.set('role', role);
   return url.toString();

@@ -1,4 +1,4 @@
-import { apiRequestUrl } from '@/shared/config/env';
+import { adminApiRequestUrl } from '@/shared/config/env';
 import { getSessionSyncGeneration, isCurrentSessionRequest } from '@/shared/auth/session-sync';
 import { z } from 'zod';
 
@@ -44,7 +44,7 @@ function adminActorId(payload: unknown) {
 }
 
 function apiUrl(path: string) {
-  return apiRequestUrl(path);
+  return adminApiRequestUrl(path);
 }
 
 function adminAuthTransition(path: string, method: string) {
