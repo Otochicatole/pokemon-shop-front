@@ -20,7 +20,7 @@ import type { CheckoutPreview, OrderInput } from '@/shared/api/contracts';
 import styles from './checkout-flow.module.css';
 
 type SellerDeliverySelection = { delivery: 'PICKUP' | 'SHIPMENT'; pickupPointId?: string; shippingRateId?: string };
-type ShippingZoneOption = { id: string; name: string; provinces: string[]; rates: Array<{ id: string; name: string; price: { amountMinor: string; currency: string } }> };
+type ShippingZoneOption = { id: string; name: string; provinces: string[]; rates: Array<{ id: string; name: string; price: { amountMinor: string; currency: typeof BASE_CURRENCY } }> };
 
 function estimateMaxRedeemablePoints(
   available: number,
