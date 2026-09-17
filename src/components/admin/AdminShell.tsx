@@ -24,6 +24,7 @@ export function AdminShell({ adminName, adminEmail, navigation, onLogout, childr
     new: 'Nuevo',
     inventory: 'Inventario',
     suppliers: 'Proveedores',
+    purchases: 'Compras',
     news: 'Noticias',
     affiliates: 'Afiliados',
     sellers: 'Vendedores',

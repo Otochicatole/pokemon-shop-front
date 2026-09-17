@@ -1,1 +1,10 @@
-export { changeSupplierStatus, editSupplier, listSupplierDirectory, registerSupplier } from './supplier-service';
+export {
+  changeSupplierStatus,
+  editSupplier,
+  listPurchases,
+  listSupplierDirectory,
+  loadSupplier,
+  registerPurchase,
+  registerSupplier,
+  removePurchase,
+} from './supplier-service';
