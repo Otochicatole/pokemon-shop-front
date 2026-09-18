@@ -27,13 +27,13 @@ describe('NewsCarousel', () => {
     expect(screen.getByRole('heading', { name: 'Primera noticia' })).toBeInTheDocument();
   });
 
-  it('autoplays every five seconds and pauses while focused or hovered', () => {
+  it('autoplays using the configured interval and pauses while focused or hovered', () => {
     vi.useFakeTimers();
-    render(<NewsCarousel items={items} />);
-    act(() => { vi.advanceTimersByTime(5000); });
+    render(<NewsCarousel items={items} intervalMs={3000} />);
+    act(() => { vi.advanceTimersByTime(3000); });
     expect(screen.getByRole('heading', { name: 'Segunda noticia' })).toBeInTheDocument();
     fireEvent.mouseEnter(screen.getByRole('region', { name: 'Noticias de la tienda' }));
-    act(() => { vi.advanceTimersByTime(5000); });
+    act(() => { vi.advanceTimersByTime(3000); });
     expect(screen.getByRole('heading', { name: 'Segunda noticia' })).toBeInTheDocument();
   });
 });

@@ -11,7 +11,9 @@ export const newsSchema = z.object({
 
 export const publicNewsListSchema = z.object({
   data: z.array(newsSchema),
-  meta: z.record(z.string(), z.unknown()).optional(),
+  meta: z.object({
+    rotationIntervalSeconds: z.number().int().min(2).max(120).optional(),
+  }).passthrough().optional(),
 });
 
 export const adminNewsSchema = z.object({
@@ -27,6 +29,16 @@ export const adminNewsListEnvelopeSchema = z.object({
 });
 export const adminNewsDetailEnvelopeSchema = z.object({ data: z.object({ news: adminNewsSchema }), meta: z.record(z.string(), z.unknown()).optional() });
 
+export const adminNewsSettingsSchema = z.object({
+  rotationIntervalSeconds: z.number().int().min(2).max(120),
+  version: z.number().int().positive(),
+  updatedAt: z.string().or(z.date()),
+});
+export const adminNewsSettingsEnvelopeSchema = z.object({
+  data: adminNewsSettingsSchema,
+  meta: z.record(z.string(), z.unknown()).optional(),
+});
+
 export const newsFormSchema = z.object({
   title: z.string().trim().min(1, 'El título es obligatorio').max(180, 'Máximo 180 caracteres'),
   summary: z.string().trim().max(500, 'Máximo 500 caracteres'),
@@ -39,3 +51,8 @@ export const newsFormSchema = z.object({
 export type News = z.infer<typeof newsSchema>;
 export type AdminNews = z.infer<typeof adminNewsSchema>;
 export type NewsFormValues = z.infer<typeof newsFormSchema>;
+export type AdminNewsSettings = z.infer<typeof adminNewsSettingsSchema>;
+export type AdminNewsSettingsInput = {
+  rotationIntervalSeconds: number;
+  expectedVersion: number;
+};

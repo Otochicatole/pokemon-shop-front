@@ -1,6 +1,14 @@
 import { adminFetch } from '@/shared/admin/client';
 import { apiFetch } from '@/shared/api/client';
-import { adminNewsDetailEnvelopeSchema, adminNewsListEnvelopeSchema, publicNewsListSchema, type AdminNews, type NewsFormValues } from '../domain/contracts';
+import {
+  adminNewsDetailEnvelopeSchema,
+  adminNewsListEnvelopeSchema,
+  adminNewsSettingsEnvelopeSchema,
+  publicNewsListSchema,
+  type AdminNews,
+  type AdminNewsSettingsInput,
+  type NewsFormValues,
+} from '../domain/contracts';
 
 export async function listPublicNews() {
   return apiFetch('/news', {}, publicNewsListSchema);
@@ -52,6 +60,16 @@ export async function uploadAdminNewsCover(id: string, version: number, file: Fi
 export async function clearAdminNewsCover(id: string, version: number) {
   const response = await adminFetch(`/admin/news/${id}/cover`, { method: 'DELETE', body: JSON.stringify({ expectedVersion: version }) }, adminNewsDetailEnvelopeSchema);
   return response.data.news;
+}
+
+export async function getAdminNewsSettings() {
+  const response = await adminFetch('/admin/news/settings', {}, adminNewsSettingsEnvelopeSchema);
+  return response.data;
+}
+
+export async function updateAdminNewsSettings(input: AdminNewsSettingsInput) {
+  const response = await adminFetch('/admin/news/settings', { method: 'PATCH', body: JSON.stringify(input) }, adminNewsSettingsEnvelopeSchema);
+  return response.data;
 }
 
 export type { AdminNews };

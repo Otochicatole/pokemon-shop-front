@@ -21,8 +21,9 @@ function HeroActions() {
   );
 }
 
-export function HomeHero({ news }: { news: News[] }) {
+export function HomeHero({ news, rotationIntervalSeconds = 5 }: { news: News[]; rotationIntervalSeconds?: number }) {
   const [coverUrl, setCoverUrl] = useState<string | null>(news[0]?.coverUrl ?? null);
+  const intervalMs = Math.max(2, rotationIntervalSeconds) * 1000;
 
   return (
     <section className={styles.hero} aria-label="Portada">
@@ -35,6 +36,7 @@ export function HomeHero({ news }: { news: News[] }) {
             <NewsCarousel
               items={news}
               variant="hero"
+              intervalMs={intervalMs}
               onActiveChange={(item) => setCoverUrl(item.coverUrl)}
             />
             <HeroActions />

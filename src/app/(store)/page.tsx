@@ -48,7 +48,7 @@ const collections = [
 export default async function Home() {
   const [products, news] = await Promise.all([
     listProducts(new URLSearchParams({ limit: '5' })).catch(() => ({ data: [], nextCursor: null })),
-    listPublicNews().catch(() => ({ data: [] })),
+    listPublicNews().catch(() => ({ data: [], meta: { rotationIntervalSeconds: 5 } })),
   ]);
 
   return (
@@ -87,7 +87,10 @@ export default async function Home() {
           }),
         }}
       />
-      <HomeHero news={news.data} />
+      <HomeHero
+        news={news.data}
+        rotationIntervalSeconds={news.meta?.rotationIntervalSeconds ?? 5}
+      />
 
       <section className={styles.trustStrip} aria-label="Beneficios de la tienda">
         <span>

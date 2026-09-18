@@ -10,8 +10,8 @@ import { toast } from '@/components/feedback';
 import { AdminDataTable, AdminPageHeader, Button, ConfirmDialog, CursorPagination, Dialog, SwitchField, TextareaField, TextField } from '@/components';
 import { adminErrorMessage } from '@/shared/admin/client';
 import { adminDate, AdminBadge } from '@/shared/admin/format';
-import { clearAdminNewsCover, createAdminNews, deleteAdminNews, listAdminNews, updateAdminNews, uploadAdminNewsCover } from '../infrastructure/api';
-import { newsFormSchema, type AdminNews, type NewsFormValues } from '../domain/contracts';
+import { clearAdminNewsCover, createAdminNews, deleteAdminNews, getAdminNewsSettings, listAdminNews, updateAdminNews, updateAdminNewsSettings, uploadAdminNewsCover } from '../infrastructure/api';
+import { newsFormSchema, type AdminNews, type AdminNewsSettings, type NewsFormValues } from '../domain/contracts';
 import styles from './news-management.module.css';
 
 import shared from '@/components/admin/admin-shared.module.css';
@@ -22,6 +22,60 @@ function formValues(news?: AdminNews | null): NewsFormValues {
 }
 function currentRowValues(news: AdminNews, active = news.active): NewsFormValues {
   return { ...formValues(news), active };
+}
+
+function NewsRotationSettings({ settings }: { settings: AdminNewsSettings }) {
+  const queryClient = useQueryClient();
+  const [seconds, setSeconds] = useState(String(settings.rotationIntervalSeconds));
+  const parsed = Number(seconds);
+  const valid = Number.isInteger(parsed) && parsed >= 2 && parsed <= 120;
+  const dirty = valid && parsed !== settings.rotationIntervalSeconds;
+  const mutation = useMutation({
+    mutationFn: () => updateAdminNewsSettings({ rotationIntervalSeconds: parsed, expectedVersion: settings.version }),
+    onSuccess: async (updated) => {
+      queryClient.setQueryData(['admin', 'news-settings'], updated);
+      setSeconds(String(updated.rotationIntervalSeconds));
+      toast.success('Intervalo del carrusel actualizado');
+    },
+    onError: (error) => toast.error(adminErrorMessage(error)),
+  });
+
+  return (
+    <section className={styles.newsSettingsPanel} aria-labelledby="news-rotation-title">
+      <div className={styles.newsSettingsHeader}>
+        <div className={styles.newsSettingsCopy}>
+          <p className={styles.newsSettingsEyebrow}>Carrusel del home</p>
+          <h2 id="news-rotation-title">Rotación automática</h2>
+          <p>Define cada cuántos segundos cambia la noticia destacada. Entre 2 y 120.</p>
+        </div>
+        <span className={styles.newsSettingsBadge} aria-live="polite">
+          Activo: {settings.rotationIntervalSeconds}s
+        </span>
+      </div>
+      <form
+        className={styles.newsSettingsForm}
+        onSubmit={(event) => {
+          event.preventDefault();
+          if (dirty) mutation.mutate();
+        }}
+      >
+        <TextField
+          className={styles.newsSettingsField}
+          label="Segundos"
+          type="number"
+          min={2}
+          max={120}
+          step={1}
+          inputMode="numeric"
+          value={seconds}
+          onChange={(event) => setSeconds(event.target.value)}
+        />
+        <Button type="submit" disabled={!dirty || mutation.isPending}>
+          {mutation.isPending ? 'Guardando…' : 'Guardar'}
+        </Button>
+      </form>
+    </section>
+  );
 }
 
 function NewsForm({ news, onClose, onSaved }: { news: AdminNews | null; onClose: () => void; onSaved: () => Promise<void> }) {
@@ -133,6 +187,7 @@ export function NewsManagementView() {
   const [editor, setEditor] = useState<AdminNews | null | undefined>();
   const [pendingDelete, setPendingDelete] = useState<AdminNews | null>(null);
   const query = useQuery({ queryKey: ['admin', 'news', filters, cursor], queryFn: () => listAdminNews({ ...filters, cursor, limit: 25 }), placeholderData: (previous) => previous });
+  const settingsQuery = useQuery({ queryKey: ['admin', 'news-settings'], queryFn: getAdminNewsSettings });
   const invalidate = () => queryClient.invalidateQueries({ queryKey: ['admin', 'news'] }).then(() => undefined);
   const toggle = useMutation({
     mutationFn: (news: AdminNews) => updateAdminNews(news.id, news.version, currentRowValues(news, !news.active)),
@@ -147,7 +202,8 @@ export function NewsManagementView() {
   const changeFilter = (key: keyof typeof filters, value: string) => { setFilters((current) => ({ ...current, [key]: value })); setCursor(undefined); setHistory([]); };
   const news = query.data?.data ?? [];
   return <>
-    <AdminPageHeader eyebrow="Contenido editorial" title="Noticias" description="Administrá las novedades del hero del home, con imagen de fondo, prioridad y ventana de publicación." actions={<><Button variant="secondary" onClick={() => void query.refetch()} disabled={query.isFetching}><RefreshCw size={16} />Actualizar</Button><Button onClick={() => setEditor(null)}><Plus size={16} />Nueva noticia</Button></>} />
+    <AdminPageHeader eyebrow="Contenido editorial" title="Noticias" description="Administrá las novedades del hero del home, con imagen de fondo, prioridad, ventana de publicación e intervalo de rotación." actions={<><Button variant="secondary" onClick={() => void Promise.all([query.refetch(), settingsQuery.refetch()])} disabled={query.isFetching || settingsQuery.isFetching}><RefreshCw size={16} />Actualizar</Button><Button onClick={() => setEditor(null)}><Plus size={16} />Nueva noticia</Button></>} />
+    {settingsQuery.isLoading ? <div className={shared.adminLoading}>Cargando configuración del carrusel</div> : settingsQuery.isError || !settingsQuery.data ? <div className={shared.adminErrorPanel}><div><h2>No pudimos cargar el intervalo del carrusel</h2><p>{adminErrorMessage(settingsQuery.error)}</p><Button variant="secondary" onClick={() => void settingsQuery.refetch()}>Reintentar</Button></div></div> : <NewsRotationSettings key={settingsQuery.data.version} settings={settingsQuery.data} />}
     <div className={`${styles.newsToolbar} ${shared.adminToolbar}`}><TextField className={shared.adminSearchField} label="Buscar" value={filters.search} onChange={(event) => changeFilter('search', event.target.value)} placeholder="Título o bajada" /><label className="component-field"><span>Estado</span><select value={filters.active} onChange={(event) => changeFilter('active', event.target.value)}><option value="">Todas</option><option value="true">Activas</option><option value="false">Inactivas</option></select></label></div>
     {query.isLoading ? <div className={shared.adminLoading}>Cargando noticias</div> : query.isError ? <div className={shared.adminErrorPanel}><div><h2>No pudimos cargar las noticias</h2><p>{adminErrorMessage(query.error)}</p><Button variant="secondary" onClick={() => void query.refetch()}>Reintentar</Button></div></div> : <>
       <AdminDataTable caption="Noticias editoriales" rows={news} rowKey={(row) => row.id} empty="No hay noticias que coincidan con la búsqueda." columns={[

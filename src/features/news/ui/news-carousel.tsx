@@ -9,10 +9,14 @@ import styles from './news-carousel.module.css';
 type NewsCarouselProps = {
   items: News[];
   variant?: 'section' | 'hero';
+  /** Intervalo de rotación automática en milisegundos. */
+  intervalMs?: number;
   onActiveChange?: (item: News) => void;
 };
 
-export function NewsCarousel({ items, variant = 'section', onActiveChange }: NewsCarouselProps) {
+const DEFAULT_INTERVAL_MS = 5000;
+
+export function NewsCarousel({ items, variant = 'section', intervalMs = DEFAULT_INTERVAL_MS, onActiveChange }: NewsCarouselProps) {
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
@@ -20,6 +24,7 @@ export function NewsCarousel({ items, variant = 'section', onActiveChange }: New
   onActiveChangeRef.current = onActiveChange;
   const activeIndex = items.length ? Math.min(index, items.length - 1) : 0;
   const item = items[activeIndex];
+  const rotationMs = Number.isFinite(intervalMs) && intervalMs >= 2000 ? intervalMs : DEFAULT_INTERVAL_MS;
 
   useEffect(() => {
     if (typeof window.matchMedia !== 'function') return;
@@ -31,9 +36,9 @@ export function NewsCarousel({ items, variant = 'section', onActiveChange }: New
 
   useEffect(() => {
     if (items.length < 2 || paused || reducedMotion) return;
-    const timer = window.setInterval(() => setIndex((current) => (current + 1) % items.length), 5000);
+    const timer = window.setInterval(() => setIndex((current) => (current + 1) % items.length), rotationMs);
     return () => window.clearInterval(timer);
-  }, [items.length, paused, reducedMotion]);
+  }, [items.length, paused, reducedMotion, rotationMs]);
 
   useEffect(() => {
     if (item) onActiveChangeRef.current?.(item);
