@@ -114,34 +114,92 @@ function NewsForm({ news, onClose, onSaved }: { news: AdminNews | null; onClose:
   });
 
   return (
-    <form className={`${shared.adminDialogForm} ${styles.newsDialogForm}`} onSubmit={form.handleSubmit((values) => save.mutate(values))} noValidate>
-      <div className={`${shared.adminFormGrid} ${styles.newsFormGrid}`}>
-        <TextField className={shared.adminFormSpan} label="Título" maxLength={180} error={form.formState.errors.title?.message} autoFocus {...form.register('title')} />
-        <TextareaField className={shared.adminFormSpan} label="Bajada" maxLength={500} rows={5} error={form.formState.errors.summary?.message} hint="Texto informativo; las noticias no tienen enlace ni acción." {...form.register('summary')} />
-        <TextField label="Prioridad" type="number" min={0} max={1_000_000} error={form.formState.errors.sortOrder?.message} {...form.register('sortOrder', { valueAsNumber: true })} />
-        <div className={styles.newsSwitchField}>
-          <SwitchField label="Noticia activa" description="Solo se publica dentro de la ventana configurada." checked={active} onChange={(value) => { setActive(value); form.setValue('active', value, { shouldDirty: true }); }} />
-        </div>
-        <TextField label="Inicio (UTC)" type="datetime-local" hint="Inclusivo" error={form.formState.errors.startsAt?.message} {...form.register('startsAt')} />
-        <TextField label="Fin (UTC)" type="datetime-local" hint="Exclusivo; opcional" error={form.formState.errors.endsAt?.message} {...form.register('endsAt')} />
-        <div className={`${shared.adminFormSpan} ${styles.coverField}`}>
-          <span className={styles.coverLabel}>Fondo del hero</span>
-          <p className={styles.coverHint}>Imagen de fondo del panel de noticias en el home. JPEG, PNG o WebP.</p>
+    <form className={styles.newsDialogForm} onSubmit={form.handleSubmit((values) => save.mutate(values))} noValidate>
+      <div className={styles.newsDialogBody}>
+        <section className={styles.newsFormSection} aria-labelledby="news-content-title">
+          <div className={styles.newsFormSectionHead}>
+            <h3 id="news-content-title">Contenido</h3>
+            <p>Texto que se muestra en el carrusel del home.</p>
+          </div>
+          <div className={styles.newsFormStack}>
+            <TextField label="Título" maxLength={180} error={form.formState.errors.title?.message} autoFocus {...form.register('title')} />
+            <TextareaField
+              label="Bajada"
+              maxLength={500}
+              rows={3}
+              error={form.formState.errors.summary?.message}
+              hint="Solo texto informativo. Sin enlaces ni botones."
+              {...form.register('summary')}
+            />
+          </div>
+        </section>
+
+        <section className={styles.newsFormSection} aria-labelledby="news-publish-title">
+          <div className={styles.newsFormSectionHead}>
+            <h3 id="news-publish-title">Publicación</h3>
+            <p>Orden, estado y ventana horaria (UTC).</p>
+          </div>
+          <div className={styles.newsFormPublish}>
+            <TextField
+              label="Orden"
+              type="number"
+              min={0}
+              max={1_000_000}
+              error={form.formState.errors.sortOrder?.message}
+              hint="Menor número = aparece antes."
+              {...form.register('sortOrder', { valueAsNumber: true })}
+            />
+            <div className={styles.newsSwitchField}>
+              <SwitchField
+                label="Noticia activa"
+                description="Visible solo dentro de la ventana."
+                checked={active}
+                onChange={(value) => {
+                  setActive(value);
+                  form.setValue('active', value, { shouldDirty: true });
+                }}
+              />
+            </div>
+            <TextField
+              label="Desde"
+              type="datetime-local"
+              hint="Opcional · inclusive"
+              error={form.formState.errors.startsAt?.message}
+              {...form.register('startsAt')}
+            />
+            <TextField
+              label="Hasta"
+              type="datetime-local"
+              hint="Opcional · exclusive"
+              error={form.formState.errors.endsAt?.message}
+              {...form.register('endsAt')}
+            />
+          </div>
+        </section>
+
+        <section className={styles.newsFormSection} aria-labelledby="news-cover-title">
+          <div className={styles.newsFormSectionHead}>
+            <h3 id="news-cover-title">Fondo del hero</h3>
+            <p>JPEG, PNG o WebP. Idealmente horizontal.</p>
+          </div>
           {!current ? (
             <p className={styles.coverHint}>Creá la noticia primero para poder subir la portada.</p>
           ) : (
-            <div className={styles.coverRow}>
-              <div className={styles.coverPreview}>
+            <div className={styles.coverBlock}>
+              <div className={`${styles.coverPreview} ${current.coverUrl ? styles.hasImage : ''}`}>
                 {current.coverUrl ? (
-                  <Image src={current.coverUrl} alt="" width={320} height={160} unoptimized />
+                  <Image src={current.coverUrl} alt="" width={640} height={200} unoptimized />
                 ) : (
-                  <span>Sin portada</span>
+                  <span className={styles.coverEmpty}>
+                    <ImagePlus size={22} aria-hidden="true" />
+                    Sin portada
+                  </span>
                 )}
               </div>
               <div className={styles.coverActions}>
-                <label className="button button-secondary">
+                <label className={`button button-secondary ${styles.coverUpload}`}>
                   <ImagePlus size={16} />
-                  {current.coverUrl ? 'Cambiar imagen' : 'Subir imagen'}
+                  {current.coverUrl ? 'Cambiar' : 'Subir imagen'}
                   <input
                     ref={fileInput}
                     className={styles.visuallyHidden}
@@ -162,18 +220,29 @@ function NewsForm({ news, onClose, onSaved }: { news: AdminNews | null; onClose:
                 </label>
                 {current.coverUrl && (
                   <Button type="button" variant="danger" disabled={cover.isPending} onClick={() => cover.mutate(null)}>
-                    Quitar portada
+                    Quitar
                   </Button>
                 )}
+                {cover.isPending && <span className={styles.coverBusy}>Subiendo…</span>}
               </div>
             </div>
           )}
-        </div>
+        </section>
       </div>
-      {form.formState.errors.root?.message && <div className={[shared.adminNotice, styles.isDanger].filter(Boolean).join(' ')} role="alert">{form.formState.errors.root.message}</div>}
-      <div className={shared.adminDialogActions}>
-        <Button type="button" variant="secondary" onClick={onClose} disabled={save.isPending || cover.isPending}>Cancelar</Button>
-        <Button type="submit" disabled={save.isPending || cover.isPending}>{save.isPending ? 'Guardando…' : current ? 'Guardar cambios' : 'Crear noticia'}</Button>
+
+      {form.formState.errors.root?.message && (
+        <div className={[shared.adminNotice, styles.isDanger].filter(Boolean).join(' ')} role="alert">
+          {form.formState.errors.root.message}
+        </div>
+      )}
+
+      <div className={styles.newsDialogActions}>
+        <Button type="button" variant="secondary" onClick={onClose} disabled={save.isPending || cover.isPending}>
+          Cancelar
+        </Button>
+        <Button type="submit" disabled={save.isPending || cover.isPending}>
+          {save.isPending ? 'Guardando…' : current ? 'Guardar cambios' : 'Crear noticia'}
+        </Button>
       </div>
     </form>
   );
@@ -219,8 +288,8 @@ export function NewsManagementView() {
       open={editor !== undefined}
       onClose={() => setEditor(undefined)}
       title={editor ? 'Editar noticia' : 'Nueva noticia'}
-      description={editor ? `Actualizá “${editor.title}”. Las fechas se interpretan en UTC.` : 'Las noticias nuevas comienzan inactivas. Las fechas se interpretan en UTC.'}
-      className={`${styles.adminNewsDialog} ${styles.newsDialog}`}
+      description={editor ? 'Cambios visibles en el home al guardar. Fechas en UTC.' : 'Se crea inactiva. Después podés subir portada y activarla. Fechas en UTC.'}
+      className={styles.adminNewsDialog}
     >
       {editor !== undefined && (
         <NewsForm key={editor?.id ?? 'new'} news={editor} onClose={() => setEditor(undefined)} onSaved={invalidate} />
