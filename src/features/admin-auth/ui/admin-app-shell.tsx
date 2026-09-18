@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Boxes, ClipboardList, Coins, CreditCard, Gauge, Handshake, MessagesSquare, Newspaper, PackageSearch, Settings, Store, Truck, UsersRound } from 'lucide-react';
+import { Boxes, ClipboardList, CreditCard, Gauge, Handshake, MessagesSquare, Newspaper, PackageSearch, Settings, Store, Truck, UsersRound } from 'lucide-react';
 import { toast } from '@/components/feedback';
 import { AdminShell, type AdminNavigationItem } from '@/components/admin';
 import { adminErrorMessage } from '@/shared/admin/client';
@@ -23,7 +23,6 @@ const navigation: AdminNavigationItem[] = [
   { href: '/admin/payments', label: 'Pagos', icon: <CreditCard size={16} /> },
   { href: '/admin/fulfillment', label: 'Envíos y retiro', icon: <Truck size={16} /> },
   { href: '/admin/customers', label: 'Clientes', icon: <UsersRound size={16} /> },
-  { href: '/admin/loyalty', label: 'Fidelidad', icon: <Coins size={16} /> },
   { href: '/admin/support', label: 'Soporte', icon: <MessagesSquare size={16} /> },
   { href: '/admin/config', label: 'Configuración', icon: <Settings size={16} /> },
 ];
