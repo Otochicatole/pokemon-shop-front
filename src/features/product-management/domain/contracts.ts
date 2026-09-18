@@ -7,7 +7,7 @@ export const adminInventorySchema = z.object({ onHand: z.number().int().nonnegat
 export const adminProductSchema = z.object({
   id: z.string(), sku: z.string(), slug: z.string(), name: z.string(), description: z.string(),
   kind: productKindSchema, stockMode: z.enum(['UNIQUE', 'QUANTITY']), status: adminProductStatusSchema,
-  price: moneySchema, version: z.number().int(), inventory: adminInventorySchema.nullable().transform((value) => value ?? { onHand: 0, reserved: 0, available: 0, version: 0 }),
+  price: moneySchema, cost: moneySchema, version: z.number().int(), inventory: adminInventorySchema.nullable().transform((value) => value ?? { onHand: 0, reserved: 0, available: 0, version: 0 }),
   pokemonCard: pokemonCardSchema.nullable().optional(), images: z.array(adminProductImageSchema).default([]),
   publishedAt: z.string().nullable().optional(), archivedAt: z.string().nullable().optional(), createdAt: z.string().or(z.date()), updatedAt: z.string().or(z.date()),
 });
@@ -38,6 +38,7 @@ export const productEditorSchema = z.object({
   kind: productKindSchema,
   stockMode: z.enum(['UNIQUE', 'QUANTITY']),
   price: z.string().regex(/^\d+(?:[.,]\d{1,2})?$/, 'Ingresá un precio válido'),
+  cost: z.string().regex(/^\d+(?:[.,]\d{1,2})?$/, 'Ingresá un costo válido'),
   initialStock: z.number().int().min(0).max(1_000_000),
   pokemonType: pokemonTypeSchema.optional(),
   setName: z.string().max(120).optional(), setCode: z.string().max(40).optional(), cardNumber: z.string().max(30).optional(), rarity: z.string().max(80).optional(), language: z.string().max(40).optional(), condition: productConditionSchema.optional(), finish: z.string().max(50).optional(), edition: z.string().max(80).optional(), gradingCompany: z.string().max(80).optional(), grade: z.string().max(30).optional(), certificationNumber: z.string().max(100).optional(),

@@ -95,6 +95,7 @@ function productWriteFromLine(item: PurchaseLineFormValues) {
     kind: item.kind,
     stockMode: item.stockMode,
     priceMinor: minorFromDecimal(item.price),
+    costMinor: minorFromDecimal(item.unitCost),
     initialStock: 0,
     pokemonCard,
   };

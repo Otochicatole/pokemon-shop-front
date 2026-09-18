@@ -22,7 +22,7 @@ function productBody(values: ProductEditorValues, existing: boolean) {
   const pokemonCard = values.kind === 'SINGLE_CARD' ? {
     pokemonType: values.pokemonType ?? null, setName: values.setName!, setCode: values.setCode || null, cardNumber: values.cardNumber!, rarity: values.rarity!, language: values.language!, condition: values.condition!, finish: values.finish || null, edition: values.edition || null, gradingCompany: values.gradingCompany || null, grade: values.grade || null, certificationNumber: values.certificationNumber || null,
   } : null;
-  return { sku: values.sku, slug: values.slug, name: values.name, description: values.description, kind: values.kind, stockMode: values.stockMode, priceMinor: minorFromDecimal(values.price), pokemonCard, ...(!existing ? { initialStock: values.initialStock } : {}) };
+  return { sku: values.sku, slug: values.slug, name: values.name, description: values.description, kind: values.kind, stockMode: values.stockMode, priceMinor: minorFromDecimal(values.price), costMinor: minorFromDecimal(values.cost), pokemonCard, ...(!existing ? { initialStock: values.initialStock } : {}) };
 }
 
 export async function createAdminProduct(values: ProductEditorValues) {
