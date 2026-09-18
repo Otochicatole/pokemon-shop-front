@@ -2,10 +2,9 @@
   min-width: 0;
   border: 2px solid var(--line);
   background: var(--surface);
-  transition: border-color .16s, transform .16s;
+  transition: border-color .16s;
 }
 
 .productTile:hover {
   border-color: var(--accent);
-  transform: translateY(-3px);
 }

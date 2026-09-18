@@ -9,12 +9,6 @@
 
 .productImage img {
   object-fit: cover;
-  transition: transform .4s;
-}
-
-:global(.product-card):hover .productImage img,
-:global(.product-tile):hover .productImage img {
-  transform: scale(1.04);
 }
 
 .productKind {
