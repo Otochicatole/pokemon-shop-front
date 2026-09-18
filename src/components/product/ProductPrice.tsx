@@ -6,5 +6,10 @@ import styles from './ProductPrice.module.css';
 
 export function ProductPrice({ price, className = '' }: { price: Money; className?: string }) {
   const fx = useStorefrontFx();
-  return <strong className={`${styles.productPrice} product-price ${className}`.trim()}>{fx.formatMoney(price)}</strong>;
+  const formatted = fx.formatMoney(price);
+  return (
+    <strong className={`${styles.productPrice} product-price ${className}`.trim()}>
+      {formatted === '—' ? formatted : `${formatted} ARS`}
+    </strong>
+  );
 }
