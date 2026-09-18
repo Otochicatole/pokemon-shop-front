@@ -101,7 +101,7 @@ export const tcgdexCardSummarySchema = z.object({
 });
 export const tcgdexCardSchema = tcgdexCardSummarySchema.extend({
   setName: z.string(), description: z.string(), rarity: z.string(), category: z.string(), types: z.array(z.string()),
-  firstEdition: z.boolean(), holo: z.boolean(), effect: z.string(), language: z.literal('Español'),
+  firstEdition: z.boolean(), holo: z.boolean(), effect: z.string(), language: z.string(),
 });
 export const tcgdexSearchEnvelopeSchema = z.object({ data: z.array(tcgdexCardSummarySchema), meta: z.record(z.string(), z.unknown()).optional() });
 export const tcgdexCardEnvelopeSchema = z.object({ data: z.object({ card: tcgdexCardSchema }), meta: z.record(z.string(), z.unknown()).optional() });

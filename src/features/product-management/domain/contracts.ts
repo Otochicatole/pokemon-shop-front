@@ -24,7 +24,7 @@ export const productImageOrderEnvelopeSchema = z.object({ data: z.object({ image
 export const inventoryMutationEnvelopeSchema = z.object({ data: z.object({ productId: z.string(), onHand: z.number().int(), reserved: z.number().int(), available: z.number().int(), version: z.number().int() }), meta: z.record(z.string(), z.unknown()).optional() });
 
 export const tcgdexCardSummarySchema = z.object({ id: z.string(), name: z.string(), localId: z.string(), setCode: z.string(), imageUrl: z.string().url().nullable(), setName: z.string().optional(), rarity: z.string().optional(), category: z.string().optional(), types: z.array(z.string()).optional(), firstEdition: z.boolean().optional(), holo: z.boolean().optional() });
-export const tcgdexCardSchema = tcgdexCardSummarySchema.extend({ setName: z.string(), description: z.string(), rarity: z.string(), category: z.string(), types: z.array(z.string()), firstEdition: z.boolean(), holo: z.boolean(), effect: z.string(), language: z.literal('Español') });
+export const tcgdexCardSchema = tcgdexCardSummarySchema.extend({ setName: z.string(), description: z.string(), rarity: z.string(), category: z.string(), types: z.array(z.string()), firstEdition: z.boolean(), holo: z.boolean(), effect: z.string(), language: z.string() });
 export const tcgdexSearchEnvelopeSchema = z.object({ data: z.array(tcgdexCardSummarySchema), meta: z.record(z.string(), z.unknown()).optional() });
 export const tcgdexCardEnvelopeSchema = z.object({ data: z.object({ card: tcgdexCardSchema }), meta: z.record(z.string(), z.unknown()).optional() });
 export const tcgdexRaritiesEnvelopeSchema = z.object({ data: z.array(z.string()), meta: z.record(z.string(), z.unknown()).optional() });
