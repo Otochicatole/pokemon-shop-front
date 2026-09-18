@@ -132,6 +132,14 @@ export function buildCatalogApiParams(filters: CatalogFilterState, cursor?: stri
   return params;
 }
 
+export function buildCatalogFiltersApiParams(filters: CatalogFilterState): URLSearchParams {
+  const params = buildCatalogApiParams(filters);
+  params.delete('limit');
+  params.delete('cursor');
+  params.delete('sort');
+  return params;
+}
+
 export function toggleCatalogFilter(filters: CatalogFilterState, key: CatalogArrayFilterKey, value: string): CatalogFilterState {
   const current = filters[key] as string[];
   const next = current.includes(value) ? current.filter((item) => item !== value) : [...current, value];

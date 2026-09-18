@@ -46,12 +46,19 @@ export const catalogFiltersSchema = z.object({
   kinds: z.array(catalogFacetOptionSchema),
   pokemonTypes: z.array(catalogFacetOptionSchema),
   sets: z.array(catalogFacetOptionSchema),
+  setCodes: z.array(catalogFacetOptionSchema).default([]),
   rarities: z.array(catalogFacetOptionSchema),
   conditions: z.array(catalogFacetOptionSchema),
   languages: z.array(catalogFacetOptionSchema),
   finishes: z.array(catalogFacetOptionSchema),
   editions: z.array(catalogFacetOptionSchema),
   gradingCompanies: z.array(catalogFacetOptionSchema),
+  availability: z.object({
+    inStock: z.number().int().nonnegative(),
+    outOfStock: z.number().int().nonnegative(),
+    graded: z.number().int().nonnegative(),
+    ungraded: z.number().int().nonnegative(),
+  }).optional(),
   priceRange: z.object({ minMinor: z.string().nullable(), maxMinor: z.string().nullable() }),
 });
 export const catalogFiltersEnvelopeSchema = z.object({ data: catalogFiltersSchema, meta: z.record(z.string(), z.unknown()).optional() });

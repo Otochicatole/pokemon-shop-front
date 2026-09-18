@@ -12,7 +12,8 @@ export async function getProduct(slug: string): Promise<Product> {
   return productSchema.parse(data.data);
 }
 
-export async function getCatalogFilters(): Promise<CatalogFilters> {
-  const response = await apiFetch('/catalog/filters', noStore, catalogFiltersEnvelopeSchema);
+export async function getCatalogFilters(params: URLSearchParams = new URLSearchParams()): Promise<CatalogFilters> {
+  const query = params.toString();
+  const response = await apiFetch(`/catalog/filters${query ? `?${query}` : ''}`, noStore, catalogFiltersEnvelopeSchema);
   return response.data;
 }

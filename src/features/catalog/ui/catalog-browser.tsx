@@ -7,7 +7,7 @@ import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/button';
 import { Drawer } from '@/components/overlay';
 import { EmptyState, ErrorState, LoadingSkeleton } from '@/components/feedback';
-import { activeCatalogFilterCount, buildCatalogApiParams, catalogFiltersToSearchParams, hasCatalogFilters, parseCatalogFilters, toggleCatalogFilter } from '../application/catalog-filter-codec';
+import { activeCatalogFilterCount, buildCatalogApiParams, buildCatalogFiltersApiParams, catalogFiltersToSearchParams, hasCatalogFilters, parseCatalogFilters, toggleCatalogFilter } from '../application/catalog-filter-codec';
 import { emptyCatalogFilters, sortLabels, type CatalogArrayFilterKey, type CatalogFilterState } from '../domain/catalog-filters';
 import { getCatalogFilters, listProducts } from '../infrastructure/api';
 import { CatalogActiveFilters } from './catalog-active-filters';
@@ -66,10 +66,13 @@ function CatalogBrowserController({ initialFilters }: { initialFilters: CatalogF
   const commitSearch = useCallback((q: string) => replaceFilters((current) => ({ ...current, q })), [replaceFilters]);
   const closeFilterDrawer = useCallback(() => setFilterDrawerOpen(false), []);
 
+  const facetParams = buildCatalogFiltersApiParams(filters);
+  const facetParamsKey = facetParams.toString();
   const facetsQuery = useQuery({
-    queryKey: ['catalog-filters'],
-    queryFn: getCatalogFilters,
-    staleTime: 30_000,
+    queryKey: ['catalog-filters', facetParamsKey],
+    queryFn: () => getCatalogFilters(facetParams),
+    staleTime: 15_000,
+    placeholderData: (previous) => previous,
   });
   const productQueryKey = buildCatalogApiParams(filters).toString();
   const products = useInfiniteQuery({

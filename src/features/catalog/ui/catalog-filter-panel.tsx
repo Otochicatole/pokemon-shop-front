@@ -37,10 +37,6 @@ interface FacetGroupProps {
   initiallyOpen?: boolean;
 }
 
-const fallbackKinds = Object.keys(productKindLabels).map((value) => ({ value, count: 0 }));
-const fallbackPokemonTypes = Object.keys(pokemonTypeLabels).map((value) => ({ value, count: 0 }));
-const fallbackConditions = Object.keys(conditionLabels).map((value) => ({ value, count: 0 }));
-
 function includeSelected(options: CatalogFacetOption[], selected: string[]): CatalogFacetOption[] {
   const known = new Set(options.map((option) => option.value));
   return [...options, ...selected.filter((value) => !known.has(value)).map((value) => ({ value, count: 0 }))];
@@ -73,6 +69,38 @@ function FacetGroup({ label, filterKey, options, selected, onToggle, labels, typ
   );
 }
 
+function SingleValueFacetGroup({ label, options, value, onChange, initiallyOpen = false }: {
+  label: string;
+  options: CatalogFacetOption[];
+  value: string;
+  onChange: (value: string) => void;
+  initiallyOpen?: boolean;
+}) {
+  if (options.length === 0 && !value) return null;
+  const selected = value ? [value] : [];
+  return (
+    <details className={`${styles.catalogFilterGroup} catalog-filter-group`} open={initiallyOpen || Boolean(value)}>
+      <summary>{label}<span>{value ? '1' : ''}</span></summary>
+      <fieldset>
+        <legend className="sr-only">{label}</legend>
+        {includeSelected(options, selected).map((option) => (
+          <button
+            type="button"
+            className={`${styles.catalogFilterOption} catalog-filter-option`}
+            aria-pressed={value === option.value}
+            key={option.value}
+            onClick={() => onChange(value === option.value ? '' : option.value)}
+          >
+            <span className={`${styles.catalogFilterMarker} catalog-filter-marker`} aria-hidden="true">{value === option.value ? '◆' : '◇'}</span>
+            <span>{option.value}</span>
+            {(option.count > 0 || options.some((item) => item.count > 0)) && <small>{option.count}</small>}
+          </button>
+        ))}
+      </fieldset>
+    </details>
+  );
+}
+
 export function CatalogFilterPanel({ filters, facets, onToggle, onChange, onClear, labelledBy }: CatalogFilterPanelProps) {
   const id = useId();
   const fx = useStorefrontFx();
@@ -90,20 +118,21 @@ export function CatalogFilterPanel({ filters, facets, onToggle, onChange, onClea
         <button type="button" className={`${styles.catalogClear} catalog-clear`} onClick={onClear}><RotateCcw size={13} /> Limpiar</button>
       </div>
 
-      <FacetGroup label="Producto" filterKey="kinds" options={facets?.kinds ?? fallbackKinds} selected={filters.kinds} onToggle={onToggle} labels={productKindLabels} initiallyOpen />
-      <FacetGroup label="Tipo / atributo" filterKey="pokemonTypes" options={facets?.pokemonTypes ?? fallbackPokemonTypes} selected={filters.pokemonTypes} onToggle={onToggle} labels={pokemonTypeLabels} typeDots initiallyOpen />
+      <FacetGroup label="Producto" filterKey="kinds" options={facets?.kinds ?? []} selected={filters.kinds} onToggle={onToggle} labels={productKindLabels} initiallyOpen />
+      <FacetGroup label="Tipo / atributo" filterKey="pokemonTypes" options={facets?.pokemonTypes ?? []} selected={filters.pokemonTypes} onToggle={onToggle} labels={pokemonTypeLabels} typeDots initiallyOpen />
       <FacetGroup label="Colección / set" filterKey="setNames" options={facets?.sets ?? []} selected={filters.setNames} onToggle={onToggle} initiallyOpen />
+      <SingleValueFacetGroup
+        label="Código de set"
+        options={facets?.setCodes ?? []}
+        value={filters.setCode}
+        onChange={(setCode) => onChange({ ...filters, setCode })}
+      />
       <FacetGroup label="Rareza" filterKey="rarities" options={facets?.rarities ?? []} selected={filters.rarities} onToggle={onToggle} />
-      <FacetGroup label="Condición" filterKey="conditions" options={facets?.conditions ?? fallbackConditions} selected={filters.conditions} onToggle={onToggle} labels={conditionLabels} />
+      <FacetGroup label="Condición" filterKey="conditions" options={facets?.conditions ?? []} selected={filters.conditions} onToggle={onToggle} labels={conditionLabels} />
       <FacetGroup label="Idioma" filterKey="languages" options={facets?.languages ?? []} selected={filters.languages} onToggle={onToggle} />
       <FacetGroup label="Acabado" filterKey="finishes" options={facets?.finishes ?? []} selected={filters.finishes} onToggle={onToggle} />
       <FacetGroup label="Edición" filterKey="editions" options={facets?.editions ?? []} selected={filters.editions} onToggle={onToggle} />
       <FacetGroup label="Empresa de grading" filterKey="gradingCompanies" options={facets?.gradingCompanies ?? []} selected={filters.gradingCompanies} onToggle={onToggle} />
-
-      <details className={`${styles.catalogFilterGroup} catalog-filter-group`} open={filters.setCode !== ''}>
-        <summary>Código de set<span>{filters.setCode ? '1' : ''}</span></summary>
-        <SetCodeField key={filters.setCode} id={id} value={filters.setCode} onApply={(setCode) => onChange({ ...filters, setCode })} />
-      </details>
 
       <details className={`${styles.catalogFilterGroup} catalog-filter-group`} open={filters.minPrice !== '' || filters.maxPrice !== ''}>
         <summary>Precio<span>{filters.minPrice || filters.maxPrice ? '●' : ''}</span></summary>
@@ -120,49 +149,46 @@ export function CatalogFilterPanel({ filters, facets, onToggle, onChange, onClea
       </details>
 
       <div className={`${styles.catalogQuickFilters} catalog-quick-filters`}>
-        <BinaryFilter
-          label="Disponibilidad"
-          value={filters.inStock}
-          trueLabel="Con stock"
-          falseLabel="Sin stock"
-          onChange={(inStock) => onChange({ ...filters, inStock })}
-        />
-        <BinaryFilter
-          label="Certificación"
-          value={filters.graded}
-          trueLabel="Graduadas"
-          falseLabel="Sin graduar"
-          onChange={(graded) => onChange({ ...filters, graded })}
-        />
+        {(filters.inStock !== null || (facets?.availability?.inStock ?? 0) > 0 || (facets?.availability?.outOfStock ?? 0) > 0) && (
+          <BinaryFilter
+            label="Disponibilidad"
+            value={filters.inStock}
+            trueLabel="Con stock"
+            falseLabel="Sin stock"
+            trueCount={facets?.availability?.inStock}
+            falseCount={facets?.availability?.outOfStock}
+            onChange={(inStock) => onChange({ ...filters, inStock })}
+          />
+        )}
+        {(filters.graded !== null || (facets?.availability?.graded ?? 0) > 0 || (facets?.availability?.ungraded ?? 0) > 0) && (
+          <BinaryFilter
+            label="Certificación"
+            value={filters.graded}
+            trueLabel="Graduadas"
+            falseLabel="Sin graduar"
+            trueCount={facets?.availability?.graded}
+            falseCount={facets?.availability?.ungraded}
+            onChange={(graded) => onChange({ ...filters, graded })}
+          />
+        )}
       </div>
     </div>
   );
 }
 
-function SetCodeField({ id, value, onApply }: { id: string; value: string; onApply: (value: string) => void }) {
-  const [draft, setDraft] = useState(value);
-  return (
-    <form className={`${styles.catalogInlineForm} catalog-inline-form`} onSubmit={(event) => { event.preventDefault(); onApply(draft.trim().slice(0, 40)); }}>
-      <label className={`${styles.catalogInlineField} catalog-inline-field`} htmlFor={`${id}-set-code`}>
-        <span className="sr-only">Código del set</span>
-        <input id={`${id}-set-code`} value={draft} maxLength={40} placeholder="Ej. SV4" onChange={(event) => setDraft(event.target.value)} />
-      </label>
-      <Button type="submit" variant="secondary">Aplicar</Button>
-    </form>
-  );
-}
-
-function BinaryFilter({ label, value, trueLabel, falseLabel, onChange }: {
+function BinaryFilter({ label, value, trueLabel, falseLabel, trueCount, falseCount, onChange }: {
   label: string;
   value: boolean | null;
   trueLabel: string;
   falseLabel: string;
+  trueCount?: number;
+  falseCount?: number;
   onChange: (value: boolean | null) => void;
 }) {
-  const options: Array<{ label: string; value: boolean | null }> = [
+  const options: Array<{ label: string; value: boolean | null; count?: number }> = [
     { label: 'Todos', value: null },
-    { label: trueLabel, value: true },
-    { label: falseLabel, value: false },
+    ...(trueCount === 0 && value !== true ? [] : [{ label: trueLabel, value: true as boolean | null, count: trueCount }]),
+    ...(falseCount === 0 && value !== false ? [] : [{ label: falseLabel, value: false as boolean | null, count: falseCount }]),
   ];
   return (
     <fieldset>
@@ -177,6 +203,7 @@ function BinaryFilter({ label, value, trueLabel, falseLabel, onChange }: {
         >
           <span className={`${styles.catalogFilterMarker} catalog-filter-marker`} aria-hidden="true">{value === option.value ? '◆' : '◇'}</span>
           <span>{option.label}</span>
+          {typeof option.count === 'number' && <small>{option.count}</small>}
         </button>
       ))}
     </fieldset>
