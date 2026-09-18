@@ -1,6 +1,10 @@
+'use client';
+
 import { X } from 'lucide-react';
 import type { CatalogFilters } from '@/shared/api/contracts';
 import { conditionLabels, pokemonTypeLabels, productKindLabels, type CatalogArrayFilterKey, type CatalogFilterState } from '../domain/catalog-filters';
+import { useStorefrontFx } from '@/shared/fx/StorefrontFxProvider';
+import { usdDecimalToArsDecimal } from '@/shared/fx/money';
 
 import styles from './catalog-active-filters.module.css';
 
@@ -24,6 +28,14 @@ const arrayFilters: Array<{ key: CatalogArrayFilterKey; label: string }> = [
 ];
 
 export function CatalogActiveFilters({ filters, facets, onChange, onClear }: CatalogActiveFiltersProps) {
+  const fx = useStorefrontFx();
+  const formatPriceChip = (usdDecimal: string) => {
+    if (fx.rateMicros) {
+      const ars = usdDecimalToArsDecimal(usdDecimal, fx.rateMicros);
+      return ars || usdDecimal;
+    }
+    return usdDecimal;
+  };
   const dynamicLabels = new Map(
     [facets?.sets, facets?.rarities, facets?.languages, facets?.finishes, facets?.editions, facets?.gradingCompanies]
       .flatMap((options) => options ?? [])
@@ -45,8 +57,8 @@ export function CatalogActiveFilters({ filters, facets, onChange, onClear }: Cat
   if (filters.setCode) chips.push({ id: 'setCode', text: `Código: ${filters.setCode}`, remove: () => onChange({ ...filters, setCode: '' }) });
   if (filters.inStock !== null) chips.push({ id: 'inStock', text: filters.inStock ? 'Con stock' : 'Sin stock', remove: () => onChange({ ...filters, inStock: null }) });
   if (filters.graded !== null) chips.push({ id: 'graded', text: filters.graded ? 'Graduadas' : 'Sin graduar', remove: () => onChange({ ...filters, graded: null }) });
-  if (filters.minPrice) chips.push({ id: 'minPrice', text: `Desde $${filters.minPrice}`, remove: () => onChange({ ...filters, minPrice: '' }) });
-  if (filters.maxPrice) chips.push({ id: 'maxPrice', text: `Hasta $${filters.maxPrice}`, remove: () => onChange({ ...filters, maxPrice: '' }) });
+  if (filters.minPrice) chips.push({ id: 'minPrice', text: `Desde $${formatPriceChip(filters.minPrice)}`, remove: () => onChange({ ...filters, minPrice: '' }) });
+  if (filters.maxPrice) chips.push({ id: 'maxPrice', text: `Hasta $${formatPriceChip(filters.maxPrice)}`, remove: () => onChange({ ...filters, maxPrice: '' }) });
 
   if (chips.length === 0) return null;
 

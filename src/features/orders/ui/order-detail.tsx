@@ -12,8 +12,9 @@ import { EmptyState } from '@/components/feedback';
 import { Dialog } from '@/components/overlay';
 import { confirmSellerOrder, getOrder, cancelOrder, openSellerOrderIssue, refreshOrderPaymentStatus } from '../infrastructure/api';
 import { resumePaymentSession, uploadReceipt } from '@/features/checkout/infrastructure/api';
-import type { Order } from '@/shared/api/contracts';
-import { formatDate, formatMoney, statusLabel } from '@/shared/lib/format';
+import type { Money, Order, ProviderMoney } from '@/shared/api/contracts';
+import { formatDate, formatMoney as formatRawMoney, statusLabel } from '@/shared/lib/format';
+import { useStorefrontFx } from '@/shared/fx/StorefrontFxProvider';
 import styles from './order-detail.module.css';
 
 const aggregateStatuses = new Set(['IN_FULFILLMENT', 'PARTIALLY_COMPLETED', 'ACTION_REQUIRED']);
@@ -59,6 +60,12 @@ const mercadoPagoReturnParams = [
 ] as const;
 
 export function OrderDetail({ number }: { number: string }) {
+  const fx = useStorefrontFx();
+  const formatMoney = (money?: Money | ProviderMoney) => {
+    if (!money) return '—';
+    if (money.currency === 'ARS') return formatRawMoney(money);
+    return fx.formatMoney(money);
+  };
   const queryClient = useQueryClient();
   const paymentReturnRefreshKey = useRef<string | null>(null);
   const [pollingStopped, setPollingStopped] = useState(false);
@@ -229,7 +236,7 @@ export function OrderDetail({ number }: { number: string }) {
             <div className={styles.bankDetails}>
               <strong>Total cobrado en Mercado Pago</strong>
               <span>{formatMoney(payment.mercadoPago.amount)}</span>
-              {payment.mercadoPago.rate && <span>Cotización DólarAPI blue venta: {payment.mercadoPago.rate.rate}</span>}
+              {payment.mercadoPago.rate && <span>Cotización {payment.mercadoPago.rate.source}: {payment.mercadoPago.rate.rate}</span>}
             </div>
           )}
           {payment?.method === 'MERCADO_PAGO' && ['PENDING_PAYMENT', 'PAYMENT_REVIEW'].includes(order.status) && ['READY', 'RETRY_REQUIRED'].includes(payment.paymentSessionStatus ?? '') && (

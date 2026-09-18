@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { Minus, Plus, Trash2 } from 'lucide-react';
 import { useCartStore } from '../infrastructure/store';
 import { cartTotal } from '../domain/cart';
-import { formatMoney } from '@/shared/lib/format';
+import { StorefrontMoney } from '@/shared/fx/StorefrontMoney';
 import { BASE_CURRENCY } from '@/shared/lib/currency';
 import styles from './cart-view.module.css';
 
@@ -50,7 +50,7 @@ export function CartView() {
                   <span>Ver producto</span>
                 </Link>
                 <p>
-                  {formatMoney(item.price)} <span aria-hidden="true">·</span> versión {item.productVersion} <span aria-hidden="true">·</span> Vende {item.seller?.name ?? 'Card Shop'}
+                  <StorefrontMoney money={item.price} /> <span aria-hidden="true">·</span> versión {item.productVersion} <span aria-hidden="true">·</span> Vende {item.seller?.name ?? 'Card Shop'}
                 </p>
                 <div className={`${styles.quantityControl} quantity-control`} aria-label={`Cantidad de ${item.name}`}>
                   <button type="button" aria-label="Reducir cantidad" onClick={() => setQuantity(item.id, item.quantity - 1)}>
@@ -63,7 +63,7 @@ export function CartView() {
                 </div>
               </div>
               <div className={`${styles.cartItemTotal} cart-item-total`}>
-                <strong>{formatMoney({ amountMinor: (BigInt(item.price.amountMinor) * BigInt(item.quantity)).toString(), currency: BASE_CURRENCY })}</strong>
+                <strong><StorefrontMoney money={{ amountMinor: (BigInt(item.price.amountMinor) * BigInt(item.quantity)).toString(), currency: BASE_CURRENCY }} /></strong>
                 <button type="button" className={`${styles.cartRemoveButton} icon-button cart-remove-button`} aria-label={`Quitar ${item.name}`} title={`Quitar ${item.name}`} onClick={() => remove(item.id)}>
                   <Trash2 size={16} />
                 </button>
@@ -89,11 +89,11 @@ export function CartView() {
         </div>
         <div className="summary-total">
           <span>Total estimado</span>
-          <strong>{formatMoney({ amountMinor: cartTotal(items).toString(), currency: BASE_CURRENCY })}</strong>
+          <strong><StorefrontMoney money={{ amountMinor: cartTotal(items).toString(), currency: BASE_CURRENCY }} /></strong>
         </div>
         <p className="form-hint">En checkout confirmaremos precio, stock y envío en el backend.</p>
         <Link href="/checkout" className="button button-primary">Continuar al checkout</Link>
-        <p className={`${styles.cartSummaryNote} cart-summary-note`}>Compra protegida · precios en USD</p>
+        <p className={`${styles.cartSummaryNote} cart-summary-note`}>Compra protegida · precios en ARS</p>
       </aside>
     </div>
   );

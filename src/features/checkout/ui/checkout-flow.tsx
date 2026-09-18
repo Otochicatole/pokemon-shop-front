@@ -9,14 +9,15 @@ import { toast } from '@/components/feedback';
 import { useCartStore } from '@/features/cart/infrastructure/store';
 import { cartTotal, storeCartTotal } from '@/features/cart/domain/cart';
 import { getProduct } from '@/features/catalog/infrastructure/api';
-import { formatMoney } from '@/shared/lib/format';
+import { formatMoney as formatRawMoney } from '@/shared/lib/format';
+import { useStorefrontFx } from '@/shared/fx/StorefrontFxProvider';
 import { BASE_CURRENCY } from '@/shared/lib/currency';
 import { Button } from '@/components/button';
 import { getCheckoutOptions, previewCheckout, createOrder } from '../infrastructure/api';
 import { getMe } from '@/features/auth/infrastructure/api';
 import { getLoyaltyAccount } from '@/features/loyalty';
 import { ApiError } from '@/shared/api/client';
-import type { CheckoutPreview, OrderInput } from '@/shared/api/contracts';
+import type { CheckoutPreview, Money, OrderInput, ProviderMoney } from '@/shared/api/contracts';
 import styles from './checkout-flow.module.css';
 
 type SellerDeliverySelection = { delivery: 'PICKUP' | 'SHIPMENT'; pickupPointId?: string; shippingRateId?: string };
@@ -47,6 +48,12 @@ function ratesForProvince(zones: ShippingZoneOption[], province: string) {
 }
 
 export function CheckoutFlow() {
+  const fx = useStorefrontFx();
+  const formatMoney = (money?: Money | ProviderMoney) => {
+    if (!money) return '—';
+    if (money.currency === 'ARS') return formatRawMoney(money);
+    return fx.formatMoney(money);
+  };
   const router = useRouter();
   const queryClient = useQueryClient();
   const items = useCartStore((state) => state.items);
@@ -634,7 +641,7 @@ export function CheckoutFlow() {
           )}
         </div>
         <div className="summary-total">
-          <span>Total USD</span>
+          <span>Total</span>
           <strong className={!quote ? `${styles.summaryPending} summary-pending` : undefined}>
             {quote ? formatMoney(quote.total) : 'Validá para calcular'}
           </strong>
@@ -646,7 +653,7 @@ export function CheckoutFlow() {
               <strong>{formatMoney(quote.mercadoPago.total)}</strong>
             </div>
             <p className="form-hint">
-              DólarAPI blue venta: {quote.mercadoPago.rate} · obtenido {new Date(quote.mercadoPago.fetchedAt).toLocaleTimeString()} · vigente hasta{' '}
+              Dólar {quote.mercadoPago.casa ?? 'configurado'} venta: {quote.mercadoPago.rate} · obtenido {new Date(quote.mercadoPago.fetchedAt).toLocaleTimeString()} · vigente hasta{' '}
               {new Date(quote.mercadoPago.expiresAt).toLocaleTimeString()}
             </p>
           </div>

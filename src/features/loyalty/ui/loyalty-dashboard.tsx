@@ -4,7 +4,8 @@ import Link from 'next/link';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { ArrowLeft, Coins, Gift, History, LockKeyhole } from 'lucide-react';
 import { EmptyState } from '@/components/feedback';
-import { formatDate, formatMoney } from '@/shared/lib/format';
+import { formatDate } from '@/shared/lib/format';
+import { StorefrontMoney } from '@/shared/fx/StorefrontMoney';
 import { getLoyaltyAccount } from '../infrastructure/api';
 import styles from './loyalty-dashboard.module.css';
 
@@ -90,11 +91,11 @@ export function LoyaltyDashboard() {
         </div>
         {program.enabled && (
           <p>
-            Cada <strong>{formatMoney(program.spendPerPoint)}</strong> netos en productos sumás{' '}
+            Cada <strong><StorefrontMoney money={program.spendPerPoint} /></strong> netos en productos sumás{' '}
             <strong>
               {program.pointsPerStep} {program.pointsPerStep === 1 ? 'punto' : 'puntos'}
             </strong>
-            . Cada punto descuenta <strong>{formatMoney(program.pointValue)}</strong>, con un máximo del{' '}
+            . Cada punto descuenta <strong><StorefrontMoney money={program.pointValue} /></strong>, con un máximo del{' '}
             {program.maximumRedemptionPercent}% por orden y un canje mínimo de {program.minimumRedemptionPoints}{' '}
             puntos.
           </p>

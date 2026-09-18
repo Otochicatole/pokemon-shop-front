@@ -7,7 +7,8 @@ import { StatusBadge } from '@/components/badge';
 import type { BadgeTone } from '@/components/badge';
 import { EmptyState } from '@/components/feedback';
 import { listOrders } from '../infrastructure/api';
-import { formatDate, formatMoney, statusLabel } from '@/shared/lib/format';
+import { formatDate, statusLabel } from '@/shared/lib/format';
+import { StorefrontMoney } from '@/shared/fx/StorefrontMoney';
 import styles from './order-list.module.css';
 
 function statusTone(status: string): BadgeTone {
@@ -66,7 +67,7 @@ export function OrderList() {
           </div>
           <div className={styles.orderMeta}>
             <StatusBadge status={statusLabel(order.status)} tone={statusTone(order.status)} />
-            <strong>{formatMoney(order.totals.total)}</strong>
+            <strong><StorefrontMoney money={order.totals.total} /></strong>
           </div>
         </Link>
       ))}

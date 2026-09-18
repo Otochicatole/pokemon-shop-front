@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getProduct, pokemonTypeLabels } from '@/features/catalog';
 import { AddToCartButton } from '@/features/cart/ui/add-to-cart-button';
-import { formatMoney } from '@/shared/lib/format';
+import { StorefrontMoney } from '@/shared/fx/StorefrontMoney';
 import { config, absoluteUrl } from '@/shared/config/env';
 
 import styles from './page.module.css';
@@ -80,7 +80,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           <div className={`${styles.detailKicker} detail-kicker`}><span className="pixel-badge pixel-badge-yellow">{kindLabel}</span><span className={`${styles.detailCode} detail-code`}>SKU {product.sku}</span></div>
           <h1>{product.name}</h1>
           <p className={`${styles.productSellerLine} product-seller-line`}>Vendido por <strong>{product.seller.name}</strong></p>
-          <div className={`${styles.detailPriceRow} detail-price-row`}><p className={`${styles.detailPrice} detail-price`}>{formatMoney(product.price)}</p><span className={`${styles.detailStockChip} ${product.available > 0 ? `${styles.isAvailable} is-available` : `${styles.isEmpty} is-empty`} detail-stock-chip`}>{product.available > 0 ? 'Disponible' : 'Agotado'}</span></div>
+          <div className={`${styles.detailPriceRow} detail-price-row`}><p className={`${styles.detailPrice} detail-price`}><StorefrontMoney money={product.price} /></p><span className={`${styles.detailStockChip} ${product.available > 0 ? `${styles.isAvailable} is-available` : `${styles.isEmpty} is-empty`} detail-stock-chip`}>{product.available > 0 ? 'Disponible' : 'Agotado'}</span></div>
           <section className={`${styles.detailDescriptionBlock} detail-description-block`} aria-labelledby="product-description-title">
             <span className={`${styles.detailSectionLabel} detail-section-label`} id="product-description-title">Descripción</span>
             <p className={`${styles.detailDescription} detail-description`}>{product.description}</p>

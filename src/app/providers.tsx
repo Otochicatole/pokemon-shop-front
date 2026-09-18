@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Toaster } from 'sonner';
 import { SupportRealtimeProvider } from '@/features/support-realtime';
+import { StorefrontFxProvider } from '@/shared/fx/StorefrontFxProvider';
 import './toaster.css';
 
 export function Providers({ children }: { children: React.ReactNode }) {
@@ -13,7 +14,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <SupportRealtimeProvider>{children}</SupportRealtimeProvider>
+      <StorefrontFxProvider>
+        <SupportRealtimeProvider>{children}</SupportRealtimeProvider>
+      </StorefrontFxProvider>
       <Toaster
         theme="dark"
         position="bottom-right"

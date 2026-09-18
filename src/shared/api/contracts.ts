@@ -136,7 +136,7 @@ export const checkoutPreviewSchema = z.object({
   }),
   expiresAt: z.string().or(z.date()),
   mercadoPago: z.object({
-    rateSnapshotId: z.string().uuid(), source: z.literal('DOLARAPI_BLUE_VENTA'), rate: z.string(), fetchedAt: z.string().or(z.date()), expiresAt: z.string().or(z.date()), total: providerMoneySchema,
+    rateSnapshotId: z.string().uuid(), source: z.string(), casa: z.string().optional(), rate: z.string(), fetchedAt: z.string().or(z.date()), expiresAt: z.string().or(z.date()), total: providerMoneySchema,
   }).nullable().optional(),
 });
 export type CheckoutPreview = z.infer<typeof checkoutPreviewSchema>;

@@ -1,9 +1,16 @@
 import Link from 'next/link';
-import { ArrowRight, Banknote, Coins, History } from 'lucide-react';
+import { ArrowRight, Banknote, Coins, DollarSign, History } from 'lucide-react';
 import { AdminPageHeader } from '@/components';
 import styles from './configuration-home.module.css';
 
 const configurationItems = [
+  {
+    href: '/admin/config/exchange-rate',
+    category: 'Moneda y cotización',
+    title: 'Tipo de dólar',
+    description: 'Cotización dolarapi para mostrar precios en ARS y cobrar con Mercado Pago.',
+    icon: DollarSign,
+  },
   {
     href: '/admin/config/transfer',
     category: 'Medios de pago',

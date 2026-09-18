@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowUpRight, Coins, Percent, ShoppingBag } from 'lucide-react';
-import { formatMoney } from '@/shared/lib/format';
+import { StorefrontMoney } from '@/shared/fx/StorefrontMoney';
 import { getLoyaltyProgram } from '../infrastructure/api';
 
 import styles from './loyalty-promo.module.css';
@@ -29,14 +29,14 @@ export function LoyaltyPromo() {
           <span><ShoppingBag size={21} /></span>
           <div>
             <small>SUMÁS</small>
-            <strong>{program.pointsPerStep} {program.pointsPerStep === 1 ? 'punto' : 'puntos'} cada {formatMoney(program.spendPerPoint)}</strong>
+            <strong>{program.pointsPerStep} {program.pointsPerStep === 1 ? 'punto' : 'puntos'} cada <StorefrontMoney money={program.spendPerPoint} /></strong>
           </div>
         </div>
         <div className={`${styles.loyaltyPromoRule} loyalty-promo-rule`}>
           <span><Coins size={21} /></span>
           <div>
             <small>CANJEÁS</small>
-            <strong>{formatMoney(program.pointValue)} por punto</strong>
+            <strong><StorefrontMoney money={program.pointValue} /> por punto</strong>
           </div>
         </div>
         <div className={`${styles.loyaltyPromoRule} loyalty-promo-rule`}>

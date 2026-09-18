@@ -4,7 +4,7 @@ import { useId, useState } from 'react';
 import { RotateCcw } from 'lucide-react';
 import { Button } from '@/components/button';
 import type { CatalogFacetOption, CatalogFilters } from '@/shared/api/contracts';
-import { minorToUsd, validateCatalogPriceRange } from '../application/catalog-filter-codec';
+import { validateCatalogPriceRange } from '../application/catalog-filter-codec';
 import {
   conditionLabels,
   pokemonTypeLabels,
@@ -12,6 +12,8 @@ import {
   type CatalogArrayFilterKey,
   type CatalogFilterState,
 } from '../domain/catalog-filters';
+import { useStorefrontFx } from '@/shared/fx/StorefrontFxProvider';
+import { arsDecimalToUsdDecimal, usdDecimalToArsDecimal, usdMinorToArsDecimal } from '@/shared/fx/money';
 
 import styles from './catalog-filter-panel.module.css';
 
@@ -73,6 +75,13 @@ function FacetGroup({ label, filterKey, options, selected, onToggle, labels, typ
 
 export function CatalogFilterPanel({ filters, facets, onToggle, onChange, onClear, labelledBy }: CatalogFilterPanelProps) {
   const id = useId();
+  const fx = useStorefrontFx();
+  const rateMicros = fx.rateMicros;
+  const toArsDisplay = (usdDecimal: string) => (rateMicros && usdDecimal ? usdDecimalToArsDecimal(usdDecimal, rateMicros) : '');
+  const toArsPlaceholder = (usdMinor: string | null | undefined) => {
+    if (!rateMicros || !usdMinor || !/^\d+$/.test(usdMinor)) return '';
+    return usdMinorToArsDecimal(usdMinor, rateMicros);
+  };
 
   return (
     <div className={`${styles.catalogFilterPanel} catalog-filter-panel`} aria-labelledby={labelledBy}>
@@ -97,14 +106,15 @@ export function CatalogFilterPanel({ filters, facets, onToggle, onChange, onClea
       </details>
 
       <details className={`${styles.catalogFilterGroup} catalog-filter-group`} open={filters.minPrice !== '' || filters.maxPrice !== ''}>
-        <summary>Precio USD<span>{filters.minPrice || filters.maxPrice ? '●' : ''}</span></summary>
+        <summary>Precio<span>{filters.minPrice || filters.maxPrice ? '●' : ''}</span></summary>
         <PriceRangeFields
-          key={`${filters.minPrice}-${filters.maxPrice}`}
+          key={`${filters.minPrice}-${filters.maxPrice}-${rateMicros ?? 'none'}`}
           id={id}
-          min={filters.minPrice}
-          max={filters.maxPrice}
-          minPlaceholder={minorToUsd(facets?.priceRange.minMinor ?? null)}
-          maxPlaceholder={minorToUsd(facets?.priceRange.maxMinor ?? null)}
+          min={toArsDisplay(filters.minPrice)}
+          max={toArsDisplay(filters.maxPrice)}
+          minPlaceholder={toArsPlaceholder(facets?.priceRange.minMinor ?? null)}
+          maxPlaceholder={toArsPlaceholder(facets?.priceRange.maxMinor ?? null)}
+          rateMicros={rateMicros}
           onApply={(minPrice, maxPrice) => onChange({ ...filters, minPrice, maxPrice })}
         />
       </details>
@@ -173,33 +183,45 @@ function BinaryFilter({ label, value, trueLabel, falseLabel, onChange }: {
   );
 }
 
-function PriceRangeFields({ id, min, max, minPlaceholder, maxPlaceholder, onApply }: {
+function PriceRangeFields({ id, min, max, minPlaceholder, maxPlaceholder, rateMicros, onApply }: {
   id: string;
   min: string;
   max: string;
   minPlaceholder: string;
   maxPlaceholder: string;
+  rateMicros: string | null;
   onApply: (min: string, max: string) => void;
 }) {
   const [minPrice, setMinPrice] = useState(min);
   const [maxPrice, setMaxPrice] = useState(max);
   const [error, setError] = useState<string | null>(null);
   const apply = () => {
+    if (!rateMicros) {
+      setError('No hay cotización disponible para filtrar por precio.');
+      return;
+    }
     const result = validateCatalogPriceRange(minPrice, maxPrice);
     if (!result.success) {
       setError(result.error);
       return;
     }
+    const minUsd = result.minPrice ? arsDecimalToUsdDecimal(result.minPrice, rateMicros) : '';
+    const maxUsd = result.maxPrice ? arsDecimalToUsdDecimal(result.maxPrice, rateMicros) : '';
+    if ((result.minPrice && minUsd === null) || (result.maxPrice && maxUsd === null)) {
+      setError('No pudimos convertir el precio con la cotización actual.');
+      return;
+    }
     setError(null);
-    onApply(result.minPrice, result.maxPrice);
+    onApply(minUsd ?? '', maxUsd ?? '');
   };
   return (
     <fieldset className={`${styles.catalogPriceFields} catalog-price-fields`}>
-      <legend className="sr-only">Rango de precio en USD</legend>
-      <label htmlFor={`${id}-min-price`}><span>Mínimo</span><input id={`${id}-min-price`} inputMode="decimal" value={minPrice} placeholder={minPlaceholder || '0'} aria-invalid={Boolean(error)} aria-describedby={error ? `${id}-price-error` : undefined} onChange={(event) => setMinPrice(event.target.value)} /></label>
-      <label htmlFor={`${id}-max-price`}><span>Máximo</span><input id={`${id}-max-price`} inputMode="decimal" value={maxPrice} placeholder={maxPlaceholder || 'Sin límite'} aria-invalid={Boolean(error)} aria-describedby={error ? `${id}-price-error` : undefined} onChange={(event) => setMaxPrice(event.target.value)} /></label>
+      <legend className="sr-only">Rango de precio en ARS</legend>
+      <label htmlFor={`${id}-min-price`}><span>Mínimo ARS</span><input id={`${id}-min-price`} inputMode="decimal" value={minPrice} placeholder={minPlaceholder || '0'} aria-invalid={Boolean(error)} aria-describedby={error ? `${id}-price-error` : undefined} onChange={(event) => setMinPrice(event.target.value)} /></label>
+      <label htmlFor={`${id}-max-price`}><span>Máximo ARS</span><input id={`${id}-max-price`} inputMode="decimal" value={maxPrice} placeholder={maxPlaceholder || 'Sin límite'} aria-invalid={Boolean(error)} aria-describedby={error ? `${id}-price-error` : undefined} onChange={(event) => setMaxPrice(event.target.value)} /></label>
       {error && <p className={`${styles.catalogPriceError} catalog-price-error`} id={`${id}-price-error`} role="alert">{error}</p>}
-      <Button type="button" variant="secondary" onClick={apply}>Aplicar precio</Button>
+      {!rateMicros && <p className={`${styles.catalogPriceError} catalog-price-error`}>Cotización no disponible</p>}
+      <Button type="button" variant="secondary" onClick={apply} disabled={!rateMicros}>Aplicar precio</Button>
     </fieldset>
   );
 }
