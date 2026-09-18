@@ -231,10 +231,6 @@
   margin-top: 36px;
 }
 
-.productGrid :global(.product-card-seller) {
-  display: none;
-}
-
 .emptyHome {
   margin-top: 36px;
   min-height: 220px;

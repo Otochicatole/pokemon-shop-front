@@ -107,12 +107,12 @@
   flex: 1;
   min-height: 0;
   height: 100%;
-  padding: 14px 12px 12px;
+  padding: 12px 10px 10px;
   display: flex;
   flex-direction: column;
   align-items: stretch;
   justify-content: space-between;
-  gap: 10px;
+  gap: 8px;
   text-align: left;
 }
 
@@ -120,8 +120,9 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 8px;
+  gap: 6px;
   min-width: 0;
+  flex-shrink: 0;
 }
 
 .eyebrow {
@@ -144,8 +145,8 @@
   margin: 0;
   overflow: hidden;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
-  font: 11px/1.4 var(--pixel-font);
+  -webkit-line-clamp: 2;
+  font: 10px/1.35 var(--pixel-font);
   font-weight: 900;
   text-transform: uppercase;
   text-align: left;
@@ -157,11 +158,11 @@
 }
 
 .kindLabel {
-  padding: 5px 7px;
+  padding: 4px 6px;
   border: 2px solid #05070a;
   background: var(--accent);
   color: #05070a;
-  font: 6px var(--pixel-font);
+  font: 5px var(--pixel-font);
   text-transform: uppercase;
   box-shadow: 2px 2px 0 #05070a;
 }
@@ -171,18 +172,17 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  gap: 6px;
-  padding: 8px 0;
-  border-top: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
+  padding: 0;
+  border: 0;
   color: var(--muted);
+  overflow: hidden;
 }
 
 .backBottom {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
 .productCardFooter {
