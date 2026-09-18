@@ -18,8 +18,6 @@ export function CompanionBattle() {
 
   return (
     <div className={`${styles.battleScene} hero-art battle-scene`} aria-label="Elegí tu compañero Pokémon">
-      <div className={`${styles.routeLabel} route-label`} aria-hidden="true">RUTA 10 <span /> CENTRAL POKÉMON DE ENTRENADORES</div>
-
       <div className={`${styles.battleHud} battle-hud`} aria-label={`${selected.name}, nivel ${selected.level}, ${selected.hp} puntos de salud`}>
         <span>{selected.name}</span>
         <b>Lv. {selected.level}</b>

@@ -31,31 +31,6 @@
   background: radial-gradient(ellipse at center, transparent 42%, rgba(5, 7, 10, .45) 100%);
 }
 
-.routeLabel {
-  position: absolute;
-  top: 20px;
-  left: 22px;
-  z-index: 5;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  max-width: calc(100% - 260px);
-  padding: 8px 10px;
-  border: 2px solid rgba(244, 246, 247, .18);
-  background: rgba(7, 10, 15, .72);
-  color: #fff;
-  font: 7px var(--pixel-font);
-  text-transform: uppercase;
-  backdrop-filter: blur(4px);
-}
-
-.routeLabel span {
-  width: 36px;
-  height: 2px;
-  flex: 0 0 36px;
-  background: var(--accent);
-}
-
 .battleHud {
   position: absolute;
   top: 22px;
@@ -242,10 +217,6 @@
     min-height: 520px;
   }
 
-  .routeLabel {
-    max-width: calc(100% - 200px);
-  }
-
   .battleHud {
     width: 180px;
   }
@@ -254,21 +225,6 @@
 @media (max-width: 760px) {
   .battleScene {
     min-height: 480px;
-  }
-
-  .routeLabel {
-    left: 12px;
-    top: 12px;
-    right: auto;
-    max-width: min(52%, 180px);
-    gap: 6px;
-    padding: 6px 8px;
-    font-size: 6px;
-  }
-
-  .routeLabel span {
-    width: 20px;
-    flex-basis: 20px;
   }
 
   .battleHud {

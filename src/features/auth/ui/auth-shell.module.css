@@ -14,10 +14,6 @@
   color: white;
 }
 
-.authAside :global(.brand-mark) {
-  background: var(--accent);
-}
-
 .authAside > p {
   max-width: 380px;
   color: #d6dce2;
@@ -31,13 +27,6 @@
   padding: 0;
   display: block;
   min-height: 700px;
-}
-
-.authAsideHero > :global(.brand) {
-  position: absolute;
-  top: 60px;
-  left: clamp(28px, 7vw, 100px);
-  z-index: 8;
 }
 
 .authAsideHero > :global(.battle-scene) {
@@ -97,10 +86,6 @@
     border-right: 0;
     border-bottom: 2px solid var(--line);
   }
-  .authAsideHero > :global(.brand) {
-    top: 30px;
-    left: clamp(24px, 6vw, 80px);
-  }
   .authAsideHero > :global(.hero-art.legendary-scene) {
     position: relative;
     inset: auto;
@@ -127,10 +112,6 @@
     min-height: 420px;
     height: 420px;
     padding: 0;
-  }
-  .authAsideHero > :global(.brand) {
-    top: 22px;
-    left: 24px;
   }
   .authAsideHero > :global(.battle-scene),
   .authAsideHero > :global(.legendary-scene),

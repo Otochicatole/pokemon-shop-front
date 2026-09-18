@@ -33,8 +33,10 @@ export function adminApiRequestUrl(path: string) {
   return apiPath;
 }
 
+/** Browser-facing Google OAuth start URL. Must match on SSR and client to avoid hydration mismatches. */
 export function googleAuthUrl() {
-  return apiRequestUrl('/auth/google');
+  const apiPath = `${config.apiBase}/auth/google`;
+  return config.publicApiUrl ? `${config.publicApiUrl}${apiPath}` : apiPath;
 }
 
 export function absoluteUrl(path = '/') {

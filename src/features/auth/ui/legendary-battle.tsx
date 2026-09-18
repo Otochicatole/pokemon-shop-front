@@ -18,8 +18,6 @@ export function LegendaryBattle() {
 
   return (
     <div className={`${styles.legendaryScene} hero-art legendary-scene`} aria-label="Elegí un Pokémon legendario">
-      <div className={`${styles.legendaryLabel} legendary-label`} aria-hidden="true">ARCHIVO LEGENDARIO <span /> CÁMARA CELESTIAL</div>
-
       <div className={`${styles.legendaryHud} legendary-hud`} aria-label={`${selected.name}, nivel ${selected.level}, ${selected.hp} puntos de salud`}>
         <span>{selected.name}</span>
         <b>Lv. {selected.level}</b>
