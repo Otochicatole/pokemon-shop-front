@@ -1,10 +1,10 @@
 .productCardBody {
-  padding: 15px;
+  padding: 10px 12px 12px;
 }
 
 .productCardBody h3 {
-  margin: 9px 0 15px;
-  font: 13px/1.55 var(--pixel-font);
+  margin: 4px 0 8px;
+  font: 11px/1.35 var(--pixel-font);
   text-transform: uppercase;
 }
 

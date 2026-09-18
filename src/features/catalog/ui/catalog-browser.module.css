@@ -188,7 +188,7 @@
 }
 
 .catalogResults .catalogSkeleton :global(.skeleton-card) {
-  aspect-ratio: 5 / 7;
+  aspect-ratio: 3 / 4;
   box-shadow: 4px 4px 0 #05070a;
 }
 

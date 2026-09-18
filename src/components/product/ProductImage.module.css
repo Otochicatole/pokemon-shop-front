@@ -1,7 +1,7 @@
 .productImage {
   display: block;
   position: relative;
-  aspect-ratio: 5 / 7;
+  aspect-ratio: 3 / 4;
   overflow: hidden;
   border-bottom: 2px solid var(--line);
   background: #18252c;

@@ -47,7 +47,7 @@ const collections = [
 
 export default async function Home() {
   const [products, news] = await Promise.all([
-    listProducts(new URLSearchParams({ limit: '8' })).catch(() => ({ data: [], nextCursor: null })),
+    listProducts(new URLSearchParams({ limit: '5' })).catch(() => ({ data: [], nextCursor: null })),
     listPublicNews().catch(() => ({ data: [] })),
   ]);
 

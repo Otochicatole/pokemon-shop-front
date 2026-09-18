@@ -16,8 +16,8 @@
 }
 
 .productCardSingle :global(.product-image) {
-  aspect-ratio: 5 / 7;
-  padding: 8px;
+  aspect-ratio: 3 / 4;
+  padding: 6px;
   border-bottom-color: var(--line-strong);
   background:
     radial-gradient(circle at 50% 38%, rgba(83, 190, 229, .2), transparent 46%),
@@ -27,7 +27,7 @@
 .productCardSingle :global(.product-image)::after {
   content: '';
   position: absolute;
-  inset: 8px;
+  inset: 6px;
   pointer-events: none;
   border: 1px solid rgba(147, 160, 173, .22);
 }
@@ -39,19 +39,19 @@
 }
 
 .productCardSingle :global(.product-kind) {
-  top: 16px;
-  left: 16px;
+  top: 12px;
+  left: 12px;
   z-index: 2;
   box-shadow: 3px 3px 0 #05070a;
 }
 
 .productCardSingle :global(.product-card-body) {
-  padding: 17px 16px 16px;
+  padding: 10px 12px 12px;
 }
 
 .productCardDetails {
-  min-height: 31px;
-  margin: -5px 0 13px;
+  min-height: 0;
+  margin: 0 0 8px;
   display: flex;
   align-items: center;
   flex-wrap: wrap;
