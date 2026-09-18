@@ -19,3 +19,7 @@
 .componentField select:focus {
   border-color: var(--accent);
 }
+
+.componentField .formError {
+  margin: 0;
+}
