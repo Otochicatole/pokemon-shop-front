@@ -206,9 +206,9 @@
   display: grid;
   gap: 10px;
   margin: 0 -28px;
-  padding: 14px 28px 20px;
-  border-top: 1px solid var(--line);
-  background: rgba(7, 10, 15, .92);
+  padding: 16px 28px 22px;
+  border-top: 1px solid rgba(148, 163, 184, .14);
+  background: linear-gradient(180deg, transparent, rgba(16, 22, 30, .35) 28%, rgba(16, 22, 30, .55));
   position: sticky;
   bottom: 0;
 }
