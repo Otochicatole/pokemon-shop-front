@@ -11,7 +11,7 @@ import {
 } from '../domain/contracts';
 
 export async function listPublicNews() {
-  return apiFetch('/news', {}, publicNewsListSchema);
+  return apiFetch('/news', { cache: 'no-store' }, publicNewsListSchema);
 }
 
 export interface AdminNewsQuery { search?: string; active?: string; cursor?: string; limit?: number; }

@@ -10,6 +10,8 @@ import { absoluteUrl, config, siteDescription } from '@/shared/config/env';
 
 import styles from './page.module.css';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: { absolute: `${config.storeName} · Cartas Pokémon y coleccionables` },
   description: siteDescription,

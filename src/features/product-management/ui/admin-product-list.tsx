@@ -100,7 +100,11 @@ export function AdminProductListView() {
     onSuccess: async ({ action, succeeded, failures, attempted }) => {
       setBulkAction(null);
       setSelectedIds(new Set());
-      await queryClient.invalidateQueries({ queryKey: ['admin', 'products'] });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['admin', 'products'] }),
+        queryClient.invalidateQueries({ queryKey: ['products'] }),
+        queryClient.invalidateQueries({ queryKey: ['catalog-filters'] }),
+      ]);
       if (succeeded > 0 && failures.length === 0) {
         toast.success(bulkCopy[action].success(succeeded));
         return;

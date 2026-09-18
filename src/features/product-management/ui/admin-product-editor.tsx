@@ -139,7 +139,11 @@ export function AdminProductEditor({ productId }: { productId?: string }) {
       else {
         await deleteAdminProduct(productId, product.data.version);
         setConfirmAction(null);
-        await queryClient.invalidateQueries({ queryKey: ['admin', 'products'] });
+        await Promise.all([
+          queryClient.invalidateQueries({ queryKey: ['admin', 'products'] }),
+          queryClient.invalidateQueries({ queryKey: ['products'] }),
+          queryClient.invalidateQueries({ queryKey: ['catalog-filters'] }),
+        ]);
         toast.success('Producto eliminado definitivamente');
         router.replace('/admin/products');
         router.refresh();
@@ -147,7 +151,11 @@ export function AdminProductEditor({ productId }: { productId?: string }) {
       }
       setConfirmAction(null);
       await product.refetch();
-      await queryClient.invalidateQueries({ queryKey: ['admin', 'products'] });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['admin', 'products'] }),
+        queryClient.invalidateQueries({ queryKey: ['products'] }),
+        queryClient.invalidateQueries({ queryKey: ['catalog-filters'] }),
+      ]);
       toast.success(confirmAction === 'publish' ? 'Producto publicado' : 'Producto archivado');
     } catch (error) { toast.error(adminErrorMessage(error)); }
   };

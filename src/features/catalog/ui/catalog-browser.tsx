@@ -69,7 +69,7 @@ function CatalogBrowserController({ initialFilters }: { initialFilters: CatalogF
   const facetsQuery = useQuery({
     queryKey: ['catalog-filters'],
     queryFn: getCatalogFilters,
-    staleTime: 5 * 60 * 1000,
+    staleTime: 30_000,
   });
   const productQueryKey = buildCatalogApiParams(filters).toString();
   const products = useInfiniteQuery({
@@ -77,6 +77,8 @@ function CatalogBrowserController({ initialFilters }: { initialFilters: CatalogF
     initialPageParam: null as string | null,
     queryFn: ({ pageParam }) => listProducts(buildCatalogApiParams(filters, pageParam)),
     getNextPageParam: (last) => last.meta.nextCursor,
+    staleTime: 0,
+    refetchOnMount: 'always',
   });
 
   const items = products.data?.pages.flatMap((page) => page.data) ?? [];

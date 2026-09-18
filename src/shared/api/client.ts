@@ -118,14 +118,14 @@ export async function apiFetch<T>(path: string, init: RequestInit = {}, schema?:
   // browser request can receive a 304 without a JSON body, which would leave
   // the header showing the anonymous state until a full page reload (notably
   // right after the Google OAuth callback).
-  const authRequest = path.startsWith('/auth/');
+  // Catalog and other public GETs must not be retained by the browser HTTP cache
+  // or Next's Data Cache; otherwise newly published products stay invisible until
+  // a hard refresh.
   const requestInit = {
     ...init,
     headers,
     credentials: 'include',
-    ...(authRequest
-      ? { cache: 'no-store' as const }
-      : typeof window === 'undefined' ? { next: { revalidate: 15 } } : {}),
+    cache: init.cache ?? 'no-store',
   } as RequestInit;
   const url = userApiUrl(path);
   let response = await fetch(url, requestInit);

@@ -7,6 +7,8 @@ import { CatalogBrowser } from '@/features/catalog';
 import { config } from '@/shared/config/env';
 import styles from './page.module.css';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: 'Catálogo',
   description:

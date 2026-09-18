@@ -9,6 +9,7 @@ import { config, absoluteUrl } from '@/shared/config/env';
 import styles from './page.module.css';
 import { ProductImageGallery } from './product-image-gallery';
 
+export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
