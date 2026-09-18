@@ -105,6 +105,7 @@ export const tcgdexCardSchema = tcgdexCardSummarySchema.extend({
 });
 export const tcgdexSearchEnvelopeSchema = z.object({ data: z.array(tcgdexCardSummarySchema), meta: z.record(z.string(), z.unknown()).optional() });
 export const tcgdexCardEnvelopeSchema = z.object({ data: z.object({ card: tcgdexCardSchema }), meta: z.record(z.string(), z.unknown()).optional() });
+export const tcgdexRaritiesEnvelopeSchema = z.object({ data: z.array(z.string()), meta: z.record(z.string(), z.unknown()).optional() });
 
 export type AffiliateProfile = z.infer<typeof affiliateProfileSchema>;
 export type AffiliateListing = z.infer<typeof affiliateListingSchema>;

@@ -27,6 +27,7 @@ export const tcgdexCardSummarySchema = z.object({ id: z.string(), name: z.string
 export const tcgdexCardSchema = tcgdexCardSummarySchema.extend({ setName: z.string(), description: z.string(), rarity: z.string(), category: z.string(), types: z.array(z.string()), firstEdition: z.boolean(), holo: z.boolean(), effect: z.string(), language: z.literal('Español') });
 export const tcgdexSearchEnvelopeSchema = z.object({ data: z.array(tcgdexCardSummarySchema), meta: z.record(z.string(), z.unknown()).optional() });
 export const tcgdexCardEnvelopeSchema = z.object({ data: z.object({ card: tcgdexCardSchema }), meta: z.record(z.string(), z.unknown()).optional() });
+export const tcgdexRaritiesEnvelopeSchema = z.object({ data: z.array(z.string()), meta: z.record(z.string(), z.unknown()).optional() });
 export type TcgDexCardSummary = z.infer<typeof tcgdexCardSummarySchema>;
 export type TcgDexCard = z.infer<typeof tcgdexCardSchema>;
 

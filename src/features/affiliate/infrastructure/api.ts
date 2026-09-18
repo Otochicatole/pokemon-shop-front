@@ -10,6 +10,7 @@ import {
   listingStatusSchema,
   tcgdexCardEnvelopeSchema,
   tcgdexSearchEnvelopeSchema,
+  tcgdexRaritiesEnvelopeSchema,
   type AffiliateListingEditorValues,
 } from '../domain/contracts';
 
@@ -97,6 +98,10 @@ export async function searchAffiliateTcgdexCards(query: string) {
 export async function getAffiliateTcgdexCard(id: string) {
   const response = await apiFetch(`/affiliate/tcgdex/cards/${encodeURIComponent(id)}`, {}, tcgdexCardEnvelopeSchema);
   return response.data.card;
+}
+export async function listAffiliateTcgdexRarities() {
+  const response = await apiFetch('/affiliate/tcgdex/rarities', {}, tcgdexRaritiesEnvelopeSchema);
+  return response.data;
 }
 export async function getAffiliateLogistics() { return affiliateLogisticsSchema.parse(data(await apiFetch('/affiliate/logistics'))); }
 export async function createAffiliateShippingZone(input: { name: string; provinces: string[] }) { return data(await apiFetch('/affiliate/shipping-zones', { method: 'POST', body: JSON.stringify(input) })); }

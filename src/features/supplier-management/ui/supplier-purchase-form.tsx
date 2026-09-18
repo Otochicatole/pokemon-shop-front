@@ -10,8 +10,9 @@ import { useState } from 'react';
 import { toast } from '@/components/feedback';
 import { AdminPageHeader, Button, Dialog, MoneyField, SelectField, TextareaField, TextField } from '@/components';
 import { adminErrorMessage } from '@/shared/admin/client';
-import { getAdminProduct, getTcgdexCard, importTcgdexImage, searchTcgdexCards } from '@/features/product-management/infrastructure/api';
+import { getAdminProduct, getTcgdexCard, importTcgdexImage, listTcgdexRarities, searchTcgdexCards } from '@/features/product-management/infrastructure/api';
 import type { TcgDexCard, TcgDexCardSummary } from '@/features/product-management/domain/contracts';
+import { raritySelectOptions, useTcgdexRarities } from '@/shared/tcgdex/rarities';
 import { loadSupplier, registerPurchase } from '../application';
 import { purchaseFormSchema, type PurchaseLineFormValues } from '../domain/contracts';
 import styles from './supplier-purchase-form.module.css';
@@ -96,6 +97,7 @@ export function SupplierPurchaseFormView({ supplierId }: { supplierId: string })
     enabled: tcgdexLine !== null && tcgdexQuery.length >= 2,
     staleTime: 60_000,
   });
+  const { rarities } = useTcgdexRarities(listTcgdexRarities);
 
   const save = useMutation({
     mutationFn: async () => {
@@ -164,7 +166,7 @@ export function SupplierPurchaseFormView({ supplierId }: { supplierId: string })
         setName: card.setName,
         setCode: card.setCode,
         cardNumber: card.localId,
-        rarity: card.rarity || 'Sin rareza',
+        rarity: card.rarity || 'Ninguno',
         language: card.language,
         condition: 'NM',
         finish: card.holo ? 'Holo' : 'Normal',
@@ -274,7 +276,10 @@ export function SupplierPurchaseFormView({ supplierId }: { supplierId: string })
                       <TextField id={`purchase-${index}-setName`} label="Colección / set" value={line.setName ?? ''} onChange={(event) => updateLine(index, { setName: event.target.value })} />
                       <TextField id={`purchase-${index}-setCode`} label="Código de set" value={line.setCode ?? ''} onChange={(event) => updateLine(index, { setCode: event.target.value })} />
                       <TextField id={`purchase-${index}-cardNumber`} label="Número" value={line.cardNumber ?? ''} onChange={(event) => updateLine(index, { cardNumber: event.target.value })} />
-                      <TextField id={`purchase-${index}-rarity`} label="Rareza" value={line.rarity ?? ''} onChange={(event) => updateLine(index, { rarity: event.target.value })} />
+                      <SelectField id={`purchase-${index}-rarity`} label="Rareza" value={line.rarity ?? ''} onChange={(event) => updateLine(index, { rarity: event.target.value })}>
+                        <option value="">Seleccioná rareza</option>
+                        {raritySelectOptions(rarities, line.rarity).map((rarity) => <option key={rarity} value={rarity}>{rarity}</option>)}
+                      </SelectField>
                       <TextField id={`purchase-${index}-language`} label="Idioma" value={line.language ?? ''} onChange={(event) => updateLine(index, { language: event.target.value })} />
                       <TextField id={`purchase-${index}-finish`} label="Acabado / foil" value={line.finish ?? ''} onChange={(event) => updateLine(index, { finish: event.target.value })} />
                       <TextField id={`purchase-${index}-edition`} label="Edición" value={line.edition ?? ''} onChange={(event) => updateLine(index, { edition: event.target.value })} />

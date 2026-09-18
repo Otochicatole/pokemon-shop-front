@@ -22,6 +22,7 @@ import {
   deleteAffiliateImage,
   getAffiliateTcgdexCard,
   importAffiliateTcgdexImage,
+  listAffiliateTcgdexRarities,
   listingBody,
   reorderAffiliateImages,
   searchAffiliateTcgdexCards,
@@ -30,6 +31,7 @@ import {
   updateAffiliateListing,
   uploadAffiliateImages,
 } from '../infrastructure/api';
+import { raritySelectOptions, useTcgdexRarities } from '@/shared/tcgdex/rarities';
 import styles from './affiliate-portal.module.css';
 
 const pokemonTypes = ['COLORLESS', 'DARKNESS', 'DRAGON', 'FAIRY', 'FIGHTING', 'FIRE', 'GRASS', 'LIGHTNING', 'METAL', 'PSYCHIC', 'WATER'] as const;
@@ -202,7 +204,7 @@ export function AffiliateListingCreateForm() {
         setName: card.setName,
         setCode: card.setCode,
         cardNumber: card.localId,
-        rarity: card.rarity || 'Sin rareza',
+        rarity: card.rarity || 'Ninguno',
         language: card.language,
         condition: 'NM',
         finish: card.holo ? 'Holo' : 'Normal',
@@ -357,7 +359,7 @@ export function AffiliateListingEditForm({ listing, onSaved }: { listing: Affili
         setName: card.setName,
         setCode: card.setCode,
         cardNumber: card.localId,
-        rarity: card.rarity || 'Sin rareza',
+        rarity: card.rarity || 'Ninguno',
         language: card.language,
         condition: 'NM',
         finish: card.holo ? 'Holo' : 'Normal',
@@ -606,6 +608,9 @@ function AffiliateListingFormShell({
   createFiles, onCreateFilesChange, images, onMoveImage, onAltChange, onRemoveImage,
   uploadFiles, onUploadFilesChange, onUpload, imageBusy,
 }: FormShellProps) {
+  const { rarities } = useTcgdexRarities(listAffiliateTcgdexRarities, values.kind === 'SINGLE_CARD');
+  const rarityOptions = useMemo(() => raritySelectOptions(rarities, values.rarity), [rarities, values.rarity]);
+
   return (
     <>
       <header className={styles.affiliateHeader}>
@@ -727,7 +732,10 @@ function AffiliateListingFormShell({
                 </label>
                 <label>
                   Rareza
-                  <input value={values.rarity ?? ''} onChange={(event) => onChange('rarity', event.target.value)} />
+                  <select value={values.rarity ?? ''} onChange={(event) => onChange('rarity', event.target.value)}>
+                    <option value="">Seleccioná rareza</option>
+                    {rarityOptions.map((rarity) => <option key={rarity} value={rarity}>{rarity}</option>)}
+                  </select>
                   <FieldError message={errors.rarity} />
                 </label>
                 <label>
