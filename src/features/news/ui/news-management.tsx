@@ -182,6 +182,9 @@ function NewsForm({ news, onClose, onSaved }: { news: AdminNews | null; onClose:
             <h3 id="news-cover-title">Fondo del hero</h3>
             <p>JPEG, PNG o WebP. Idealmente horizontal.</p>
           </div>
+          <p className={styles.coverWarning} role="note">
+            Resolución recomendada: 1600 × 900 px (aprox. 16:9).
+          </p>
           {!current ? (
             <p className={styles.coverHint}>Creá la noticia primero para poder subir la portada.</p>
           ) : (

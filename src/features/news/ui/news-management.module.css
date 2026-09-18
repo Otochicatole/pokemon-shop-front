@@ -43,6 +43,16 @@
   line-height: 1.45;
 }
 
+.coverWarning {
+  margin: 0;
+  padding: 8px 10px;
+  border: 1px solid rgba(255, 213, 47, .35);
+  background: rgba(255, 213, 47, .08);
+  color: var(--accent);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
 .visuallyHidden {
   position: absolute;
   width: 1px;
