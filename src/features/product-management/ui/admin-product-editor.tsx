@@ -19,7 +19,7 @@ import { raritySelectOptions, useTcgdexRarities } from '@/shared/tcgdex/rarities
 import styles from './admin-product-editor.module.css';
 
 import shared from '@/components/admin/admin-shared.module.css';
-const defaults: ProductEditorValues = { sku: '', slug: '', name: '', description: '', kind: 'SINGLE_CARD', stockMode: 'UNIQUE', price: '0', cost: '0', initialStock: 0, pokemonType: 'COLORLESS', setName: '', setCode: '', cardNumber: '', rarity: '', language: 'Español', condition: 'NM', finish: '', edition: '', gradingCompany: '', grade: '', certificationNumber: '' };
+const defaults: ProductEditorValues = { sku: '', slug: '', name: '', description: '', kind: 'SINGLE_CARD', stockMode: 'UNIQUE', price: '0', cost: '0', initialStock: 1, pokemonType: 'COLORLESS', setName: '', setCode: '', cardNumber: '', rarity: '', language: 'Español', condition: 'NM', finish: '', edition: '', gradingCompany: '', grade: '', certificationNumber: '' };
 const pokemonTypes = ['COLORLESS', 'DARKNESS', 'DRAGON', 'FAIRY', 'FIGHTING', 'FIRE', 'GRASS', 'LIGHTNING', 'METAL', 'PSYCHIC', 'WATER'] as const;
 
 function decimalFromMinor(value: string) { return (Number(BigInt(value)) / 100).toFixed(2); }
