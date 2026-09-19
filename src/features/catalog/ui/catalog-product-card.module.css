@@ -1,100 +1,71 @@
-.productCardSingle :global(.product-card-front) {
+.productCard {
+  box-shadow: 4px 4px 0 #05070a;
+}
+
+.productCard:hover {
+  box-shadow: 5px 5px 0 #05070a;
+}
+
+.productCardSingle {
   border-color: #3b4f60;
+  background: linear-gradient(180deg, #121b24, var(--surface));
+}
+
+.productCardSingle:hover {
+  border-color: var(--accent);
+}
+
+.productCardSingle :global(.product-image) {
+  aspect-ratio: 3 / 4;
+  padding: 6px;
+  border-bottom-color: var(--line-strong);
   background:
-    radial-gradient(circle at 50% 38%, rgba(83, 190, 229, .22), transparent 46%),
+    radial-gradient(circle at 50% 38%, rgba(83, 190, 229, .2), transparent 46%),
     linear-gradient(145deg, #1a303d, #0b1117);
 }
 
-.productCardSingle :global(.product-card-back) {
-  border-color: #3b4f60;
-  background:
-    linear-gradient(135deg, rgba(83, 190, 229, .1), transparent 40%),
-    linear-gradient(180deg, #121b24, var(--surface));
+.productCardSingle :global(.product-image)::after {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  pointer-events: none;
+  border: 1px solid rgba(147, 160, 173, .22);
 }
 
-.specsPanel {
-  flex: 1;
+.productCardSingle :global(.product-image) img {
+  padding: 4px;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 9px rgba(0, 0, 0, .36));
+}
+
+.productCardSingle :global(.product-kind) {
+  top: 12px;
+  left: 12px;
+  z-index: 2;
+  box-shadow: 3px 3px 0 #05070a;
+}
+
+.productCardSingle :global(.product-card-body) {
+  padding: 10px 12px 12px;
+}
+
+.productCardDetails {
   min-height: 0;
+  margin: 0 0 8px;
   display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.specsHeading {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 8px;
-  color: var(--accent);
-  font: 6px/1.3 var(--pixel-font);
-  letter-spacing: .04em;
-  text-transform: uppercase;
-}
-
-.specsHeading span:last-child {
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 7px;
   color: var(--muted);
+  font-size: 10px;
+}
+
+.productCardDetails :global(.pixel-badge) {
+  padding: 4px 6px;
   font-size: 5px;
-  letter-spacing: .03em;
-}
-
-.specs {
-  flex: 1;
-  min-height: 0;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  grid-auto-rows: minmax(0, 1fr);
-  gap: 0;
-  margin: 0;
-  padding: 0;
-  border: 1px solid var(--line);
-  background:
-    radial-gradient(rgba(83, 190, 229, .08) 0.6px, transparent 0.7px),
-    rgba(8, 12, 18, .72);
-  background-size: 6px 6px, auto;
-}
-
-.specCell {
-  min-width: 0;
-  min-height: 0;
-  padding: 5px 6px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 3px;
-  border-bottom: 1px solid var(--line);
-  border-right: 1px solid var(--line);
-}
-
-.specCell:nth-child(2n) {
-  border-right: 0;
-}
-
-.specCell:nth-last-child(-n + 2) {
-  border-bottom: 0;
-}
-
-.specCell dt {
-  margin: 0;
-  color: var(--muted);
-  font: 5px/1.2 var(--pixel-font);
-  text-transform: uppercase;
-  letter-spacing: .03em;
-}
-
-.specCell dd {
-  margin: 0;
-  overflow: hidden;
-  color: var(--ink);
-  font-size: 9px;
-  font-weight: 800;
-  line-height: 1.2;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .productCardSeller {
-  display: block;
-  margin: 0;
   color: var(--muted);
-  font: 7px/1.3 var(--pixel-font);
+  font-size: 10px;
 }
