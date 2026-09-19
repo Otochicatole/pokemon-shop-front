@@ -1,5 +1,5 @@
 import { adminFetch } from '@/shared/admin/client';
-import { adminProductDetailEnvelopeSchema, adminProductListEnvelopeSchema, inventoryHistoryEnvelopeSchema, inventoryMutationEnvelopeSchema, productImageOrderEnvelopeSchema, productImagesEnvelopeSchema, productImageUpdateEnvelopeSchema, productMutationEnvelopeSchema, productStatusEnvelopeSchema, tcgdexCardEnvelopeSchema, tcgdexRaritiesEnvelopeSchema, tcgdexSearchEnvelopeSchema, type AdminProduct, type AdminProductImage, type InventoryAdjustment, type ProductEditorValues } from '../domain/contracts';
+import { adminProductDetailEnvelopeSchema, adminProductListEnvelopeSchema, inventoryHistoryEnvelopeSchema, inventoryMutationEnvelopeSchema, productImageOrderEnvelopeSchema, productImagesEnvelopeSchema, productImageUpdateEnvelopeSchema, productMutationEnvelopeSchema, productStatusEnvelopeSchema, tcgdexCardEnvelopeSchema, tcgdexRaritiesEnvelopeSchema, tcgdexSearchEnvelopeSchema, tcgdexSetsEnvelopeSchema, type AdminProduct, type AdminProductImage, type InventoryAdjustment, type ProductEditorValues } from '../domain/contracts';
 
 export interface AdminProductQuery { search?: string; status?: string; kind?: string; stock?: string; pokemonType?: string; setName?: string; cursor?: string; limit?: number; }
 export async function listAdminProducts(query: AdminProductQuery): Promise<{ data: AdminProduct[]; nextCursor: string | null }> {
@@ -12,6 +12,7 @@ export async function getAdminProduct(id: string) { const response = await admin
 export async function searchTcgdexCards(query: string) { const response = await adminFetch(`/admin/tcgdex/cards?q=${encodeURIComponent(query)}`, {}, tcgdexSearchEnvelopeSchema); return response.data; }
 export async function getTcgdexCard(id: string) { const response = await adminFetch(`/admin/tcgdex/cards/${encodeURIComponent(id)}`, {}, tcgdexCardEnvelopeSchema); return response.data.card; }
 export async function listTcgdexRarities() { const response = await adminFetch('/admin/tcgdex/rarities', {}, tcgdexRaritiesEnvelopeSchema); return response.data; }
+export async function listTcgdexSets() { const response = await adminFetch('/admin/tcgdex/sets', {}, tcgdexSetsEnvelopeSchema); return response.data; }
 
 function minorFromDecimal(value: string) {
   const normalized = value.replace(',', '.');

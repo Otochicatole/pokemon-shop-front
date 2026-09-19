@@ -23,6 +23,7 @@ import {
   getAffiliateTcgdexCard,
   importAffiliateTcgdexImage,
   listAffiliateTcgdexRarities,
+  listAffiliateTcgdexSets,
   listingBody,
   reorderAffiliateImages,
   searchAffiliateTcgdexCards,
@@ -32,6 +33,7 @@ import {
   uploadAffiliateImages,
 } from '../infrastructure/api';
 import { raritySelectOptions, useTcgdexRarities } from '@/shared/tcgdex/rarities';
+import { selectedSetId, setSelectOptions, useTcgdexSets } from '@/shared/tcgdex/sets';
 import styles from './affiliate-portal.module.css';
 
 const pokemonTypes = ['COLORLESS', 'DARKNESS', 'DRAGON', 'FAIRY', 'FIGHTING', 'FIRE', 'GRASS', 'LIGHTNING', 'METAL', 'PSYCHIC', 'WATER'] as const;
@@ -609,7 +611,10 @@ function AffiliateListingFormShell({
   uploadFiles, onUploadFilesChange, onUpload, imageBusy,
 }: FormShellProps) {
   const { rarities } = useTcgdexRarities(listAffiliateTcgdexRarities, values.kind === 'SINGLE_CARD');
+  const { sets } = useTcgdexSets(listAffiliateTcgdexSets, values.kind === 'SINGLE_CARD');
   const rarityOptions = useMemo(() => raritySelectOptions(rarities, values.rarity), [rarities, values.rarity]);
+  const setOptions = useMemo(() => setSelectOptions(sets, values.setName, values.setCode), [sets, values.setName, values.setCode]);
+  const setValueId = selectedSetId(setOptions, values.setName, values.setCode);
 
   return (
     <>
@@ -718,7 +723,17 @@ function AffiliateListingFormShell({
                 </label>
                 <label>
                   Colección / set
-                  <input value={values.setName ?? ''} onChange={(event) => onChange('setName', event.target.value)} />
+                  <select
+                    value={setValueId}
+                    onChange={(event) => {
+                      const selected = setOptions.find((set) => set.id === event.target.value);
+                      onChange('setName', selected?.name ?? '');
+                      onChange('setCode', selected?.id ?? '');
+                    }}
+                  >
+                    <option value="">Seleccioná set</option>
+                    {setOptions.map((set) => <option key={set.id} value={set.id}>{set.name}</option>)}
+                  </select>
                   <FieldError message={errors.setName} />
                 </label>
                 <label>

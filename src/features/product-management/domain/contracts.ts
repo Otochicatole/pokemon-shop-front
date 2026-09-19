@@ -28,8 +28,11 @@ export const tcgdexCardSchema = tcgdexCardSummarySchema.extend({ setName: z.stri
 export const tcgdexSearchEnvelopeSchema = z.object({ data: z.array(tcgdexCardSummarySchema), meta: z.record(z.string(), z.unknown()).optional() });
 export const tcgdexCardEnvelopeSchema = z.object({ data: z.object({ card: tcgdexCardSchema }), meta: z.record(z.string(), z.unknown()).optional() });
 export const tcgdexRaritiesEnvelopeSchema = z.object({ data: z.array(z.string()), meta: z.record(z.string(), z.unknown()).optional() });
+export const tcgdexSetOptionSchema = z.object({ id: z.string(), name: z.string() });
+export const tcgdexSetsEnvelopeSchema = z.object({ data: z.array(tcgdexSetOptionSchema), meta: z.record(z.string(), z.unknown()).optional() });
 export type TcgDexCardSummary = z.infer<typeof tcgdexCardSummarySchema>;
 export type TcgDexCard = z.infer<typeof tcgdexCardSchema>;
+export type TcgDexSetOption = z.infer<typeof tcgdexSetOptionSchema>;
 
 export const productEditorSchema = z.object({
   sku: z.string().trim().min(1, 'El SKU es obligatorio').max(80),
