@@ -1,3 +1,5 @@
+'use client';
+
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import type { Money } from '@/shared/api/contracts';
@@ -29,4 +31,3 @@ export function ProductCard({ product, details, action, className = '' }: Produc
     </ProductTile>
   );
 }
-

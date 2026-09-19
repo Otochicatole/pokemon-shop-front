@@ -1,3 +1,5 @@
+'use client';
+
 import type { PokemonType, Product } from '@/shared/api/contracts';
 import { ProductCard as BaseProductCard } from '@/components/product';
 import { PixelBadge, type BadgeTone } from '@/components/badge';
@@ -26,13 +28,13 @@ export function CatalogProductCard({ product }: { product: Product }) {
     <BaseProductCard
       className={cardClass}
       product={{ name: product.name, slug: product.slug, eyebrow: card?.setName ?? product.sku, kindLabel, price: product.price, available: product.available, image: product.images[0] }}
-      details={
+      details={(
         <>
           <div className={`${styles.productCardDetails} product-card-details`}>
             {card ? (
               <>
                 {card.pokemonType && <PixelBadge tone={typeTones[card.pokemonType] ?? 'cyan'}>{pokemonTypeLabels[card.pokemonType]}</PixelBadge>}
-                <span>{conditionLabels[card.condition]} · {card.language}</span>
+                <span>{conditionLabels[card.condition]}{' \u00b7 '}{card.language}</span>
               </>
             ) : (
               <span>{productKindLabels[product.kind]}</span>
@@ -40,7 +42,7 @@ export function CatalogProductCard({ product }: { product: Product }) {
           </div>
           <small className={`${styles.productCardSeller} product-card-seller`}>Vende: {product.seller.name}</small>
         </>
-      }
+      )}
       action={<AddToCartButton product={product} compact />}
     />
   );
