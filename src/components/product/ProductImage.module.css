@@ -9,25 +9,35 @@
 
 .productImage img {
   object-fit: cover;
-  transition: transform .4s;
+  transition: transform .35s;
 }
 
 :global(.product-card):hover .productImage img,
 :global(.product-tile):hover .productImage img {
-  transform: scale(1.04);
+  transform: scale(1.03);
+}
+
+.productBadges {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  right: 6px;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  pointer-events: none;
 }
 
 .productKind {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  padding: 7px 8px;
+  padding: 4px 5px;
   border: 2px solid #05070a;
   background: var(--accent);
   color: #05070a;
-  font: 7px var(--pixel-font);
+  font: 6px var(--pixel-font);
   text-transform: uppercase;
-  z-index: 2;
+  box-shadow: 2px 2px 0 #05070a;
 }
 
 .imagePlaceholder {
@@ -37,5 +47,5 @@
   place-items: center;
   background: linear-gradient(135deg, #173340, #25556a);
   color: var(--cyan);
-  font: 44px var(--pixel-font);
+  font: 32px var(--pixel-font);
 }

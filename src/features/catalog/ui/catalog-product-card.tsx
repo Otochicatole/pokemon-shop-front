@@ -4,7 +4,7 @@ import type { PokemonType, Product } from '@/shared/api/contracts';
 import { ProductCard as BaseProductCard } from '@/components/product';
 import { PixelBadge, type BadgeTone } from '@/components/badge';
 import { AddToCartButton } from '@/features/cart/ui/add-to-cart-button';
-import { conditionLabels, pokemonTypeLabels, productKindLabels } from '../domain/catalog-filters';
+import { pokemonTypeLabels } from '../domain/catalog-filters';
 import styles from './catalog-product-card.module.css';
 
 const typeTones: Partial<Record<PokemonType, BadgeTone>> = {
@@ -24,25 +24,25 @@ export function CatalogProductCard({ product }: { product: Product }) {
     product.kind === 'SINGLE_CARD' ? 'product-card-single' : '',
   ].filter(Boolean).join(' ');
 
+  const typeBadge = card?.pokemonType ? (
+    <PixelBadge tone={typeTones[card.pokemonType] ?? 'cyan'} className={styles.typeBadge}>
+      {pokemonTypeLabels[card.pokemonType]}
+    </PixelBadge>
+  ) : null;
+
   return (
     <BaseProductCard
       className={cardClass}
-      product={{ name: product.name, slug: product.slug, eyebrow: card?.setName ?? product.sku, kindLabel, price: product.price, available: product.available, image: product.images[0] }}
-      details={(
-        <>
-          <div className={`${styles.productCardDetails} product-card-details`}>
-            {card ? (
-              <>
-                {card.pokemonType && <PixelBadge tone={typeTones[card.pokemonType] ?? 'cyan'}>{pokemonTypeLabels[card.pokemonType]}</PixelBadge>}
-                <span>{conditionLabels[card.condition]}{' \u00b7 '}{card.language}</span>
-              </>
-            ) : (
-              <span>{productKindLabels[product.kind]}</span>
-            )}
-          </div>
-          <small className={`${styles.productCardSeller} product-card-seller`}>Vende: {product.seller.name}</small>
-        </>
-      )}
+      product={{
+        name: product.name,
+        slug: product.slug,
+        eyebrow: card?.setName ?? product.sku,
+        kindLabel,
+        price: product.price,
+        available: product.available,
+        image: product.images[0],
+      }}
+      imageBadge={typeBadge}
       action={<AddToCartButton product={product} compact />}
     />
   );

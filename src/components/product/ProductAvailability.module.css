@@ -1,8 +1,8 @@
 .stockMuted,
 .stockWarn,
 .stockAvailable {
-  margin: 10px 0 0;
-  font: 9px var(--pixel-font);
+  margin: 5px 0 0;
+  font: 7px var(--pixel-font);
 }
 
 .stockMuted {
