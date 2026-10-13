@@ -23,7 +23,7 @@ function firstWebp(directory: string): string | null {
 test.describe('CMS administrativo integrado', () => {
   test.skip(process.env.RUN_ADMIN_E2E !== '1', 'Requiere backend local migrado y habilitación explícita porque modifica datos de desarrollo.');
 
-  test.beforeAll(() => { backendCommand('db:seed'); });
+  test.beforeAll(() => { backendCommand('db:seed:demo'); });
 
   test('login → producto → imagen → stock → publicación → transferencia → auditoría', async ({ page }) => {
     await page.goto('/admin/login');

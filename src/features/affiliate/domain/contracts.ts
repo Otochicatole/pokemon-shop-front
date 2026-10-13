@@ -1,4 +1,7 @@
 import { z } from 'zod';
+import { pokemonTcgMarketPriceSchema } from '@/shared/pokemon-tcg/autofill';
+import { pokemonTcgCardSummarySchema } from '@/shared/pokemon-tcg/contracts';
+export { pokemonTcgCardSummarySchema } from '@/shared/pokemon-tcg/contracts';
 import { pokemonCardSchema, pokemonTypeSchema, productConditionSchema, productKindSchema } from '@/shared/api/contracts';
 
 export const affiliateStatusSchema = z.enum(['ACTIVE', 'SUSPENDED']);
@@ -94,20 +97,15 @@ export const affiliateListingEditorSchema = z.object({
   }
 });
 
-export const tcgdexCardSummarySchema = z.object({
-  id: z.string(), name: z.string(), localId: z.string(), setCode: z.string(), imageUrl: z.string().url().nullable(),
-  setName: z.string().optional(), rarity: z.string().optional(), category: z.string().optional(), types: z.array(z.string()).optional(),
-  firstEdition: z.boolean().optional(), holo: z.boolean().optional(),
-});
-export const tcgdexCardSchema = tcgdexCardSummarySchema.extend({
+export const pokemonTcgCardSchema = pokemonTcgCardSummarySchema.extend({
   setName: z.string(), description: z.string(), rarity: z.string(), category: z.string(), types: z.array(z.string()),
-  firstEdition: z.boolean(), holo: z.boolean(), effect: z.string(), language: z.string(),
+  firstEdition: z.boolean(), holo: z.boolean(), effect: z.string(), language: z.string(), marketPrice: pokemonTcgMarketPriceSchema.nullable().default(null),
 });
-export const tcgdexSearchEnvelopeSchema = z.object({ data: z.array(tcgdexCardSummarySchema), meta: z.record(z.string(), z.unknown()).optional() });
-export const tcgdexCardEnvelopeSchema = z.object({ data: z.object({ card: tcgdexCardSchema }), meta: z.record(z.string(), z.unknown()).optional() });
-export const tcgdexRaritiesEnvelopeSchema = z.object({ data: z.array(z.string()), meta: z.record(z.string(), z.unknown()).optional() });
-export const tcgdexSetOptionSchema = z.object({ id: z.string(), name: z.string() });
-export const tcgdexSetsEnvelopeSchema = z.object({ data: z.array(tcgdexSetOptionSchema), meta: z.record(z.string(), z.unknown()).optional() });
+export const pokemonTcgSearchEnvelopeSchema = z.object({ data: z.array(pokemonTcgCardSummarySchema), meta: z.record(z.string(), z.unknown()).optional() });
+export const pokemonTcgCardEnvelopeSchema = z.object({ data: z.object({ card: pokemonTcgCardSchema }), meta: z.record(z.string(), z.unknown()).optional() });
+export const pokemonTcgRaritiesEnvelopeSchema = z.object({ data: z.array(z.string()), meta: z.record(z.string(), z.unknown()).optional() });
+export const pokemonTcgSetOptionSchema = z.object({ id: z.string(), name: z.string() });
+export const pokemonTcgSetsEnvelopeSchema = z.object({ data: z.array(pokemonTcgSetOptionSchema), meta: z.record(z.string(), z.unknown()).optional() });
 
 export type AffiliateProfile = z.infer<typeof affiliateProfileSchema>;
 export type AffiliateListing = z.infer<typeof affiliateListingSchema>;
@@ -115,5 +113,5 @@ export type AffiliateBalance = z.infer<typeof affiliateBalanceSchema>;
 export type AffiliateOrder = z.infer<typeof affiliateOrderSchema>;
 export type AffiliateLogistics = z.infer<typeof affiliateLogisticsSchema>;
 export type AffiliateListingEditorValues = z.infer<typeof affiliateListingEditorSchema>;
-export type TcgDexCardSummary = z.infer<typeof tcgdexCardSummarySchema>;
-export type TcgDexCard = z.infer<typeof tcgdexCardSchema>;
+export type PokemonTcgCardSummary = z.infer<typeof pokemonTcgCardSummarySchema>;
+export type PokemonTcgCard = z.infer<typeof pokemonTcgCardSchema>;

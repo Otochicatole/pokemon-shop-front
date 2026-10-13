@@ -22,9 +22,14 @@ vi.mock('@/features/affiliate/infrastructure/api', async (importOriginal) => {
     updateAffiliateListing: vi.fn(),
     submitAffiliateListing: vi.fn(),
     uploadAffiliateImages: vi.fn(),
-    importAffiliateTcgdexImage: vi.fn(),
-    searchAffiliateTcgdexCards: vi.fn(),
-    getAffiliateTcgdexCard: vi.fn(),
+    importAffiliatePokemonTcgImage: vi.fn(),
+    searchAffiliatePokemonTcgCards: vi.fn(),
+    getAffiliatePokemonTcgCard: vi.fn(),
+    listAffiliatePokemonTcgRarities: vi.fn().mockResolvedValue(['Rare', 'Ultra Rare']),
+    listAffiliatePokemonTcgSets: vi.fn().mockResolvedValue([
+      { id: 'Sword & Shield', name: 'Sword & Shield' },
+      { id: 'Champions Path', name: 'Champions Path' },
+    ]),
     reorderAffiliateImages: vi.fn(),
     updateAffiliateImage: vi.fn(),
     deleteAffiliateImage: vi.fn(),
@@ -81,7 +86,8 @@ function renderWithClient(node: React.ReactNode) {
   return render(<QueryClientProvider client={client}>{node}</QueryClientProvider>);
 }
 
-function fillRequiredCardFields() {
+async function fillRequiredCardFields() {
+  await screen.findByRole('option', { name: 'Sword & Shield' });
   fireEvent.change(screen.getByLabelText(/^Nombre$/i), { target: { value: 'Pikachu V' } });
   fireEvent.change(screen.getByLabelText(/^Descripción$/i), { target: { value: 'Carta lista para publicar' } });
   fireEvent.change(screen.getByLabelText(/Precio en USD/i), { target: { value: '24.50' } });
@@ -103,7 +109,7 @@ describe('affiliate listing editor', () => {
     });
 
     renderWithClient(<AffiliateListingCreateForm />);
-    fillRequiredCardFields();
+    await fillRequiredCardFields();
     fireEvent.click(screen.getByRole('button', { name: /Guardar borrador/i }));
 
     await waitFor(() => {
@@ -126,6 +132,7 @@ describe('affiliate listing editor', () => {
     const onSaved = vi.fn();
 
     renderWithClient(<AffiliateListingEditForm listing={listing} onSaved={onSaved} />);
+    await screen.findByRole('option', { name: 'Champions Path' });
 
     const priceInput = screen.getByLabelText(/Precio en USD/i);
     expect(priceInput).toHaveValue(15);

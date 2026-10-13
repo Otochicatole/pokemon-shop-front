@@ -8,10 +8,10 @@ import {
   affiliatePayoutsEnvelopeSchema,
   affiliateProfileSchema,
   listingStatusSchema,
-  tcgdexCardEnvelopeSchema,
-  tcgdexSearchEnvelopeSchema,
-  tcgdexRaritiesEnvelopeSchema,
-  tcgdexSetsEnvelopeSchema,
+  pokemonTcgCardEnvelopeSchema,
+  pokemonTcgSearchEnvelopeSchema,
+  pokemonTcgRaritiesEnvelopeSchema,
+  pokemonTcgSetsEnvelopeSchema,
   type AffiliateListingEditorValues,
 } from '../domain/contracts';
 
@@ -37,7 +37,7 @@ function emptyToUndefined(value?: string) {
 export function listingBody(values: AffiliateListingEditorValues, options?: { expectedVersion?: number }) {
   const pokemonCard = values.kind === 'SINGLE_CARD'
     ? {
-        pokemonType: values.pokemonType,
+        pokemonType: values.pokemonType ?? null,
         setName: values.setName!,
         setCode: emptyToUndefined(values.setCode),
         cardNumber: values.cardNumber!,
@@ -89,23 +89,23 @@ export async function updateAffiliateImage(listingId: string, imageId: string, e
 export async function reorderAffiliateImages(listingId: string, expectedVersion: number, imageIds: string[]) {
   return data<{ imageIds: string[]; version: number }>(await apiFetch(`/affiliate/listings/${listingId}/images/order`, { method: 'PUT', body: JSON.stringify({ expectedVersion, imageIds }) }));
 }
-export async function importAffiliateTcgdexImage(listingId: string, expectedVersion: number, imageUrl: string) {
-  return data<{ fileIds: string[]; version: number }>(await apiFetch(`/affiliate/listings/${listingId}/tcgdex-image`, { method: 'POST', body: JSON.stringify({ expectedVersion, imageUrl }) }));
+export async function importAffiliatePokemonTcgImage(listingId: string, expectedVersion: number, imageUrl: string) {
+  return data<{ fileIds: string[]; version: number }>(await apiFetch(`/affiliate/listings/${listingId}/pokemon-tcg-image`, { method: 'POST', body: JSON.stringify({ expectedVersion, imageUrl }) }));
 }
-export async function searchAffiliateTcgdexCards(query: string) {
-  const response = await apiFetch(`/affiliate/tcgdex/cards?q=${encodeURIComponent(query)}`, {}, tcgdexSearchEnvelopeSchema);
+export async function searchAffiliatePokemonTcgCards(query: string) {
+  const response = await apiFetch(`/affiliate/pokemon-tcg/cards?q=${encodeURIComponent(query)}`, {}, pokemonTcgSearchEnvelopeSchema);
   return response.data;
 }
-export async function getAffiliateTcgdexCard(id: string) {
-  const response = await apiFetch(`/affiliate/tcgdex/cards/${encodeURIComponent(id)}`, {}, tcgdexCardEnvelopeSchema);
+export async function getAffiliatePokemonTcgCard(id: string) {
+  const response = await apiFetch(`/affiliate/pokemon-tcg/cards/${encodeURIComponent(id)}`, {}, pokemonTcgCardEnvelopeSchema);
   return response.data.card;
 }
-export async function listAffiliateTcgdexRarities() {
-  const response = await apiFetch('/affiliate/tcgdex/rarities', {}, tcgdexRaritiesEnvelopeSchema);
+export async function listAffiliatePokemonTcgRarities() {
+  const response = await apiFetch('/affiliate/pokemon-tcg/rarities', {}, pokemonTcgRaritiesEnvelopeSchema);
   return response.data;
 }
-export async function listAffiliateTcgdexSets() {
-  const response = await apiFetch('/affiliate/tcgdex/sets', {}, tcgdexSetsEnvelopeSchema);
+export async function listAffiliatePokemonTcgSets() {
+  const response = await apiFetch('/affiliate/pokemon-tcg/sets', {}, pokemonTcgSetsEnvelopeSchema);
   return response.data;
 }
 export async function getAffiliateLogistics() { return affiliateLogisticsSchema.parse(data(await apiFetch('/affiliate/logistics'))); }

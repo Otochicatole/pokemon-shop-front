@@ -846,69 +846,6 @@
 .affiliateUploadRow > .affiliateFileTrigger {
   flex: 0 0 auto;
 }
-.affiliateWideDialog { width: min(920px, calc(100vw - 32px)); }
-.affiliateTcgdexSearch {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 12px;
-  align-items: end;
-  margin-bottom: 16px;
-}
-.affiliateTcgdexSearch label {
-  display: grid;
-  gap: 8px;
-  color: var(--muted);
-  font: 8px var(--pixel-font);
-  text-transform: uppercase;
-}
-.affiliateTcgdexSearch input {
-  min-height: 46px;
-  width: 100%;
-  padding: 10px 12px;
-  border: 2px solid var(--line);
-  background: #080f16;
-  color: var(--ink);
-  font: 13px var(--font-geist), Arial, sans-serif;
-}
-.affiliateTcgdexResults {
-  display: grid;
-  gap: 10px;
-  max-height: min(52vh, 480px);
-  overflow: auto;
-}
-.affiliateTcgdexResult {
-  display: grid;
-  grid-template-columns: 64px minmax(0, 1fr) auto;
-  gap: 12px;
-  align-items: center;
-  width: 100%;
-  padding: 10px;
-  border: 2px solid var(--line);
-  background: #0a1219;
-  color: inherit;
-  text-align: left;
-  cursor: pointer;
-}
-.affiliateTcgdexResult:hover { border-color: var(--accent); }
-.affiliateTcgdexResult:disabled { opacity: .7; cursor: wait; }
-.affiliateTcgdexResultImage {
-  display: grid;
-  place-items: center;
-  width: 64px;
-  height: 84px;
-  overflow: hidden;
-  border: 1px solid var(--line);
-  background: #05070a;
-  color: var(--muted);
-}
-.affiliateTcgdexResultImage img { width: 100%; height: 100%; object-fit: contain; }
-.affiliateTcgdexResultInfo { display: grid; gap: 4px; min-width: 0; }
-.affiliateTcgdexResultInfo strong { color: var(--ink); font-size: 14px; }
-.affiliateTcgdexResultMeta { display: flex; flex-wrap: wrap; gap: 8px; color: var(--muted); font-size: 12px; }
-.affiliateTcgdexResultMetaMuted { opacity: .85; }
-.affiliateTcgdexResultAction { color: var(--accent); }
-.affiliateSpin { animation: affiliateSpin 1s linear infinite; }
-@keyframes affiliateSpin { to { transform: rotate(360deg); } }
 
 .affiliatePanel :global([class*="adminImageGrid"]) {
   display: grid;
@@ -1210,9 +1147,6 @@
   .affiliateEditorSectionHeading { align-items: flex-start; flex-direction: column; }
   .affiliateEditorSectionHeading :global(.button) { width: 100%; }
   .affiliateEditorSection .affiliateFormGrid { grid-template-columns: 1fr; }
-  .affiliateTcgdexSearch { grid-template-columns: 1fr; }
-  .affiliateTcgdexResult { grid-template-columns: 56px minmax(0, 1fr); }
-  .affiliateTcgdexResultAction { display: none; }
 }
 
 /* Body copy stays on the storefront sans; headings/labels keep --pixel-font from rules above. */

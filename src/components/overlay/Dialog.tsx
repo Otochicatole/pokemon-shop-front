@@ -4,7 +4,7 @@ import { useEffect, useId, useRef } from 'react';
 
 import styles from './Dialog.module.css';
 
-const focusableSelector = 'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+const focusableSelector = 'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), summary, [tabindex]:not([tabindex="-1"])';
 
 export function Dialog({ open, title, onClose, children, className = '', description }: { open: boolean; title: string; onClose: () => void; children: ReactNode; className?: string; description?: string }) {
   const titleId = useId();
@@ -20,7 +20,8 @@ export function Dialog({ open, title, onClose, children, className = '', descrip
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     const frame = window.requestAnimationFrame(() => {
-      const first = dialogRef.current?.querySelector<HTMLElement>(focusableSelector);
+      const first = dialogRef.current?.querySelector<HTMLElement>('[data-dialog-autofocus]')
+        ?? dialogRef.current?.querySelector<HTMLElement>(focusableSelector);
       (first ?? dialogRef.current)?.focus();
     });
     const handleKeyDown = (event: KeyboardEvent) => {

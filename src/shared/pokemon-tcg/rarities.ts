@@ -10,9 +10,9 @@ export function raritySelectOptions(rarities: readonly string[], current?: strin
   return values;
 }
 
-export function useTcgdexRarities(fetcher: () => Promise<string[]>, enabled = true) {
+export function usePokemonTcgRarities(fetcher: () => Promise<string[]>, enabled = true) {
   const query = useQuery({
-    queryKey: ['tcgdex', 'rarities'],
+    queryKey: ['pokemon-tcg', 'rarities'],
     queryFn: fetcher,
     enabled,
     staleTime: 60 * 60 * 1000,

@@ -1,39 +1,39 @@
 'use client';
-/* TCGdex image URLs are selected at runtime and are intentionally rendered as remote previews. */
-/* eslint-disable @next/next/no-img-element */
 
 import Link from 'next/link';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, Check, CheckCircle2, ImagePlus, LoaderCircle, Save, Search, Upload } from 'lucide-react';
+import { ArrowLeft, Check, CheckCircle2, ImagePlus, Save, Search, Upload } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from '@/components/feedback';
-import { Button, ConfirmDialog, Dialog, ImageManager } from '@/components';
+import { Button, ConfirmDialog, ImageManager } from '@/components';
 import { ApiError } from '@/shared/api/client';
 import {
   affiliateListingEditorSchema,
   type AffiliateListing,
   type AffiliateListingEditorValues,
-  type TcgDexCard,
-  type TcgDexCardSummary,
+  type PokemonTcgCard,
+  type PokemonTcgCardSummary,
 } from '../domain/contracts';
 import {
   createAffiliateListing,
   deleteAffiliateImage,
-  getAffiliateTcgdexCard,
-  importAffiliateTcgdexImage,
-  listAffiliateTcgdexRarities,
-  listAffiliateTcgdexSets,
+  getAffiliatePokemonTcgCard,
+  importAffiliatePokemonTcgImage,
+  listAffiliatePokemonTcgRarities,
+  listAffiliatePokemonTcgSets,
   listingBody,
   reorderAffiliateImages,
-  searchAffiliateTcgdexCards,
+  searchAffiliatePokemonTcgCards,
   submitAffiliateListing,
   updateAffiliateImage,
   updateAffiliateListing,
   uploadAffiliateImages,
 } from '../infrastructure/api';
-import { raritySelectOptions, useTcgdexRarities } from '@/shared/tcgdex/rarities';
-import { selectedSetId, setSelectOptions, useTcgdexSets } from '@/shared/tcgdex/sets';
+import { pokemonTcgAutofill, pokemonTcgPriceNote } from '@/shared/pokemon-tcg/autofill';
+import { PokemonTcgSearchDialog } from '@/shared/pokemon-tcg/search-dialog';
+import { raritySelectOptions, usePokemonTcgRarities } from '@/shared/pokemon-tcg/rarities';
+import { selectedSetId, setSelectOptions, usePokemonTcgSets } from '@/shared/pokemon-tcg/sets';
 import styles from './affiliate-portal.module.css';
 
 const pokemonTypes = ['COLORLESS', 'DARKNESS', 'DRAGON', 'FAIRY', 'FIGHTING', 'FIRE', 'GRASS', 'LIGHTNING', 'METAL', 'PSYCHIC', 'WATER'] as const;
@@ -45,7 +45,7 @@ const defaults: AffiliateListingEditorValues = {
   stockMode: 'UNIQUE',
   price: '',
   stock: 1,
-  pokemonType: 'COLORLESS',
+  pokemonType: undefined,
   setName: '',
   setCode: '',
   cardNumber: '',
@@ -75,21 +75,6 @@ function initialPriceFromListing(listing: AffiliateListing) {
   return decimalFromMinor(listing.product.priceMinor);
 }
 
-function pokemonTypeFromTcgdex(value?: string) {
-  const normalized = (value ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase();
-  if (normalized.includes('DARK') || normalized.includes('OSCUR')) return 'DARKNESS';
-  if (normalized.includes('DRAGON')) return 'DRAGON';
-  if (normalized.includes('FAIRY') || normalized.includes('HADA')) return 'FAIRY';
-  if (normalized.includes('FIGHT') || normalized.includes('LUCH')) return 'FIGHTING';
-  if (normalized.includes('FIRE') || normalized.includes('FUEG')) return 'FIRE';
-  if (normalized.includes('GRASS') || normalized.includes('PLANT')) return 'GRASS';
-  if (normalized.includes('LIGHT') || normalized.includes('RAYO')) return 'LIGHTNING';
-  if (normalized.includes('METAL')) return 'METAL';
-  if (normalized.includes('PSYCH') || normalized.includes('PSIQU')) return 'PSYCHIC';
-  if (normalized.includes('WATER') || normalized.includes('AGUA')) return 'WATER';
-  return 'COLORLESS';
-}
-
 function valuesFromListing(listing: AffiliateListing): AffiliateListingEditorValues {
   const card = listing.product.pokemonCard;
   return {
@@ -99,7 +84,7 @@ function valuesFromListing(listing: AffiliateListing): AffiliateListingEditorVal
     stockMode: listing.product.stockMode,
     price: initialPriceFromListing(listing),
     stock: listing.product.inventory?.onHand ?? 0,
-    pokemonType: card?.pokemonType ?? 'COLORLESS',
+    pokemonType: card?.pokemonType ?? undefined,
     setName: card?.setName ?? '',
     setCode: card?.setCode ?? '',
     cardNumber: card?.cardNumber ?? '',
@@ -172,55 +157,43 @@ export function AffiliateListingCreateForm() {
   const queryClient = useQueryClient();
   const [files, setFiles] = useState<File[]>([]);
   const draft = useListingDraft(defaults);
-  const [tcgdexOpen, setTcgdexOpen] = useState(false);
-  const [tcgdexInput, setTcgdexInput] = useState('');
-  const [tcgdexQuery, setTcgdexQuery] = useState('');
-  const [tcgdexSelectedImage, setTcgdexSelectedImage] = useState<string | null>(null);
-  const [tcgdexLoadingId, setTcgdexLoadingId] = useState<string | null>(null);
+  const [pokemonTcgOpen, setPokemonTcgOpen] = useState(false);
+  const [pokemonTcgInput, setPokemonTcgInput] = useState('');
+  const [pokemonTcgQuery, setPokemonTcgQuery] = useState('');
+  const [pokemonTcgSelectedImage, setPokemonTcgSelectedImage] = useState<string | null>(null);
+  const [priceNote, setPriceNote] = useState<string | null>(null);
+  const [pokemonTcgLoadingId, setPokemonTcgLoadingId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
-  const tcgdexResults = useQuery({
-    queryKey: ['affiliate', 'tcgdex', tcgdexQuery],
-    queryFn: () => searchAffiliateTcgdexCards(tcgdexQuery),
-    enabled: tcgdexOpen && tcgdexQuery.length >= 2,
+  const pokemonTcgResults = useQuery({
+    queryKey: ['affiliate', 'pokemon-tcg', pokemonTcgQuery],
+    queryFn: () => searchAffiliatePokemonTcgCards(pokemonTcgQuery),
+    enabled: pokemonTcgOpen && pokemonTcgQuery.length >= 2,
     staleTime: 60_000,
   });
 
-  const openTcgdex = () => {
-    setTcgdexInput(draft.values.name);
-    setTcgdexQuery('');
-    setTcgdexOpen(true);
+  const openPokemonTcg = () => {
+    setPokemonTcgInput(draft.values.name);
+    setPokemonTcgQuery('');
+    setPokemonTcgOpen(true);
   };
 
-  const applyTcgdexCard = async (summary: TcgDexCardSummary) => {
-    setTcgdexLoadingId(summary.id);
+  const applyPokemonTcgCard = async (summary: PokemonTcgCardSummary) => {
+    setPokemonTcgLoadingId(summary.id);
     try {
-      const card: TcgDexCard = await getAffiliateTcgdexCard(summary.id);
+      const card: PokemonTcgCard = await getAffiliatePokemonTcgCard(summary.id);
       draft.replace({
         ...draft.values,
-        name: card.name,
-        description: card.description || card.effect || `Carta Pokémon ${card.name} de ${card.setName}.`,
-        kind: 'SINGLE_CARD',
-        stockMode: 'UNIQUE',
-        stock: 1,
-        pokemonType: pokemonTypeFromTcgdex(card.types[0]),
-        setName: card.setName,
-        setCode: card.setCode,
-        cardNumber: card.localId,
-        rarity: card.rarity || 'Ninguno',
-        language: card.language,
-        condition: 'NM',
-        finish: card.holo ? 'Holo' : 'Normal',
-        edition: card.firstEdition ? '1.ª edición' : '',
-        price: !draft.values.price || draft.values.price === '0' || draft.values.price === '0.00' ? '' : draft.values.price,
+        ...pokemonTcgAutofill(card),
       }, { dirty: true });
-      setTcgdexSelectedImage(card.imageUrl ?? summary.imageUrl);
-      setTcgdexOpen(false);
-      if (card.imageUrl) toast.success('Datos e imagen de TCGdex cargados. Definí el precio antes de guardar.');
-      else toast.warning('Datos de TCGdex cargados; esta carta no tiene imagen disponible. Definí el precio antes de guardar.');
+      setPriceNote(pokemonTcgPriceNote(card));
+      setPokemonTcgSelectedImage(card.imageUrl ?? summary.imageUrl);
+      setPokemonTcgOpen(false);
+      if (card.imageUrl) toast.success('Carta de Pokémon TCG cargada. Revisá el precio y completá los datos faltantes.');
+      else toast.warning('Carta de Pokémon TCG cargada sin imagen. Revisá el precio y completá los datos faltantes.');
     } catch (error) {
       toast.error(dataError(error));
     } finally {
-      setTcgdexLoadingId(null);
+      setPokemonTcgLoadingId(null);
     }
   };
 
@@ -236,13 +209,13 @@ export function AffiliateListingCreateForm() {
     try {
       const created = await createAffiliateListing(parsed.values);
       let version = 1;
-      if (tcgdexSelectedImage) {
+      if (pokemonTcgSelectedImage) {
         try {
-          const imported = await importAffiliateTcgdexImage(created.id, version, tcgdexSelectedImage);
+          const imported = await importAffiliatePokemonTcgImage(created.id, version, pokemonTcgSelectedImage);
           version = imported.version;
-          setTcgdexSelectedImage(null);
+          setPokemonTcgSelectedImage(null);
         } catch (error) {
-          toast.warning(`Borrador creado, pero no se pudo importar la imagen de TCGdex: ${dataError(error)}`);
+          toast.warning(`Borrador creado, pero no se pudo importar la imagen de Pokémon TCG: ${dataError(error)}`);
         }
       }
       if (files.length) {
@@ -274,21 +247,30 @@ export function AffiliateListingCreateForm() {
         onChange={draft.patch}
         saving={saving}
         onSubmit={onSubmit}
-        onOpenTcgdex={openTcgdex}
-        tcgdexSelectedImage={tcgdexSelectedImage}
+        onOpenPokemonTcg={openPokemonTcg}
+        pokemonTcgSelectedImage={pokemonTcgSelectedImage}
+        priceNote={priceNote}
         createFiles={files}
         onCreateFilesChange={setFiles}
       />
-      <TcgdexDialog
-        open={tcgdexOpen}
-        onClose={() => setTcgdexOpen(false)}
-        input={tcgdexInput}
-        onInputChange={setTcgdexInput}
-        onSearch={() => setTcgdexQuery(tcgdexInput.trim())}
-        query={tcgdexQuery}
-        results={tcgdexResults}
-        loadingId={tcgdexLoadingId}
-        onSelect={(card) => void applyTcgdexCard(card)}
+      <PokemonTcgSearchDialog
+        open={pokemonTcgOpen}
+        onClose={() => setPokemonTcgOpen(false)}
+        input={pokemonTcgInput}
+        onInputChange={setPokemonTcgInput}
+        onSearch={() => {
+          const query = pokemonTcgInput.trim();
+          if (query.length < 2) return;
+          if (query === pokemonTcgQuery) void pokemonTcgResults.refetch();
+          else setPokemonTcgQuery(query);
+        }}
+        query={pokemonTcgQuery}
+        cards={pokemonTcgResults.data}
+        isFetching={pokemonTcgResults.isFetching}
+        isError={pokemonTcgResults.isError}
+        errorMessage={pokemonTcgResults.isError ? dataError(pokemonTcgResults.error) : undefined}
+        loadingId={pokemonTcgLoadingId}
+        onSelect={(card) => void applyPokemonTcgCard(card)}
       />
     </>
   );
@@ -299,16 +281,17 @@ export function AffiliateListingEditForm({ listing, onSaved }: { listing: Affili
   const queryClient = useQueryClient();
   const listingId = listing.id;
   const productVersionRef = useRef(listing.product.version);
-  productVersionRef.current = listing.product.version;
+  useEffect(() => { productVersionRef.current = listing.product.version; }, [listing.product.version]);
   const [returning, setReturning] = useState(false);
   const [uploadFiles, setUploadFiles] = useState<File[]>([]);
   const [removeImageId, setRemoveImageId] = useState<string | null>(null);
   const draft = useListingDraft(() => valuesFromListing(listing));
-  const [tcgdexOpen, setTcgdexOpen] = useState(false);
-  const [tcgdexInput, setTcgdexInput] = useState('');
-  const [tcgdexQuery, setTcgdexQuery] = useState('');
-  const [tcgdexSelectedImage, setTcgdexSelectedImage] = useState<string | null>(null);
-  const [tcgdexLoadingId, setTcgdexLoadingId] = useState<string | null>(null);
+  const [pokemonTcgOpen, setPokemonTcgOpen] = useState(false);
+  const [pokemonTcgInput, setPokemonTcgInput] = useState('');
+  const [pokemonTcgQuery, setPokemonTcgQuery] = useState('');
+  const [pokemonTcgSelectedImage, setPokemonTcgSelectedImage] = useState<string | null>(null);
+  const [priceNote, setPriceNote] = useState<string | null>(null);
+  const [pokemonTcgLoadingId, setPokemonTcgLoadingId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [busyImages, setBusyImages] = useState(false);
   const hydratedId = useRef(listingId);
@@ -317,7 +300,7 @@ export function AffiliateListingEditForm({ listing, onSaved }: { listing: Affili
     if (hydratedId.current === listingId) return;
     hydratedId.current = listingId;
     draft.replace(valuesFromListing(listing));
-    setTcgdexSelectedImage(null);
+    setPokemonTcgSelectedImage(null);
     // Solo al cambiar de publicación.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [listingId]);
@@ -335,47 +318,36 @@ export function AffiliateListingEditForm({ listing, onSaved }: { listing: Affili
     () => [...listing.product.images].sort((a, b) => a.sortOrder - b.sortOrder),
     [listing.product.images],
   );
-  const tcgdexResults = useQuery({
-    queryKey: ['affiliate', 'tcgdex', tcgdexQuery],
-    queryFn: () => searchAffiliateTcgdexCards(tcgdexQuery),
-    enabled: tcgdexOpen && tcgdexQuery.length >= 2,
+  const pokemonTcgResults = useQuery({
+    queryKey: ['affiliate', 'pokemon-tcg', pokemonTcgQuery],
+    queryFn: () => searchAffiliatePokemonTcgCards(pokemonTcgQuery),
+    enabled: pokemonTcgOpen && pokemonTcgQuery.length >= 2,
     staleTime: 60_000,
   });
 
-  const openTcgdex = () => {
-    setTcgdexInput(draft.values.name);
-    setTcgdexQuery('');
-    setTcgdexOpen(true);
+  const openPokemonTcg = () => {
+    setPokemonTcgInput(draft.values.name);
+    setPokemonTcgQuery('');
+    setPokemonTcgOpen(true);
   };
 
-  const applyTcgdexCard = async (summary: TcgDexCardSummary) => {
-    setTcgdexLoadingId(summary.id);
+  const applyPokemonTcgCard = async (summary: PokemonTcgCardSummary) => {
+    setPokemonTcgLoadingId(summary.id);
     try {
-      const card: TcgDexCard = await getAffiliateTcgdexCard(summary.id);
+      const card: PokemonTcgCard = await getAffiliatePokemonTcgCard(summary.id);
       draft.replace({
         ...draft.values,
-        name: card.name,
-        description: card.description || card.effect || `Carta Pokémon ${card.name} de ${card.setName}.`,
-        kind: 'SINGLE_CARD',
-        pokemonType: pokemonTypeFromTcgdex(card.types[0]),
-        setName: card.setName,
-        setCode: card.setCode,
-        cardNumber: card.localId,
-        rarity: card.rarity || 'Ninguno',
-        language: card.language,
-        condition: 'NM',
-        finish: card.holo ? 'Holo' : 'Normal',
-        edition: card.firstEdition ? '1.ª edición' : '',
-        price: !draft.values.price || draft.values.price === '0' || draft.values.price === '0.00' ? '' : draft.values.price,
+        ...pokemonTcgAutofill(card),
       }, { dirty: true });
-      setTcgdexSelectedImage(card.imageUrl ?? summary.imageUrl);
-      setTcgdexOpen(false);
-      if (card.imageUrl) toast.success('Datos e imagen de TCGdex cargados. Se importará al guardar. Definí el precio si falta.');
-      else toast.warning('Datos de TCGdex cargados; esta carta no tiene imagen disponible. Definí el precio si falta.');
+      setPriceNote(pokemonTcgPriceNote(card));
+      setPokemonTcgSelectedImage(card.imageUrl ?? summary.imageUrl);
+      setPokemonTcgOpen(false);
+      if (card.imageUrl) toast.success('Carta de Pokémon TCG cargada. Revisá el precio y completá los datos faltantes.');
+      else toast.warning('Carta de Pokémon TCG cargada sin imagen. Revisá el precio y completá los datos faltantes.');
     } catch (error) {
       toast.error(dataError(error));
     } finally {
-      setTcgdexLoadingId(null);
+      setPokemonTcgLoadingId(null);
     }
   };
 
@@ -421,15 +393,15 @@ export function AffiliateListingEditForm({ listing, onSaved }: { listing: Affili
       let nextVersion = result.version;
       let nextStatus = result.status;
       productVersionRef.current = nextVersion;
-      if (tcgdexSelectedImage) {
+      if (pokemonTcgSelectedImage) {
         try {
-          const imported = await importAffiliateTcgdexImage(listingId, nextVersion, tcgdexSelectedImage);
+          const imported = await importAffiliatePokemonTcgImage(listingId, nextVersion, pokemonTcgSelectedImage);
           nextVersion = imported.version;
           productVersionRef.current = nextVersion;
-          setTcgdexSelectedImage(null);
+          setPokemonTcgSelectedImage(null);
           imageImported = true;
         } catch (error) {
-          toast.warning(`Cambios guardados, pero no se pudo importar la imagen de TCGdex: ${dataError(error)}`);
+          toast.warning(`Cambios guardados, pero no se pudo importar la imagen de Pokémon TCG: ${dataError(error)}`);
         }
       }
       syncListingCache(values, { version: nextVersion, status: nextStatus });
@@ -447,7 +419,7 @@ export function AffiliateListingEditForm({ listing, onSaved }: { listing: Affili
             ? 'Cambios guardados, imagen importada y publicación enviada a revisión.'
             : 'Cambios guardados y enviados a revisión.'
           : imageImported
-            ? 'Cambios guardados con imagen de TCGdex'
+            ? 'Cambios guardados con imagen de Pokémon TCG'
             : 'Cambios guardados. La publicación volvió a borrador; enviala a revisión cuando esté lista.',
       );
       draft.replace(values);
@@ -527,8 +499,9 @@ export function AffiliateListingEditForm({ listing, onSaved }: { listing: Affili
         saving={saving || busyImages}
         onSubmit={(event) => void runSave(event)}
         onSubmitForReview={canSubmitForReview ? () => void runSave(undefined, { submit: true }) : undefined}
-        onOpenTcgdex={openTcgdex}
-        tcgdexSelectedImage={tcgdexSelectedImage}
+        onOpenPokemonTcg={openPokemonTcg}
+        pokemonTcgSelectedImage={pokemonTcgSelectedImage}
+        priceNote={priceNote}
         images={images}
         onMoveImage={(id, direction) => void moveImage(id, direction)}
         onAltChange={(id, value) => {
@@ -542,16 +515,24 @@ export function AffiliateListingEditForm({ listing, onSaved }: { listing: Affili
         onUpload={() => void upload()}
         imageBusy={busyImages}
       />
-      <TcgdexDialog
-        open={tcgdexOpen}
-        onClose={() => setTcgdexOpen(false)}
-        input={tcgdexInput}
-        onInputChange={setTcgdexInput}
-        onSearch={() => setTcgdexQuery(tcgdexInput.trim())}
-        query={tcgdexQuery}
-        results={tcgdexResults}
-        loadingId={tcgdexLoadingId}
-        onSelect={(card) => void applyTcgdexCard(card)}
+      <PokemonTcgSearchDialog
+        open={pokemonTcgOpen}
+        onClose={() => setPokemonTcgOpen(false)}
+        input={pokemonTcgInput}
+        onInputChange={setPokemonTcgInput}
+        onSearch={() => {
+          const query = pokemonTcgInput.trim();
+          if (query.length < 2) return;
+          if (query === pokemonTcgQuery) void pokemonTcgResults.refetch();
+          else setPokemonTcgQuery(query);
+        }}
+        query={pokemonTcgQuery}
+        cards={pokemonTcgResults.data}
+        isFetching={pokemonTcgResults.isFetching}
+        isError={pokemonTcgResults.isError}
+        errorMessage={pokemonTcgResults.isError ? dataError(pokemonTcgResults.error) : undefined}
+        loadingId={pokemonTcgLoadingId}
+        onSelect={(card) => void applyPokemonTcgCard(card)}
       />
       <ConfirmDialog
         open={Boolean(removeImageId)}
@@ -590,8 +571,9 @@ type FormShellProps = {
   saving: boolean;
   onSubmit: (event: FormEvent) => void;
   onSubmitForReview?: () => void;
-  onOpenTcgdex: () => void;
-  tcgdexSelectedImage: string | null;
+  onOpenPokemonTcg: () => void;
+  pokemonTcgSelectedImage: string | null;
+  priceNote: string | null;
   createFiles?: File[];
   onCreateFilesChange?: (files: File[]) => void;
   images?: AffiliateListing['product']['images'];
@@ -606,12 +588,12 @@ type FormShellProps = {
 
 function AffiliateListingFormShell({
   eyebrow, title, description, backHref, onBack, backLabel = 'Volver', backDisabled, reviewNote,
-  values, errors, onChange, saving, onSubmit, onSubmitForReview, onOpenTcgdex, tcgdexSelectedImage,
+  values, errors, onChange, saving, onSubmit, onSubmitForReview, onOpenPokemonTcg, pokemonTcgSelectedImage, priceNote,
   createFiles, onCreateFilesChange, images, onMoveImage, onAltChange, onRemoveImage,
   uploadFiles, onUploadFilesChange, onUpload, imageBusy,
 }: FormShellProps) {
-  const { rarities } = useTcgdexRarities(listAffiliateTcgdexRarities, values.kind === 'SINGLE_CARD');
-  const { sets } = useTcgdexSets(listAffiliateTcgdexSets, values.kind === 'SINGLE_CARD');
+  const { rarities } = usePokemonTcgRarities(listAffiliatePokemonTcgRarities, values.kind === 'SINGLE_CARD');
+  const { sets } = usePokemonTcgSets(listAffiliatePokemonTcgSets, values.kind === 'SINGLE_CARD');
   const rarityOptions = useMemo(() => raritySelectOptions(rarities, values.rarity), [rarities, values.rarity]);
   const setOptions = useMemo(() => setSelectOptions(sets, values.setName, values.setCode), [sets, values.setName, values.setCode]);
   const setValueId = selectedSetId(setOptions, values.setName, values.setCode);
@@ -698,15 +680,17 @@ function AffiliateListingFormShell({
             <div className={styles.affiliateEditorSection}>
               <div className={styles.affiliateEditorSectionHeading}>
                 <h2>Datos de la carta</h2>
-                <Button type="button" variant="secondary" onClick={onOpenTcgdex}><Search size={16} />Autocompletar con TCGdex</Button>
+                <Button type="button" variant="secondary" onClick={onOpenPokemonTcg}><Search size={16} />Autocompletar con Pokémon TCG</Button>
               </div>
-              {tcgdexSelectedImage && (
-                <p className={styles.affiliateAutofillNote}><Check size={15} />Imagen de TCGdex lista para importarse al guardar. El precio sigue siendo manual.</p>
+              {pokemonTcgSelectedImage && (
+                <p className={styles.affiliateAutofillNote}><Check size={15} />Imagen de Pokémon TCG lista para importarse al guardar.</p>
               )}
+              {priceNote && <p className={styles.affiliateAutofillNote} role="status">{priceNote} Revisá los datos autocompletados y completá los campos faltantes.</p>}
               <div className={styles.affiliateFormGrid}>
                 <label>
                   Tipo / atributo
-                  <select value={values.pokemonType ?? 'COLORLESS'} onChange={(event) => onChange('pokemonType', event.target.value as AffiliateListingEditorValues['pokemonType'])}>
+                  <select value={values.pokemonType ?? ''} onChange={(event) => onChange('pokemonType', (event.target.value || undefined) as AffiliateListingEditorValues['pokemonType'])}>
+                    <option value="">Sin especificar / no aplica</option>
                     {pokemonTypes.map((type) => <option key={type} value={type}>{type}</option>)}
                   </select>
                 </label>
@@ -866,64 +850,5 @@ function AffiliateListingFormShell({
         </form>
       </section>
     </>
-  );
-}
-
-function TcgdexDialog({
-  open, onClose, input, onInputChange, onSearch, query, results, loadingId, onSelect,
-}: {
-  open: boolean;
-  onClose: () => void;
-  input: string;
-  onInputChange: (value: string) => void;
-  onSearch: () => void;
-  query: string;
-  results: ReturnType<typeof useQuery<TcgDexCardSummary[], Error>>;
-  loadingId: string | null;
-  onSelect: (card: TcgDexCardSummary) => void;
-}) {
-  return (
-    <Dialog open={open} onClose={onClose} title="Autocompletar carta" description="Buscá una carta en TCGdex. Se completarán los datos e imagen; el precio siempre lo definís vos." className={styles.affiliateWideDialog}>
-      <form className={styles.affiliateTcgdexSearch} onSubmit={(event) => { event.preventDefault(); onSearch(); }}>
-        <label>
-          Nombre o parte del nombre
-          <input value={input} onChange={(event) => onInputChange(event.target.value)} placeholder="Ej.: Pikachu" autoFocus />
-        </label>
-        <Button type="submit" disabled={input.trim().length < 2 || results.isFetching}>
-          <Search size={16} />{results.isFetching ? 'Buscando…' : 'Buscar carta'}
-        </Button>
-      </form>
-      {results.isError && <p className="form-error">{dataError(results.error)}</p>}
-      {results.isFetching && <div className={styles.affiliateLoading}>Consultando TCGdex</div>}
-      {!results.isFetching && query && !results.data?.length && <div className={styles.affiliateEmpty}><p>No encontramos cartas con esa búsqueda.</p></div>}
-      {results.data && results.data.length > 0 && (
-        <div className={styles.affiliateTcgdexResults} aria-label="Resultados de cartas TCGdex">
-          {results.data.map((card) => (
-            <button type="button" key={card.id} className={styles.affiliateTcgdexResult} onClick={() => onSelect(card)} disabled={Boolean(loadingId)}>
-              <span className={styles.affiliateTcgdexResultImage}>
-                {card.imageUrl ? <img src={card.imageUrl} alt="" loading="lazy" /> : <ImagePlus size={18} />}
-              </span>
-              <span className={styles.affiliateTcgdexResultInfo}>
-                <strong>{card.name}</strong>
-                <span className={styles.affiliateTcgdexResultMeta}>
-                  <small>{card.setName || `Set ${card.setCode}`}</small>
-                  <small>N.º {card.localId} · {card.setCode}</small>
-                </span>
-                <span className={`${styles.affiliateTcgdexResultMeta} ${styles.affiliateTcgdexResultMetaMuted}`}>
-                  {card.rarity && <small>{card.rarity}</small>}
-                  {card.category && <small>{card.category}</small>}
-                  {card.types?.length ? <small>{card.types.join(' · ')}</small> : null}
-                  {card.holo && <small>Holo</small>}
-                  {card.firstEdition && <small>1.ª edición</small>}
-                </span>
-              </span>
-              <span className={styles.affiliateTcgdexResultAction}>
-                {loadingId === card.id ? <LoaderCircle size={16} className={styles.affiliateSpin} /> : <Check size={16} />}
-              </span>
-            </button>
-          ))}
-        </div>
-      )}
-    </Dialog>
   );
 }
