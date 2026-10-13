@@ -10,7 +10,8 @@ import { AdminPageHeader, Button, MoneyField, SelectField, TextareaField, TextFi
 import { adminErrorMessage } from '@/shared/admin/client';
 import { getAdminProduct, getPokemonTcgCard, importPokemonTcgImage, listPokemonTcgRarities, searchPokemonTcgCards } from '@/features/product-management/infrastructure/api';
 import type { PokemonTcgCard, PokemonTcgCardSummary } from '@/features/product-management/domain/contracts';
-import { pokemonTcgAutofill, pokemonTcgPriceNote } from '@/shared/pokemon-tcg/autofill';
+import { marketPriceDecimal, pokemonTcgAutofill, pokemonTcgPriceNote } from '@/shared/pokemon-tcg/autofill';
+import { PokemonTcgPricePicker } from '@/shared/pokemon-tcg/price-picker';
 import { PokemonTcgSearchDialog } from '@/shared/pokemon-tcg/search-dialog';
 import { usePokemonTcgSearch } from '@/shared/pokemon-tcg/use-search';
 import { raritySelectOptions, usePokemonTcgRarities } from '@/shared/pokemon-tcg/rarities';
@@ -218,7 +219,20 @@ export function SupplierPurchaseFormView({ supplierId }: { supplierId: string })
                     <option value="UNIQUE">Pieza única</option>
                     <option value="QUANTITY">Por cantidad</option>
                   </SelectField>
-                  <MoneyField id={`purchase-${index}-price`} label="Precio de venta" value={line.price} onChange={(event) => updateLine(index, { price: event.target.value })} />
+                  <div>
+                    <MoneyField id={`purchase-${index}-price`} label="Precio de venta" value={line.price} onChange={(event) => updateLine(index, { price: event.target.value })} />
+                    {line.kind === 'SINGLE_CARD' && (
+                      <PokemonTcgPricePicker
+                        scope="admin"
+                        cardName={line.name}
+                        disabled={save.isPending}
+                        onApply={(price) => {
+                          const value = marketPriceDecimal(price);
+                          if (value) updateLine(index, { price: value, priceNote: pokemonTcgPriceNote({ marketPrice: price }) });
+                        }}
+                      />
+                    )}
+                  </div>
                   <TextField id={`purchase-${index}-quantity`} label="Cantidad comprada" type="number" min={1} value={line.quantity} onChange={(event) => updateLine(index, { quantity: Number(event.target.value) || 1 })} />
                   <MoneyField id={`purchase-${index}-unitCost`} label="Costo unitario" value={line.unitCost} onChange={(event) => updateLine(index, { unitCost: event.target.value })} />
                 </div>

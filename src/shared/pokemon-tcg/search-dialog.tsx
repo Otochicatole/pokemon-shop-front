@@ -1,9 +1,12 @@
 'use client';
 
 import { useEffect, useId, useRef, useState } from 'react';
-import { ArrowLeft, ArrowRight, ChevronDown, ImageOff, LoaderCircle, Search } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ChevronDown, History, ImageOff, LoaderCircle, Search } from 'lucide-react';
 import { Dialog } from '@/components/overlay/Dialog';
 import type { PokemonTcgCardSummary, PokemonTcgPagination, PokemonTcgPrice } from './contracts';
+import { marketPriceDecimal, type PokemonTcgMarketPrice } from './autofill';
+import { formatPrice as money, priceDate, sourceName, variantName } from './price-format';
+import { PokemonTcgPriceHistory } from './price-history';
 import styles from './search-dialog.module.css';
 
 type Props = {
@@ -24,23 +27,10 @@ type Props = {
   loadingId: string | null;
   onSelect: (card: PokemonTcgCardSummary) => void;
   footerNote?: string;
+  priceSelection?: { scope: 'admin' | 'affiliate'; onApply: (price: PokemonTcgMarketPrice) => void };
 };
 
-const variantLabels: Record<string, string> = { normal: 'Normal', holofoil: 'Holo', 'reverse-holofoil': 'Reverse Holo' };
-const sourceLabels: Record<string, string> = { tcgplayer: 'TCGPlayer', cardmarket: 'Cardmarket' };
 const categoryLabels: Record<string, string> = { Pokemon: 'Pokémon', Trainer: 'Entrenador', Energy: 'Energía' };
-const sourceName = (source: string) => sourceLabels[source.toLowerCase()] ?? source;
-const variantName = (variant: string) => variantLabels[variant] ?? variant;
-
-function money(amountMinor: string, currency: string) {
-  const minor = BigInt(amountMinor);
-  return `${currency} ${(minor / 100n).toLocaleString('es-AR')},${(minor % 100n).toString().padStart(2, '0')}`;
-}
-
-function priceDate(value: string) {
-  const date = new Date(value);
-  return Number.isFinite(date.getTime()) ? date.toLocaleDateString('es-AR', { timeZone: 'UTC' }) : 'No informada';
-}
 
 function CardImage({ card }: { card: PokemonTcgCardSummary }) {
   const [failed, setFailed] = useState(false);
@@ -55,14 +45,14 @@ function CardImage({ card }: { card: PokemonTcgCardSummary }) {
   );
 }
 
-function PriceDetails({ prices }: { prices: PokemonTcgPrice[] }) {
+function PriceDetails({ prices, onApply }: { prices: PokemonTcgPrice[]; onApply?: (price: PokemonTcgMarketPrice) => void }) {
   return (
     <details className={styles.priceDetails}>
       <summary><ChevronDown size={16} aria-hidden="true" /><span>Ver todos los precios <span className={styles.priceCount}>({prices.length})</span></span></summary>
       <div className={styles.priceTableWrap}>
         <table className={styles.priceTable}>
           <caption>Precios de referencia por mercado y variante. Cada importe conserva su moneda.</caption>
-          <thead><tr><th scope="col">Mercado / variante</th><th scope="col">Precio</th><th scope="col">Mínimo</th><th scope="col">Máximo</th><th scope="col">Actualizado (UTC)</th></tr></thead>
+          <thead><tr><th scope="col">Mercado / variante</th><th scope="col">Precio</th><th scope="col">Mínimo</th><th scope="col">Máximo</th><th scope="col">Actualizado (UTC)</th>{onApply && <th scope="col">Aplicar</th>}</tr></thead>
           <tbody>{prices.map((price, index) => (
             <tr key={`${price.source}-${price.currency}-${price.variant}-${index}`}>
               <th scope="row">{sourceName(price.source)}<span>{variantName(price.variant)}</span></th>
@@ -70,6 +60,7 @@ function PriceDetails({ prices }: { prices: PokemonTcgPrice[] }) {
               <td>{price.lowAmountMinor !== null ? money(price.lowAmountMinor, price.currency) : 'No informado'}</td>
               <td>{price.highAmountMinor !== null ? money(price.highAmountMinor, price.currency) : 'No informado'}</td>
               <td><time dateTime={price.updatedAt}>{priceDate(price.updatedAt)}</time></td>
+              {onApply && <td>{price.currency === 'USD' && BigInt(price.amountMinor) > 0n ? <button type="button" className={styles.tableApply} onClick={() => onApply({ ...price, currency: 'USD' })} aria-label={`Usar ${money(price.amountMinor, price.currency)} de ${sourceName(price.source)}, ${variantName(price.variant)}`}>Usar precio</button> : <span className={styles.currencyNote}>Solo referencia</span>}</td>}
             </tr>
           ))}</tbody>
         </table>
@@ -78,7 +69,7 @@ function PriceDetails({ prices }: { prices: PokemonTcgPrice[] }) {
   );
 }
 
-function CardResult({ card, loadingId, onSelect }: Pick<Props, 'loadingId' | 'onSelect'> & { card: PokemonTcgCardSummary }) {
+function CardResult({ card, loadingId, onSelect, priceSelection, onViewHistory }: Pick<Props, 'loadingId' | 'onSelect' | 'priceSelection'> & { card: PokemonTcgCardSummary; onViewHistory: (card: PokemonTcgCardSummary) => void }) {
   const titleId = useId();
   const price = card.marketPrice;
   const metadata = [
@@ -105,19 +96,24 @@ function CardResult({ card, loadingId, onSelect }: Pick<Props, 'loadingId' | 'on
           <span className={styles.quoteSource}>{sourceName(price.source)} · {variantName(price.variant)}</span>
           <span className={styles.quoteDate}>Actualizado <time dateTime={price.updatedAt}>{priceDate(price.updatedAt)}</time></span>
         </> : <p className={styles.noPrice}>Sin referencia en USD<span>Podés ingresar el precio manualmente.</span></p>}
-        <button type="button" className={styles.selectButton} disabled={loadingId !== null} onClick={() => onSelect(card)} aria-label={`Usar carta ${card.name}, ${card.setName || card.setCode}, número ${card.localId}`}>
-          {loadingId === card.id ? <><LoaderCircle size={16} className={styles.spin} aria-hidden="true" />Completando…</> : <>Usar carta<ArrowRight size={16} aria-hidden="true" /></>}
+        <button type="button" className={styles.selectButton} disabled={loadingId !== null || Boolean(priceSelection && !marketPriceDecimal(price))} onClick={() => onSelect(card)} aria-label={`${priceSelection ? 'Usar precio de' : 'Usar carta'} ${card.name}, ${card.setName || card.setCode}, número ${card.localId}`}>
+          {loadingId === card.id ? <><LoaderCircle size={16} className={styles.spin} aria-hidden="true" />Completando…</> : <>{priceSelection ? 'Usar precio' : 'Usar carta'}<ArrowRight size={16} aria-hidden="true" /></>}
         </button>
+        {priceSelection && <button type="button" className={styles.historyToggle} data-price-history-card={card.id} onClick={() => onViewHistory(card)}><History size={16} aria-hidden="true" />Ver historial de precios<ArrowRight size={14} aria-hidden="true" /></button>}
       </div>
-      {!!card.prices?.length && <PriceDetails prices={card.prices} />}
+      {!!card.prices?.length && <PriceDetails prices={card.prices} onApply={priceSelection?.onApply} />}
     </article>
   );
 }
 
-export function PokemonTcgSearchDialog({ open, onClose, input, onInputChange, onSearch, onRetry, query, page = 1, pagination, onPageChange, cards = [], isFetching, isError, errorMessage, loadingId, onSelect, footerNote }: Props) {
+export function PokemonTcgSearchDialog({ open, onClose, input, onInputChange, onSearch, onRetry, query, page = 1, pagination, onPageChange, cards = [], isFetching, isError, errorMessage, loadingId, onSelect, footerNote, priceSelection }: Props) {
   const inputId = useId();
   const resultsId = useId();
   const resultsRef = useRef<HTMLDivElement>(null);
+  const backRef = useRef<HTMLButtonElement>(null);
+  const historyRef = useRef<HTMLDivElement>(null);
+  const returnPosition = useRef<{ cardId: string; listScroll: number; dialogScroll: number } | null>(null);
+  const [historyCard, setHistoryCard] = useState<PokemonTcgCardSummary | null>(null);
   const searched = query.trim().length >= 2;
   const busy = isFetching || loadingId !== null;
   const searchDisabled = input.trim().length < 2 || isFetching || loadingId !== null;
@@ -131,8 +127,55 @@ export function PokemonTcgSearchDialog({ open, onClose, input, onInputChange, on
     const dialog = resultsRef.current.closest<HTMLElement>('[role="dialog"]');
     if (dialog) dialog.scrollTop = 0;
   }, [open, query, page]);
+  useEffect(() => {
+    if (!open) return;
+    if (historyCard) {
+      backRef.current?.focus({ preventScroll: true });
+      const dialog = historyRef.current?.closest<HTMLElement>('[role="dialog"]');
+      if (dialog) dialog.scrollTop = 0;
+      return;
+    }
+    const saved = returnPosition.current;
+    if (!saved || !resultsRef.current || isFetching) return;
+    resultsRef.current.scrollTop = saved.listScroll;
+    const dialog = resultsRef.current.closest<HTMLElement>('[role="dialog"]');
+    if (dialog) dialog.scrollTop = saved.dialogScroll;
+    const trigger = Array.from(resultsRef.current.querySelectorAll<HTMLButtonElement>('[data-price-history-card]')).find((button) => button.dataset.priceHistoryCard === saved.cardId);
+    trigger?.focus({ preventScroll: true });
+    returnPosition.current = null;
+  }, [open, historyCard, isFetching]);
+  function viewHistory(card: PokemonTcgCardSummary) {
+    returnPosition.current = {
+      cardId: card.id,
+      listScroll: resultsRef.current?.scrollTop ?? 0,
+      dialogScroll: resultsRef.current?.closest<HTMLElement>('[role="dialog"]')?.scrollTop ?? 0,
+    };
+    setHistoryCard(card);
+  }
   return (
-    <Dialog open={open} onClose={onClose} title="Autocompletar carta" className={styles.searchDialog} description="Elegí una carta para completar sus datos, imagen y precio de referencia en USD.">
+    <Dialog open={open} onClose={onClose} title={historyCard && priceSelection ? 'Historial de precios' : priceSelection ? 'Buscar precio de venta' : 'Autocompletar carta'} className={`${styles.searchDialog} ${historyCard && priceSelection ? styles.historyDialog : ''}`} description={historyCard && priceSelection ? undefined : priceSelection ? 'Buscá una carta, compará sus precios y consultá el historial antes de elegir un importe en USD.' : 'Elegí una carta para completar sus datos, imagen y precio de referencia en USD.'}>
+      {historyCard && priceSelection ? <>
+        <button ref={backRef} type="button" className={styles.backButton} onClick={() => setHistoryCard(null)}><ArrowLeft size={16} aria-hidden="true" />Volver a resultados</button>
+        <div className={styles.historyCard}>
+          <CardImage key={historyCard.imageUrl} card={historyCard} />
+          <div className={styles.historyIdentity}>
+            <h3>{historyCard.name}</h3>
+            <p>{historyCard.setName || 'Colección no informada'}</p>
+            <span>Set {historyCard.setCode || '—'} · N.º {historyCard.localId || '—'}</span>
+          </div>
+          <div className={styles.currentQuote}>
+            {historyCard.marketPrice ? <>
+              <span>Precio actual de referencia</span>
+              <strong>{money(historyCard.marketPrice.amountMinor, historyCard.marketPrice.currency)}</strong>
+              <span>{sourceName(historyCard.marketPrice.source)} · {variantName(historyCard.marketPrice.variant)}</span>
+              {marketPriceDecimal(historyCard.marketPrice) && <button type="button" className={styles.tableApply} onClick={() => priceSelection.onApply(historyCard.marketPrice!)}>Usar precio actual</button>}
+            </> : <span>Sin precio actual en USD</span>}
+          </div>
+        </div>
+        <div ref={historyRef} className={styles.historyBody}>
+          <PokemonTcgPriceHistory key={historyCard.id} card={historyCard} scope={priceSelection.scope} onApply={priceSelection.onApply} hideHeading />
+        </div>
+      </> : <>
       <div className={styles.searchBar} role="search" aria-label="Buscar en el catálogo Pokémon TCG">
         <label htmlFor={inputId}>Nombre o parte del nombre</label>
         <div className={styles.searchControls}>
@@ -156,8 +199,9 @@ export function PokemonTcgSearchDialog({ open, onClose, input, onInputChange, on
           : isError ? <div className={styles.errorState} role="alert"><p>{errorMessage || 'No pudimos consultar el catálogo.'}</p><button type="button" onClick={onRetry ?? onSearch} disabled={busy}>Reintentar búsqueda</button></div>
           : !searched ? <div className={styles.emptyState}><Search size={28} aria-hidden="true" /><p>Encontrá la versión exacta<span>Ingresá al menos 2 caracteres. Podrás comparar colección, número, rareza y precios antes de elegir.</span></p></div>
           : !cards.length ? <div className={styles.emptyState}><Search size={28} aria-hidden="true" /><p>{page > 1 ? 'No hay cartas en esta página' : `No encontramos cartas para “${query}”`}<span>{page > 1 ? 'Volvé a la página anterior o realizá una nueva búsqueda.' : 'Probá con menos palabras o revisá cómo se escribe el nombre.'}</span></p></div>
-          : cards.map((card) => <CardResult key={card.id} card={card} loadingId={loadingId} onSelect={onSelect} />)}
+          : cards.map((card) => <CardResult key={card.id} card={card} loadingId={loadingId} onSelect={onSelect} priceSelection={priceSelection} onViewHistory={viewHistory} />)}
       </div>
+      </>}
       <p className={styles.footerNote}>{footerNote || 'Los precios varían según el mercado, la variante y la condición. Podés editar el precio de venta.'}</p>
     </Dialog>
   );

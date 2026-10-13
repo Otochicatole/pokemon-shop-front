@@ -30,7 +30,8 @@ import {
   updateAffiliateListing,
   uploadAffiliateImages,
 } from '../infrastructure/api';
-import { pokemonTcgAutofill, pokemonTcgPriceNote } from '@/shared/pokemon-tcg/autofill';
+import { marketPriceDecimal, pokemonTcgAutofill, pokemonTcgPriceNote, type PokemonTcgMarketPrice } from '@/shared/pokemon-tcg/autofill';
+import { PokemonTcgPricePicker } from '@/shared/pokemon-tcg/price-picker';
 import { PokemonTcgSearchDialog } from '@/shared/pokemon-tcg/search-dialog';
 import { usePokemonTcgSearch } from '@/shared/pokemon-tcg/use-search';
 import { raritySelectOptions, usePokemonTcgRarities } from '@/shared/pokemon-tcg/rarities';
@@ -242,6 +243,12 @@ export function AffiliateListingCreateForm() {
         saving={saving}
         onSubmit={onSubmit}
         onOpenPokemonTcg={openPokemonTcg}
+        onApplyPrice={(price) => {
+          const value = marketPriceDecimal(price);
+          if (!value) return;
+          draft.patch('price', value);
+          setPriceNote(pokemonTcgPriceNote({ marketPrice: price }));
+        }}
         pokemonTcgSelectedImage={pokemonTcgSelectedImage}
         priceNote={priceNote}
         createFiles={files}
@@ -486,6 +493,12 @@ export function AffiliateListingEditForm({ listing, onSaved }: { listing: Affili
         onSubmit={(event) => void runSave(event)}
         onSubmitForReview={canSubmitForReview ? () => void runSave(undefined, { submit: true }) : undefined}
         onOpenPokemonTcg={openPokemonTcg}
+        onApplyPrice={(price) => {
+          const value = marketPriceDecimal(price);
+          if (!value) return;
+          draft.patch('price', value);
+          setPriceNote(pokemonTcgPriceNote({ marketPrice: price }));
+        }}
         pokemonTcgSelectedImage={pokemonTcgSelectedImage}
         priceNote={priceNote}
         images={images}
@@ -557,6 +570,7 @@ type FormShellProps = {
   onSubmit: (event: FormEvent) => void;
   onSubmitForReview?: () => void;
   onOpenPokemonTcg: () => void;
+  onApplyPrice: (price: PokemonTcgMarketPrice) => void;
   pokemonTcgSelectedImage: string | null;
   priceNote: string | null;
   createFiles?: File[];
@@ -573,7 +587,7 @@ type FormShellProps = {
 
 function AffiliateListingFormShell({
   eyebrow, title, description, backHref, onBack, backLabel = 'Volver', backDisabled, reviewNote,
-  values, errors, onChange, saving, onSubmit, onSubmitForReview, onOpenPokemonTcg, pokemonTcgSelectedImage, priceNote,
+  values, errors, onChange, saving, onSubmit, onSubmitForReview, onOpenPokemonTcg, onApplyPrice, pokemonTcgSelectedImage, priceNote,
   createFiles, onCreateFilesChange, images, onMoveImage, onAltChange, onRemoveImage,
   uploadFiles, onUploadFilesChange, onUpload, imageBusy,
 }: FormShellProps) {
@@ -630,22 +644,25 @@ function AffiliateListingFormShell({
                   <option value="QUANTITY">Por cantidad</option>
                 </select>
               </label>
-              <label>
-                Precio en USD *
-                <input
-                  type="number"
-                  min="0.01"
-                  step="0.01"
-                  inputMode="decimal"
-                  autoComplete="off"
-                  placeholder="Ej. 15.99"
-                  value={values.price}
-                  onChange={(event) => onChange('price', event.target.value)}
-                  required
-                  aria-invalid={Boolean(errors.price)}
-                />
-                <FieldError message={errors.price} />
-              </label>
+              <div>
+                <label>
+                  Precio en USD *
+                  <input
+                    type="number"
+                    min="0.01"
+                    step="0.01"
+                    inputMode="decimal"
+                    autoComplete="off"
+                    placeholder="Ej. 15.99"
+                    value={values.price}
+                    onChange={(event) => onChange('price', event.target.value)}
+                    required
+                    aria-invalid={Boolean(errors.price)}
+                  />
+                  <FieldError message={errors.price} />
+                </label>
+                {values.kind === 'SINGLE_CARD' && <PokemonTcgPricePicker scope="affiliate" cardName={values.name} disabled={saving} onApply={onApplyPrice} />}
+              </div>
               <label>
                 Stock{values.stockMode === 'UNIQUE' ? ' (máx. 1)' : ''}
                 <input

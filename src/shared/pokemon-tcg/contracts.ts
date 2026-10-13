@@ -37,3 +37,22 @@ export const pokemonTcgSearchEnvelopeSchema = z.object({
 
 export type PokemonTcgPagination = z.infer<typeof pokemonTcgPaginationSchema>;
 export type PokemonTcgSearchResult = z.infer<typeof pokemonTcgSearchEnvelopeSchema>;
+
+export const pokemonTcgPriceHistoryPointSchema = z.object({
+  sourceId: z.string().min(1),
+  source: z.string().min(1),
+  currency: z.string().regex(/^[A-Z]{3}$/),
+  variant: z.string().min(1),
+  amountMinor: z.string().regex(/^\d+$/),
+  recordedAt: z.iso.date(),
+  observedAt: z.iso.datetime().nullable(),
+});
+
+export const pokemonTcgPriceHistoryDataSchema = z.object({
+  cardId: z.string().regex(/^[1-9]\d*$/),
+  prices: z.array(pokemonTcgPriceHistoryPointSchema),
+});
+
+export const pokemonTcgPriceHistoryEnvelopeSchema = z.object({ data: pokemonTcgPriceHistoryDataSchema });
+export type PokemonTcgPriceHistoryPoint = z.infer<typeof pokemonTcgPriceHistoryPointSchema>;
+export type PokemonTcgPriceHistoryData = z.infer<typeof pokemonTcgPriceHistoryDataSchema>;

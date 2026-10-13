@@ -6,6 +6,24 @@ import styles from './Dialog.module.css';
 
 const focusableSelector = 'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), summary, [tabindex]:not([tabindex="-1"])';
 
+function dialogFocusables(dialog: HTMLElement) {
+  return Array.from(dialog.querySelectorAll<HTMLElement>(focusableSelector)).filter((element) => {
+    if (element.matches(':disabled') || (element.hasAttribute('tabindex') && element.tabIndex < 0)) return false;
+    const visibility = window.getComputedStyle(element).visibility;
+    if (visibility === 'hidden' || visibility === 'collapse') return false;
+    for (let ancestor: HTMLElement | null = element; ancestor; ancestor = ancestor.parentElement) {
+      if (ancestor.hidden || ancestor.hasAttribute('inert') || ancestor.getAttribute('aria-hidden') === 'true' || window.getComputedStyle(ancestor).display === 'none') return false;
+      // A closed disclosure keeps only its first direct summary in the tab order.
+      if (ancestor !== element && ancestor.tagName === 'DETAILS' && !ancestor.hasAttribute('open')) {
+        const summary = Array.from(ancestor.children).find((child) => child.tagName === 'SUMMARY');
+        if (!summary?.contains(element)) return false;
+      }
+      if (ancestor === dialog) break;
+    }
+    return true;
+  });
+}
+
 export function Dialog({ open, title, onClose, children, className = '', description }: { open: boolean; title: string; onClose: () => void; children: ReactNode; className?: string; description?: string }) {
   const titleId = useId();
   const descriptionId = useId();
@@ -25,8 +43,8 @@ export function Dialog({ open, title, onClose, children, className = '', descrip
     if (window.innerWidth > scrollRoot.clientWidth) scrollRoot.style.scrollbarGutter = 'stable';
     scrollRoot.style.overflow = 'hidden';
     const frame = window.requestAnimationFrame(() => {
-      const first = dialogRef.current?.querySelector<HTMLElement>('[data-dialog-autofocus]')
-        ?? dialogRef.current?.querySelector<HTMLElement>(focusableSelector);
+      const focusable = dialogRef.current ? dialogFocusables(dialogRef.current) : [];
+      const first = focusable.find((element) => element.hasAttribute('data-dialog-autofocus')) ?? focusable[0];
       (first ?? dialogRef.current)?.focus({ preventScroll: true });
     });
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -36,7 +54,7 @@ export function Dialog({ open, title, onClose, children, className = '', descrip
         return;
       }
       if (event.key !== 'Tab' || !dialogRef.current) return;
-      const focusable = Array.from(dialogRef.current.querySelectorAll<HTMLElement>(focusableSelector));
+      const focusable = dialogFocusables(dialogRef.current);
       if (!focusable.length) {
         event.preventDefault();
         dialogRef.current.focus();

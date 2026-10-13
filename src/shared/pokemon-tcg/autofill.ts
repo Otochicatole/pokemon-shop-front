@@ -28,7 +28,7 @@ function normalize(value: string) {
   return value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toUpperCase();
 }
 
-function marketPriceDecimal(price: PokemonTcgMarketPrice | null | undefined) {
+export function marketPriceDecimal(price: PokemonTcgMarketPrice | null | undefined) {
   if (!price || price.currency !== 'USD' || !/^\d+$/.test(price.amountMinor)) return null;
   const minor = BigInt(price.amountMinor);
   if (minor <= 0n) return null;
@@ -57,7 +57,7 @@ export function pokemonTcgAutofill(card: AutofillCard) {
   };
 }
 
-export function pokemonTcgPriceNote(card: AutofillCard) {
+export function pokemonTcgPriceNote(card: Pick<AutofillCard, 'marketPrice'>) {
   const price = marketPriceDecimal(card.marketPrice);
   const updatedAt = card.marketPrice?.updatedAt ? new Date(card.marketPrice.updatedAt) : null;
   const dateNote = updatedAt && Number.isFinite(updatedAt.getTime())
