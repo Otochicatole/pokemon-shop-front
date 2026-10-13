@@ -17,12 +17,17 @@ export function Dialog({ open, title, onClose, children, className = '', descrip
   useEffect(() => {
     if (!open) return;
     const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
+    // Lock the viewport: locking body makes it a new scroll container and
+    // displaces sticky sidebars when the document is already scrolled.
+    const scrollRoot = document.documentElement;
+    const previousOverflow = scrollRoot.style.overflow;
+    const previousGutter = scrollRoot.style.scrollbarGutter;
+    if (window.innerWidth > scrollRoot.clientWidth) scrollRoot.style.scrollbarGutter = 'stable';
+    scrollRoot.style.overflow = 'hidden';
     const frame = window.requestAnimationFrame(() => {
       const first = dialogRef.current?.querySelector<HTMLElement>('[data-dialog-autofocus]')
         ?? dialogRef.current?.querySelector<HTMLElement>(focusableSelector);
-      (first ?? dialogRef.current)?.focus();
+      (first ?? dialogRef.current)?.focus({ preventScroll: true });
     });
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
@@ -51,8 +56,9 @@ export function Dialog({ open, title, onClose, children, className = '', descrip
     return () => {
       window.cancelAnimationFrame(frame);
       document.removeEventListener('keydown', handleKeyDown);
-      document.body.style.overflow = previousOverflow;
-      previousFocus?.focus();
+      scrollRoot.style.overflow = previousOverflow;
+      scrollRoot.style.scrollbarGutter = previousGutter;
+      previousFocus?.focus({ preventScroll: true });
     };
   }, [open]);
 
