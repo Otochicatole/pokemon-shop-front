@@ -1,0 +1,192 @@
+.gallery { min-width: 0; }
+.gallery :global(.dialog-backdrop) { z-index: 300; }
+.figure { margin: 0; }
+
+.mainImage {
+  position: relative;
+  height: clamp(500px, 48vw, 640px);
+  border: 1px solid var(--line-strong);
+  background: #0c1218;
+}
+
+.expandImage {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: zoom-in;
+}
+
+.expandImage img { padding: 22px 22px 62px; object-fit: contain; }
+
+.zoomHint {
+  position: absolute;
+  left: 50%;
+  bottom: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: max-content;
+  max-width: calc(100% - 24px);
+  transform: translateX(-50%);
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.expandImage:hover .zoomHint,
+.expandImage:focus-visible .zoomHint { color: var(--accent); }
+
+.counter {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  padding: 5px 9px;
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
+
+.caption {
+  margin: 12px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.thumbnails { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+
+.thumbnail {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 76px;
+  height: 94px;
+  padding: 0;
+  border: 1px solid var(--line);
+  background: #0c1218;
+  color: var(--muted);
+}
+
+.thumbnail img { padding: 5px; object-fit: contain; }
+.thumbnail:hover, .thumbnail.active { border-color: var(--accent); }
+.thumbnail.active { box-shadow: inset 0 -3px var(--accent); }
+
+.sku {
+  display: flex;
+  gap: 8px;
+  margin: 14px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.sku span { min-width: 0; }
+
+.emptyImage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 12px;
+  height: 100%;
+  padding: 24px;
+  color: var(--muted);
+  text-align: center;
+  font-size: 14px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.emptyImage strong { color: var(--ink); font-size: 16px; }
+
+.zoomDialog.zoomDialog {
+  display: flex;
+  flex-direction: column;
+  width: min(100%, 980px);
+  height: min(92dvh, 1000px);
+  max-height: 92dvh;
+  padding: 24px;
+  overflow: hidden;
+  background: var(--paper);
+}
+
+.zoomDialog.zoomDialog > h2 {
+  padding-right: 42px;
+  font-family: inherit;
+  font-size: 20px;
+  font-weight: 800;
+  text-transform: none;
+}
+.zoomDialog.zoomDialog :global(.dialog-close) { width: 44px; height: 44px; }
+.zoomContent { display: flex; flex: 1; flex-direction: column; min-height: 0; margin-top: 18px; }
+
+.zoomToolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  gap: 12px;
+  margin-bottom: 12px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.zoomViewport {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+.zoomFigure {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+.zoomFigureEnlarged { width: 200%; height: 200%; }
+.zoomFigure img { object-fit: contain; }
+
+.zoomControls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 18px;
+  color: var(--muted);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.zoomControls button,
+.zoomToolbar button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 9px 12px;
+  border: 1px solid var(--line-strong);
+  background: var(--surface);
+  color: var(--ink);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.zoomControls button:hover,
+.zoomToolbar button:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+
+@media (max-width: 800px) {
+  .mainImage { height: clamp(360px, 100vw, 560px); }
+  .expandImage img { padding: 16px 16px 55px; }
+  .zoomDialog.zoomDialog { padding: 18px 14px; }
+  .zoomDialog.zoomDialog > h2 { font-size: 18px; }
+  .zoomToolbar { align-items: flex-start; }
+  .zoomToolbar > span { max-width: 17ch; }
+}
