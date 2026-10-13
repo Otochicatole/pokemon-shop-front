@@ -131,9 +131,74 @@ describe('Pokémon TCG search dialog', () => {
   });
 
   it('preserves every listing field through both admin and affiliate response schemas', () => {
+    const meta = { page: 1, limit: 20, total: 1, totalPages: 1 };
     for (const schema of [adminSearchSchema, affiliateSearchSchema]) {
-      const parsed = schema.parse({ data: [card] });
+      const parsed = schema.parse({ data: [card], meta });
       expect(parsed.data).toEqual([card]);
+      expect(parsed.meta).toEqual(meta);
     }
+  });
+
+  it('shows the real total and visible range, and navigates without starting another search', async () => {
+    const user = userEvent.setup();
+    const cards = Array.from({ length: 20 }, (_, index) => ({ ...card, id: String(index) }));
+    const values = props({ cards, page: 1, pagination: { page: 1, limit: 20, total: 61, totalPages: 4 }, onPageChange: vi.fn() });
+    const view = render(<PokemonTcgSearchDialog {...values} />);
+    const navigation = screen.getByRole('navigation', { name: 'Páginas de resultados' });
+    expect(screen.getByRole('status')).toHaveTextContent('61 cartas encontradas');
+    expect(screen.getByRole('status')).toHaveTextContent('Mostrando 1–20 de 61');
+    expect(navigation).toHaveTextContent('Página 1 de 4');
+    expect(within(navigation).getByRole('button', { name: 'Anterior' })).toBeDisabled();
+    await user.click(within(navigation).getByRole('button', { name: 'Siguiente' }));
+    expect(values.onPageChange).toHaveBeenLastCalledWith(2);
+    expect(values.onSearch).not.toHaveBeenCalled();
+
+    view.rerender(<PokemonTcgSearchDialog {...values} page={2} pagination={{ page: 2, limit: 20, total: 61, totalPages: 4 }} />);
+    expect(screen.getByRole('status')).toHaveTextContent('Mostrando 21–40 de 61');
+    expect(navigation).toHaveTextContent('Página 2 de 4');
+    await user.click(within(navigation).getByRole('button', { name: 'Anterior' }));
+    expect(values.onPageChange).toHaveBeenLastCalledWith(1);
+  });
+
+  it('disables forward navigation on the last page and keeps its card selectable', async () => {
+    const user = userEvent.setup();
+    const values = props({ page: 4, pagination: { page: 4, limit: 20, total: 61, totalPages: 4 }, onPageChange: vi.fn() });
+    render(<PokemonTcgSearchDialog {...values} />);
+    expect(screen.getByRole('status')).toHaveTextContent('Mostrando 61–61 de 61');
+    expect(screen.getByRole('button', { name: 'Siguiente' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Anterior' })).toBeEnabled();
+    await user.click(screen.getByRole('button', { name: /Usar carta Rayquaza-EX/ }));
+    expect(values.onSelect).toHaveBeenCalledExactlyOnceWith(card);
+  });
+
+  it('blocks navigation during requests and card selection, hiding matches from the previous page', () => {
+    const values = props({ page: 2, pagination: { page: 1, limit: 20, total: 61, totalPages: 4 }, onPageChange: vi.fn(), isFetching: true });
+    const view = render(<PokemonTcgSearchDialog {...values} />);
+    expect(screen.getByRole('status')).toHaveTextContent('Cargando página 2…');
+    expect(screen.queryByRole('article')).not.toBeInTheDocument();
+    for (const name of ['Anterior', 'Siguiente']) expect(screen.getByRole('button', { name })).toBeDisabled();
+    view.rerender(<PokemonTcgSearchDialog {...values} isFetching={false} loadingId={card.id} />);
+    for (const name of ['Anterior', 'Siguiente']) expect(screen.getByRole('button', { name })).toBeDisabled();
+  });
+
+  it('can retry or go back after a later page fails even when the draft input is empty', async () => {
+    const user = userEvent.setup();
+    const values = props({ input: '', page: 2, cards: [], isError: true, onRetry: vi.fn(), onPageChange: vi.fn() });
+    render(<PokemonTcgSearchDialog {...values} />);
+    expect(screen.getByRole('status')).toHaveTextContent('No se pudo cargar la página 2');
+    expect(screen.getByRole('button', { name: 'Siguiente' })).toBeDisabled();
+    await user.click(screen.getByRole('button', { name: 'Reintentar búsqueda' }));
+    expect(values.onRetry).toHaveBeenCalledOnce();
+    expect(values.onSearch).not.toHaveBeenCalled();
+    await user.click(screen.getByRole('button', { name: 'Anterior' }));
+    expect(values.onPageChange).toHaveBeenCalledExactlyOnceWith(1);
+  });
+
+  it('does not display a page range or navigation for an empty result', () => {
+    render(<PokemonTcgSearchDialog {...props({ cards: [], pagination: { page: 1, limit: 20, total: 0, totalPages: 1 }, onPageChange: vi.fn() })} />);
+    expect(screen.getByRole('status')).toHaveTextContent('0 cartas encontradas');
+    expect(screen.getByText('No encontramos cartas para “Rayquaza”')).toBeVisible();
+    expect(screen.getByRole('status')).not.toHaveTextContent('Mostrando');
+    expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
   });
 });

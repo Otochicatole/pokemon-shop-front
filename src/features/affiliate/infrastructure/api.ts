@@ -92,9 +92,8 @@ export async function reorderAffiliateImages(listingId: string, expectedVersion:
 export async function importAffiliatePokemonTcgImage(listingId: string, expectedVersion: number, imageUrl: string) {
   return data<{ fileIds: string[]; version: number }>(await apiFetch(`/affiliate/listings/${listingId}/pokemon-tcg-image`, { method: 'POST', body: JSON.stringify({ expectedVersion, imageUrl }) }));
 }
-export async function searchAffiliatePokemonTcgCards(query: string) {
-  const response = await apiFetch(`/affiliate/pokemon-tcg/cards?q=${encodeURIComponent(query)}`, {}, pokemonTcgSearchEnvelopeSchema);
-  return response.data;
+export async function searchAffiliatePokemonTcgCards(query: string, page = 1, signal?: AbortSignal) {
+  return apiFetch(`/affiliate/pokemon-tcg/cards?q=${encodeURIComponent(query)}&page=${page}`, { signal }, pokemonTcgSearchEnvelopeSchema);
 }
 export async function getAffiliatePokemonTcgCard(id: string) {
   const response = await apiFetch(`/affiliate/pokemon-tcg/cards/${encodeURIComponent(id)}`, {}, pokemonTcgCardEnvelopeSchema);

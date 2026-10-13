@@ -12,6 +12,7 @@ import { getAdminProduct, getPokemonTcgCard, importPokemonTcgImage, listPokemonT
 import type { PokemonTcgCard, PokemonTcgCardSummary } from '@/features/product-management/domain/contracts';
 import { pokemonTcgAutofill, pokemonTcgPriceNote } from '@/shared/pokemon-tcg/autofill';
 import { PokemonTcgSearchDialog } from '@/shared/pokemon-tcg/search-dialog';
+import { usePokemonTcgSearch } from '@/shared/pokemon-tcg/use-search';
 import { raritySelectOptions, usePokemonTcgRarities } from '@/shared/pokemon-tcg/rarities';
 import { loadSupplier, registerPurchase } from '../application';
 import { purchaseFormSchema, type PurchaseLineFormValues } from '../domain/contracts';
@@ -74,16 +75,10 @@ export function SupplierPurchaseFormView({ supplierId }: { supplierId: string })
   const [items, setItems] = useState<PurchaseLineState[]>([emptyLine()]);
   const [error, setError] = useState<string | null>(null);
   const [pokemonTcgLine, setPokemonTcgLine] = useState<number | null>(null);
-  const [pokemonTcgInput, setPokemonTcgInput] = useState('');
-  const [pokemonTcgQuery, setPokemonTcgQuery] = useState('');
   const [pokemonTcgLoadingId, setPokemonTcgLoadingId] = useState<string | null>(null);
 
-  const pokemonTcgResults = useQuery({
-    queryKey: ['admin', 'pokemon-tcg', 'purchase', pokemonTcgQuery],
-    queryFn: () => searchPokemonTcgCards(pokemonTcgQuery),
-    enabled: pokemonTcgLine !== null && pokemonTcgQuery.length >= 2,
-    staleTime: 60_000,
-  });
+  const pokemonTcgSearch = usePokemonTcgSearch({ open: pokemonTcgLine !== null, scope: 'admin', searchCards: searchPokemonTcgCards });
+  const { input: pokemonTcgInput, setInput: setPokemonTcgInput, query: pokemonTcgQuery, results: pokemonTcgResults } = pokemonTcgSearch;
   const { rarities } = usePokemonTcgRarities(listPokemonTcgRarities);
 
   const save = useMutation({
@@ -128,8 +123,7 @@ export function SupplierPurchaseFormView({ supplierId }: { supplierId: string })
 
   const openPokemonTcg = (index: number) => {
     setPokemonTcgLine(index);
-    setPokemonTcgInput(items[index]?.name ?? '');
-    setPokemonTcgQuery('');
+    pokemonTcgSearch.reset(items[index]?.name ?? '');
   };
 
   const applyPokemonTcgCard = async (summary: PokemonTcgCardSummary) => {
@@ -138,7 +132,7 @@ export function SupplierPurchaseFormView({ supplierId }: { supplierId: string })
     setPokemonTcgLoadingId(summary.id);
     // Cerrar el diálogo primero para que el formulario quede editable de inmediato.
     setPokemonTcgLine(null);
-    setPokemonTcgQuery('');
+    pokemonTcgSearch.reset();
     try {
       const card: PokemonTcgCard = await getPokemonTcgCard(summary.id);
       const generatedSku = `TCG-${card.id.replace(/[^A-Za-z0-9-]/g, '-').toUpperCase()}`.slice(0, 80);
@@ -300,14 +294,13 @@ export function SupplierPurchaseFormView({ supplierId }: { supplierId: string })
         onClose={() => setPokemonTcgLine(null)}
         input={pokemonTcgInput}
         onInputChange={setPokemonTcgInput}
-        onSearch={() => {
-          const query = pokemonTcgInput.trim();
-          if (query.length < 2) return;
-          if (query === pokemonTcgQuery) void pokemonTcgResults.refetch();
-          else setPokemonTcgQuery(query);
-        }}
+        onSearch={pokemonTcgSearch.search}
         query={pokemonTcgQuery}
-        cards={pokemonTcgResults.data}
+        cards={pokemonTcgResults.data?.data}
+        pagination={pokemonTcgResults.data?.meta}
+        page={pokemonTcgSearch.page}
+        onPageChange={pokemonTcgSearch.changePage}
+        onRetry={pokemonTcgSearch.retry}
         isFetching={pokemonTcgResults.isFetching}
         isError={pokemonTcgResults.isError}
         errorMessage={pokemonTcgResults.isError ? adminErrorMessage(pokemonTcgResults.error) : undefined}

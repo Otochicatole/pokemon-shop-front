@@ -22,3 +22,18 @@ export const pokemonTcgCardSummarySchema = z.object({
 
 export type PokemonTcgCardSummary = z.infer<typeof pokemonTcgCardSummarySchema>;
 export type PokemonTcgPrice = z.infer<typeof pokemonTcgPriceSchema>;
+
+export const pokemonTcgPaginationSchema = z.object({
+  page: z.number().int().positive(),
+  limit: z.number().int().positive(),
+  total: z.number().int().nonnegative(),
+  totalPages: z.number().int().nonnegative(),
+});
+
+export const pokemonTcgSearchEnvelopeSchema = z.object({
+  data: z.array(pokemonTcgCardSummarySchema),
+  meta: pokemonTcgPaginationSchema,
+});
+
+export type PokemonTcgPagination = z.infer<typeof pokemonTcgPaginationSchema>;
+export type PokemonTcgSearchResult = z.infer<typeof pokemonTcgSearchEnvelopeSchema>;

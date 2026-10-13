@@ -1,9 +1,9 @@
 'use client';
 
-import { useId, useState } from 'react';
-import { ArrowRight, ChevronDown, ImageOff, LoaderCircle, Search } from 'lucide-react';
+import { useEffect, useId, useRef, useState } from 'react';
+import { ArrowLeft, ArrowRight, ChevronDown, ImageOff, LoaderCircle, Search } from 'lucide-react';
 import { Dialog } from '@/components/overlay/Dialog';
-import type { PokemonTcgCardSummary, PokemonTcgPrice } from './contracts';
+import type { PokemonTcgCardSummary, PokemonTcgPagination, PokemonTcgPrice } from './contracts';
 import styles from './search-dialog.module.css';
 
 type Props = {
@@ -12,7 +12,11 @@ type Props = {
   input: string;
   onInputChange: (value: string) => void;
   onSearch: () => void;
+  onRetry?: () => void;
   query: string;
+  page?: number;
+  pagination?: PokemonTcgPagination;
+  onPageChange?: (page: number) => void;
   cards?: PokemonTcgCardSummary[];
   isFetching: boolean;
   isError: boolean;
@@ -110,11 +114,23 @@ function CardResult({ card, loadingId, onSelect }: Pick<Props, 'loadingId' | 'on
   );
 }
 
-export function PokemonTcgSearchDialog({ open, onClose, input, onInputChange, onSearch, query, cards = [], isFetching, isError, errorMessage, loadingId, onSelect, footerNote }: Props) {
+export function PokemonTcgSearchDialog({ open, onClose, input, onInputChange, onSearch, onRetry, query, page = 1, pagination, onPageChange, cards = [], isFetching, isError, errorMessage, loadingId, onSelect, footerNote }: Props) {
   const inputId = useId();
   const resultsId = useId();
+  const resultsRef = useRef<HTMLDivElement>(null);
   const searched = query.trim().length >= 2;
+  const busy = isFetching || loadingId !== null;
   const searchDisabled = input.trim().length < 2 || isFetching || loadingId !== null;
+  const total = pagination?.total ?? cards.length;
+  const showPagination = searched && onPageChange && ((pagination?.totalPages ?? 0) > 1 || page > 1);
+  const rangeStart = cards.length && pagination ? (pagination.page - 1) * pagination.limit + 1 : 0;
+  const rangeEnd = pagination ? Math.min(total, rangeStart + cards.length - 1) : cards.length;
+  useEffect(() => {
+    if (!open || !resultsRef.current) return;
+    resultsRef.current.scrollTop = 0;
+    const dialog = resultsRef.current.closest<HTMLElement>('[role="dialog"]');
+    if (dialog) dialog.scrollTop = 0;
+  }, [open, query, page]);
   return (
     <Dialog open={open} onClose={onClose} title="Autocompletar carta" className={styles.searchDialog} description="Elegí una carta para completar sus datos, imagen y precio de referencia en USD.">
       <div className={styles.searchBar} role="search" aria-label="Buscar en el catálogo Pokémon TCG">
@@ -127,14 +143,19 @@ export function PokemonTcgSearchDialog({ open, onClose, input, onInputChange, on
         </div>
       </div>
       <div className={styles.resultsHeading} role="status" aria-live="polite">
-        <span>{isFetching ? 'Buscando cartas y precios…' : isError ? 'No se pudo completar la búsqueda' : searched ? `${cards.length} ${cards.length === 1 ? 'carta encontrada' : 'cartas encontradas'} para “${query}”` : 'Catálogo Pokémon TCG'}</span>
-        {searched && !isFetching && !isError && cards.length >= 20 && <span>Se muestran las primeras {cards.length}. Afiná el nombre para ver otras cartas.</span>}
+        <span>{isFetching ? page > 1 ? `Cargando página ${page}…` : 'Buscando cartas y precios…' : isError ? `No se pudo cargar la página ${page}` : searched ? `${total} ${total === 1 ? 'carta encontrada' : 'cartas encontradas'} para “${query}”` : 'Catálogo Pokémon TCG'}</span>
+        {searched && !isFetching && !isError && pagination && cards.length > 0 && <span>Mostrando {rangeStart}–{rangeEnd} de {total}</span>}
       </div>
-      <div id={resultsId} className={styles.results} aria-busy={isFetching}>
+      {showPagination && <nav className={styles.pagination} aria-label="Páginas de resultados">
+        <button type="button" onClick={() => onPageChange(page - 1)} disabled={busy || page <= 1} aria-controls={resultsId}><ArrowLeft size={16} aria-hidden="true" />Anterior</button>
+        <span aria-current="page">Página <strong>{page}</strong>{pagination && pagination.totalPages > 0 ? ` de ${pagination.totalPages}` : ''}</span>
+        <button type="button" onClick={() => onPageChange(page + 1)} disabled={busy || isError || !pagination || page >= pagination.totalPages} aria-controls={resultsId}>Siguiente<ArrowRight size={16} aria-hidden="true" /></button>
+      </nav>}
+      <div ref={resultsRef} id={resultsId} className={styles.results} aria-busy={isFetching}>
         {isFetching ? <div className={styles.emptyState}><LoaderCircle size={28} className={styles.spin} aria-hidden="true" /><p>Consultando el catálogo<span>Buscamos los datos y precios disponibles de cada carta.</span></p></div>
-          : isError ? <div className={styles.errorState} role="alert"><p>{errorMessage || 'No pudimos consultar el catálogo.'}</p><button type="button" onClick={onSearch} disabled={searchDisabled}>Reintentar búsqueda</button></div>
+          : isError ? <div className={styles.errorState} role="alert"><p>{errorMessage || 'No pudimos consultar el catálogo.'}</p><button type="button" onClick={onRetry ?? onSearch} disabled={busy}>Reintentar búsqueda</button></div>
           : !searched ? <div className={styles.emptyState}><Search size={28} aria-hidden="true" /><p>Encontrá la versión exacta<span>Ingresá al menos 2 caracteres. Podrás comparar colección, número, rareza y precios antes de elegir.</span></p></div>
-          : !cards.length ? <div className={styles.emptyState}><Search size={28} aria-hidden="true" /><p>No encontramos cartas para “{query}”<span>Probá con menos palabras o revisá cómo se escribe el nombre.</span></p></div>
+          : !cards.length ? <div className={styles.emptyState}><Search size={28} aria-hidden="true" /><p>{page > 1 ? 'No hay cartas en esta página' : `No encontramos cartas para “${query}”`}<span>{page > 1 ? 'Volvé a la página anterior o realizá una nueva búsqueda.' : 'Probá con menos palabras o revisá cómo se escribe el nombre.'}</span></p></div>
           : cards.map((card) => <CardResult key={card.id} card={card} loadingId={loadingId} onSelect={onSelect} />)}
       </div>
       <p className={styles.footerNote}>{footerNote || 'Los precios varían según el mercado, la variante y la condición. Podés editar el precio de venta.'}</p>

@@ -75,8 +75,8 @@ async function selectCard() {
 describe('Pokémon TCG autocomplete', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(searchPokemonTcgCards).mockResolvedValue([card]);
-    vi.mocked(searchAffiliatePokemonTcgCards).mockResolvedValue([card]);
+    vi.mocked(searchPokemonTcgCards).mockResolvedValue({ data: [card], meta: { page: 1, limit: 20, total: 1, totalPages: 1 } });
+    vi.mocked(searchAffiliatePokemonTcgCards).mockResolvedValue({ data: [card], meta: { page: 1, limit: 20, total: 1, totalPages: 1 } });
     vi.mocked(getAdminProduct).mockResolvedValue(product);
     vi.mocked(createAdminProduct).mockResolvedValue(product);
     vi.mocked(updateAdminProduct).mockResolvedValue({ ...product, version: 2 });
@@ -91,6 +91,36 @@ describe('Pokémon TCG autocomplete', () => {
   ];
 
   for (const editor of editors) {
+    it(`${editor.name}: selects a card from the last page and resets pagination when reopened`, async () => {
+      const search = vi.fn(async (_query: string, page = 1) => ({
+        data: [{ ...card, id: `card-page-${page}`, name: page === 1 ? 'Charizard inicial' : 'Charizard final' }],
+        meta: { page, limit: 20, total: 21, totalPages: 2 },
+      }));
+      vi.mocked(searchPokemonTcgCards).mockImplementation(search);
+      vi.mocked(searchAffiliatePokemonTcgCards).mockImplementation(search);
+      vi.mocked(getPokemonTcgCard).mockResolvedValue(card);
+      vi.mocked(getAffiliatePokemonTcgCard).mockResolvedValue(card);
+      renderEditor(editor.node());
+      fireEvent.click(await screen.findByRole('button', { name: 'Autocompletar con Pokémon TCG' }));
+      fireEvent.change(screen.getByLabelText('Nombre o parte del nombre'), { target: { value: 'Charizard' } });
+      fireEvent.click(screen.getByRole('button', { name: 'Buscar carta' }));
+      await screen.findByRole('button', { name: /Usar carta Charizard inicial/ });
+      fireEvent.change(screen.getByLabelText('Nombre o parte del nombre'), { target: { value: 'Pikachu' } });
+      fireEvent.click(screen.getByRole('button', { name: 'Siguiente' }));
+      fireEvent.click(await screen.findByRole('button', { name: /Usar carta Charizard final/ }));
+      await waitFor(() => expect(screen.getByLabelText(/^Nombre$/)).toHaveValue('Charizard'));
+      expect(search).toHaveBeenLastCalledWith('Charizard', 2, expect.any(AbortSignal));
+      const loadCard = editor.name.startsWith('affiliate') ? getAffiliatePokemonTcgCard : getPokemonTcgCard;
+      expect(loadCard).toHaveBeenCalledWith('card-page-2');
+      fireEvent.click(screen.getByRole('button', { name: 'Autocompletar con Pokémon TCG' }));
+      expect(screen.getByLabelText('Nombre o parte del nombre')).toHaveValue('Charizard');
+      expect(screen.getByText('Encontrá la versión exacta')).toBeInTheDocument();
+      expect(screen.queryByRole('navigation', { name: 'Páginas de resultados' })).not.toBeInTheDocument();
+      fireEvent.click(screen.getByRole('button', { name: 'Buscar carta' }));
+      await screen.findByRole('button', { name: /Usar carta Charizard inicial/ });
+      expect(search).toHaveBeenCalledTimes(2);
+    });
+
     for (const set of [{ setCode: '30C', setName: '30C', rarity: 'Special illustration rare' }, { setCode: 'MEW', setName: '151', rarity: 'None' }]) {
       it(`${editor.name}: displays and saves API rarity, attribute and ${set.setCode}/${set.setName} as separate set fields`, async () => {
         const selected = { ...card, ...set, types: ['Lightning'] };

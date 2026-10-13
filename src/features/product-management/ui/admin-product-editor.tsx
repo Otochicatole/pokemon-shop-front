@@ -15,6 +15,7 @@ import { archiveAdminProduct, createAdminProduct, deleteAdminProduct, getAdminPr
 import { productEditorSchema, type ProductEditorValues, type PokemonTcgCard, type PokemonTcgCardSummary } from '../domain/contracts';
 import { pokemonTcgAutofill, pokemonTcgPriceNote } from '@/shared/pokemon-tcg/autofill';
 import { PokemonTcgSearchDialog } from '@/shared/pokemon-tcg/search-dialog';
+import { usePokemonTcgSearch } from '@/shared/pokemon-tcg/use-search';
 import { raritySelectOptions, usePokemonTcgRarities } from '@/shared/pokemon-tcg/rarities';
 import { selectedSetId, setSelectOptions, usePokemonTcgSets } from '@/shared/pokemon-tcg/sets';
 import styles from './admin-product-editor.module.css';
@@ -38,13 +39,12 @@ export function AdminProductEditor({ productId }: { productId?: string }) {
   const [removeImageId, setRemoveImageId] = useState<string | null>(null);
   const [uploadFiles, setUploadFiles] = useState<File[]>([]);
   const [pokemonTcgOpen, setPokemonTcgOpen] = useState(openPokemonTcgOnLoad);
-  const [pokemonTcgInput, setPokemonTcgInput] = useState('');
-  const [pokemonTcgQuery, setPokemonTcgQuery] = useState('');
   const [pokemonTcgSelectedImage, setPokemonTcgSelectedImage] = useState<string | null>(null);
   const [priceNote, setPriceNote] = useState<string | null>(null);
   const [pokemonTcgLoadingId, setPokemonTcgLoadingId] = useState<string | null>(null);
   const product = useQuery({ queryKey: ['admin', 'product', productId], queryFn: () => getAdminProduct(productId!), enabled: Boolean(productId) });
-  const pokemonTcgResults = useQuery({ queryKey: ['admin', 'pokemon-tcg', pokemonTcgQuery], queryFn: () => searchPokemonTcgCards(pokemonTcgQuery), enabled: pokemonTcgOpen && pokemonTcgQuery.length >= 2, staleTime: 60_000 });
+  const pokemonTcgSearch = usePokemonTcgSearch({ open: pokemonTcgOpen, scope: 'admin', searchCards: searchPokemonTcgCards });
+  const { input: pokemonTcgInput, setInput: setPokemonTcgInput, query: pokemonTcgQuery, results: pokemonTcgResults } = pokemonTcgSearch;
   const { rarities } = usePokemonTcgRarities(listPokemonTcgRarities);
   const { sets } = usePokemonTcgSets(listPokemonTcgSets);
   const form = useForm<ProductEditorValues>({ resolver: zodResolver(productEditorSchema), defaultValues: defaults });
@@ -62,7 +62,7 @@ export function AdminProductEditor({ productId }: { productId?: string }) {
   }, [form, product.data]);
   useEffect(() => { const protect = (event: BeforeUnloadEvent) => { if (form.formState.isDirty) event.preventDefault(); }; window.addEventListener('beforeunload', protect); return () => window.removeEventListener('beforeunload', protect); }, [form.formState.isDirty]);
 
-  const openPokemonTcg = () => { setPokemonTcgInput(form.getValues('name')); setPokemonTcgQuery(''); setPokemonTcgOpen(true); };
+  const openPokemonTcg = () => { pokemonTcgSearch.reset(form.getValues('name')); setPokemonTcgOpen(true); };
   const applyPokemonTcgCard = async (summary: PokemonTcgCardSummary) => {
     setPokemonTcgLoadingId(summary.id);
     try {
@@ -161,14 +161,13 @@ export function AdminProductEditor({ productId }: { productId?: string }) {
       onClose={() => setPokemonTcgOpen(false)}
       input={pokemonTcgInput}
       onInputChange={setPokemonTcgInput}
-      onSearch={() => {
-        const query = pokemonTcgInput.trim();
-        if (query.length < 2) return;
-        if (query === pokemonTcgQuery) void pokemonTcgResults.refetch();
-        else setPokemonTcgQuery(query);
-      }}
+      onSearch={pokemonTcgSearch.search}
       query={pokemonTcgQuery}
-      cards={pokemonTcgResults.data}
+      cards={pokemonTcgResults.data?.data}
+      pagination={pokemonTcgResults.data?.meta}
+      page={pokemonTcgSearch.page}
+      onPageChange={pokemonTcgSearch.changePage}
+      onRetry={pokemonTcgSearch.retry}
       isFetching={pokemonTcgResults.isFetching}
       isError={pokemonTcgResults.isError}
       errorMessage={pokemonTcgResults.isError ? adminErrorMessage(pokemonTcgResults.error) : undefined}

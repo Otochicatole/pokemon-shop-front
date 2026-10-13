@@ -69,6 +69,23 @@
   font-weight: 700;
 }
 .resultsHeading > span + span { color: var(--muted); font-size: 12px; font-weight: 400; }
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-shrink: 0;
+  margin-bottom: 12px;
+  padding: 8px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+}
+.pagination > span { color: var(--muted); font-size: 13px; text-align: center; font-variant-numeric: tabular-nums; }
+.pagination strong { color: var(--ink); }
+.pagination button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 8px 12px; border: 1px solid var(--line-strong); background: var(--paper); color: var(--ink); font-size: 13px; font-weight: 700; }
+.pagination button:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+.pagination button:disabled { opacity: .5; cursor: not-allowed; }
 .results {
   display: flex;
   flex-direction: column;
@@ -152,6 +169,10 @@
   .searchControls { flex-wrap: wrap; gap: 8px; }
   .searchButton { width: 100%; }
   .resultsHeading { margin-top: 20px; }
+  .pagination { position: sticky; top: -1px; z-index: 2; gap: 8px; padding: 8px 0; }
+  .pagination button { gap: 4px; padding: 8px; }
+  .pagination button > svg { display: none; }
+  .pagination > span { font-size: 12px; }
   .results { flex-shrink: 0; overflow: visible; padding: 3px; margin-right: -3px; scrollbar-gutter: auto; }
   .result { grid-template-columns: 80px minmax(0, 1fr); gap: 16px; padding: 16px; }
   .artwork { grid-column: 1; grid-row: 1; }

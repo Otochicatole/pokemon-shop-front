@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, Check, CheckCircle2, ImagePlus, Save, Search, Upload } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
@@ -32,6 +32,7 @@ import {
 } from '../infrastructure/api';
 import { pokemonTcgAutofill, pokemonTcgPriceNote } from '@/shared/pokemon-tcg/autofill';
 import { PokemonTcgSearchDialog } from '@/shared/pokemon-tcg/search-dialog';
+import { usePokemonTcgSearch } from '@/shared/pokemon-tcg/use-search';
 import { raritySelectOptions, usePokemonTcgRarities } from '@/shared/pokemon-tcg/rarities';
 import { selectedSetId, setSelectOptions, usePokemonTcgSets } from '@/shared/pokemon-tcg/sets';
 import styles from './affiliate-portal.module.css';
@@ -158,22 +159,15 @@ export function AffiliateListingCreateForm() {
   const [files, setFiles] = useState<File[]>([]);
   const draft = useListingDraft(defaults);
   const [pokemonTcgOpen, setPokemonTcgOpen] = useState(false);
-  const [pokemonTcgInput, setPokemonTcgInput] = useState('');
-  const [pokemonTcgQuery, setPokemonTcgQuery] = useState('');
   const [pokemonTcgSelectedImage, setPokemonTcgSelectedImage] = useState<string | null>(null);
   const [priceNote, setPriceNote] = useState<string | null>(null);
   const [pokemonTcgLoadingId, setPokemonTcgLoadingId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
-  const pokemonTcgResults = useQuery({
-    queryKey: ['affiliate', 'pokemon-tcg', pokemonTcgQuery],
-    queryFn: () => searchAffiliatePokemonTcgCards(pokemonTcgQuery),
-    enabled: pokemonTcgOpen && pokemonTcgQuery.length >= 2,
-    staleTime: 60_000,
-  });
+  const pokemonTcgSearch = usePokemonTcgSearch({ open: pokemonTcgOpen, scope: 'affiliate', searchCards: searchAffiliatePokemonTcgCards });
+  const { input: pokemonTcgInput, setInput: setPokemonTcgInput, query: pokemonTcgQuery, results: pokemonTcgResults } = pokemonTcgSearch;
 
   const openPokemonTcg = () => {
-    setPokemonTcgInput(draft.values.name);
-    setPokemonTcgQuery('');
+    pokemonTcgSearch.reset(draft.values.name);
     setPokemonTcgOpen(true);
   };
 
@@ -258,14 +252,13 @@ export function AffiliateListingCreateForm() {
         onClose={() => setPokemonTcgOpen(false)}
         input={pokemonTcgInput}
         onInputChange={setPokemonTcgInput}
-        onSearch={() => {
-          const query = pokemonTcgInput.trim();
-          if (query.length < 2) return;
-          if (query === pokemonTcgQuery) void pokemonTcgResults.refetch();
-          else setPokemonTcgQuery(query);
-        }}
+        onSearch={pokemonTcgSearch.search}
         query={pokemonTcgQuery}
-        cards={pokemonTcgResults.data}
+        cards={pokemonTcgResults.data?.data}
+        pagination={pokemonTcgResults.data?.meta}
+        page={pokemonTcgSearch.page}
+        onPageChange={pokemonTcgSearch.changePage}
+        onRetry={pokemonTcgSearch.retry}
         isFetching={pokemonTcgResults.isFetching}
         isError={pokemonTcgResults.isError}
         errorMessage={pokemonTcgResults.isError ? dataError(pokemonTcgResults.error) : undefined}
@@ -287,8 +280,6 @@ export function AffiliateListingEditForm({ listing, onSaved }: { listing: Affili
   const [removeImageId, setRemoveImageId] = useState<string | null>(null);
   const draft = useListingDraft(() => valuesFromListing(listing));
   const [pokemonTcgOpen, setPokemonTcgOpen] = useState(false);
-  const [pokemonTcgInput, setPokemonTcgInput] = useState('');
-  const [pokemonTcgQuery, setPokemonTcgQuery] = useState('');
   const [pokemonTcgSelectedImage, setPokemonTcgSelectedImage] = useState<string | null>(null);
   const [priceNote, setPriceNote] = useState<string | null>(null);
   const [pokemonTcgLoadingId, setPokemonTcgLoadingId] = useState<string | null>(null);
@@ -318,16 +309,11 @@ export function AffiliateListingEditForm({ listing, onSaved }: { listing: Affili
     () => [...listing.product.images].sort((a, b) => a.sortOrder - b.sortOrder),
     [listing.product.images],
   );
-  const pokemonTcgResults = useQuery({
-    queryKey: ['affiliate', 'pokemon-tcg', pokemonTcgQuery],
-    queryFn: () => searchAffiliatePokemonTcgCards(pokemonTcgQuery),
-    enabled: pokemonTcgOpen && pokemonTcgQuery.length >= 2,
-    staleTime: 60_000,
-  });
+  const pokemonTcgSearch = usePokemonTcgSearch({ open: pokemonTcgOpen, scope: 'affiliate', searchCards: searchAffiliatePokemonTcgCards });
+  const { input: pokemonTcgInput, setInput: setPokemonTcgInput, query: pokemonTcgQuery, results: pokemonTcgResults } = pokemonTcgSearch;
 
   const openPokemonTcg = () => {
-    setPokemonTcgInput(draft.values.name);
-    setPokemonTcgQuery('');
+    pokemonTcgSearch.reset(draft.values.name);
     setPokemonTcgOpen(true);
   };
 
@@ -520,14 +506,13 @@ export function AffiliateListingEditForm({ listing, onSaved }: { listing: Affili
         onClose={() => setPokemonTcgOpen(false)}
         input={pokemonTcgInput}
         onInputChange={setPokemonTcgInput}
-        onSearch={() => {
-          const query = pokemonTcgInput.trim();
-          if (query.length < 2) return;
-          if (query === pokemonTcgQuery) void pokemonTcgResults.refetch();
-          else setPokemonTcgQuery(query);
-        }}
+        onSearch={pokemonTcgSearch.search}
         query={pokemonTcgQuery}
-        cards={pokemonTcgResults.data}
+        cards={pokemonTcgResults.data?.data}
+        pagination={pokemonTcgResults.data?.meta}
+        page={pokemonTcgSearch.page}
+        onPageChange={pokemonTcgSearch.changePage}
+        onRetry={pokemonTcgSearch.retry}
         isFetching={pokemonTcgResults.isFetching}
         isError={pokemonTcgResults.isError}
         errorMessage={pokemonTcgResults.isError ? dataError(pokemonTcgResults.error) : undefined}

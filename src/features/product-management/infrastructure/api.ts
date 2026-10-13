@@ -9,7 +9,7 @@ export async function listAdminProducts(query: AdminProductQuery): Promise<{ dat
   return { data: response.data, nextCursor: response.meta.nextCursor };
 }
 export async function getAdminProduct(id: string) { const response = await adminFetch(`/admin/products/${id}`, {}, adminProductDetailEnvelopeSchema); return response.data.product; }
-export async function searchPokemonTcgCards(query: string) { const response = await adminFetch(`/admin/pokemon-tcg/cards?q=${encodeURIComponent(query)}`, {}, pokemonTcgSearchEnvelopeSchema); return response.data; }
+export async function searchPokemonTcgCards(query: string, page = 1, signal?: AbortSignal) { return adminFetch(`/admin/pokemon-tcg/cards?q=${encodeURIComponent(query)}&page=${page}`, { signal }, pokemonTcgSearchEnvelopeSchema); }
 export async function getPokemonTcgCard(id: string) { const response = await adminFetch(`/admin/pokemon-tcg/cards/${encodeURIComponent(id)}`, {}, pokemonTcgCardEnvelopeSchema); return response.data.card; }
 export async function listPokemonTcgRarities() { const response = await adminFetch('/admin/pokemon-tcg/rarities', {}, pokemonTcgRaritiesEnvelopeSchema); return response.data; }
 export async function listPokemonTcgSets() { const response = await adminFetch('/admin/pokemon-tcg/sets', {}, pokemonTcgSetsEnvelopeSchema); return response.data; }
