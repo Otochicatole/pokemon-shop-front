@@ -1,12 +1,11 @@
-/* Migrated from admin.css */
-.adminAutofillNote { display: flex; align-items: center; gap: 8px; margin: -4px 0 18px; padding: 11px 13px; border: 1px solid var(--green); background: rgba(121, 201, 107, .08); color: #d9f1d4; font-size: 13px; }
+.adminAutofillNote { display: flex; align-items: center; gap: 8px; margin: -4px 0 18px; padding: 12px 14px; border: 1px solid color-mix(in srgb, var(--success) 38%, var(--line)); border-radius: 12px; background: color-mix(in srgb, var(--success) 10%, var(--surface)); color: var(--success); font-size: 13px; }
 
 .adminUploadRow { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--line); }
 
-.adminUploadRow > span { flex: 1; color: var(--muted); }
+.adminUploadRow > span { flex: 1; color: var(--muted); font-size: 13px; }
 
 .adminFileTrigger { position: relative; }
 
 .adminVisuallyHiddenFile { width: 1px !important; height: 1px !important; position: absolute; left: 0; bottom: 0; padding: 0 !important; border: 0 !important; opacity: 0; }
 
-.adminFileTrigger:focus-within { outline: 3px solid var(--cyan); outline-offset: 3px; }
+.adminFileTrigger:focus-within { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 10px; }

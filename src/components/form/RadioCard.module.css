@@ -3,7 +3,8 @@
   align-items: start;
   gap: 12px;
   padding: 16px;
-  border: 2px solid var(--line);
+  border: 1px solid var(--line);
+  border-radius: 12px;
   background: var(--surface);
   cursor: pointer;
 }
@@ -19,8 +20,7 @@
 
 .radioCard strong {
   color: var(--ink);
-  font: 11px var(--pixel-font);
-  text-transform: uppercase;
+  font: 600 14px/1.4 var(--body-font);
 }
 
 .radioCard small {

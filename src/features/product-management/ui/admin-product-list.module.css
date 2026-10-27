@@ -7,20 +7,20 @@
   gap: 12px;
   margin-bottom: 14px;
   padding: 12px 16px;
-  border: 2px solid var(--line);
-  background: linear-gradient(145deg, rgba(16, 28, 38, .96), rgba(10, 16, 24, .98));
-  box-shadow: 4px 4px 0 #05070a;
+  border: 1px solid var(--line-strong);
+  border-radius: 14px;
+  background: var(--surface);
 }
 
 .bulkBarCopy {
   margin: 0;
-  color: #dce3e8;
+  color: var(--ink);
   font-size: 14px;
 }
 
 .bulkBarCopy strong {
-  color: var(--cyan);
-  font-weight: 800;
+  color: var(--accent-ink);
+  font-weight: 700;
 }
 
 .bulkBarActions {
@@ -41,9 +41,10 @@
 .selectAll {
   gap: 6px;
   min-height: 28px;
-  padding: 0;
+  padding: 2px 6px;
   border: 1px solid transparent;
-  transition: border-color .14s, background .14s;
+  border-radius: 6px;
+  transition: border-color .14s ease, background-color .14s ease;
 }
 
 .rowCheck {
@@ -53,8 +54,8 @@
 
 .selectAll[data-state='some'],
 .selectAll[data-state='all'] {
-  border-color: rgba(83, 190, 229, .45);
-  background: rgba(83, 190, 229, .08);
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--line));
+  background: color-mix(in srgb, var(--accent) 8%, var(--surface));
 }
 
 .selectAll input,
@@ -63,7 +64,7 @@
   height: 16px;
   margin: 0;
   flex: 0 0 16px;
-  accent-color: var(--cyan);
+  accent-color: var(--accent);
   cursor: pointer;
 }
 
@@ -88,14 +89,14 @@
 
 .selectAllHint {
   color: var(--muted);
-  font: 700 11px/1.2 'Nunito', var(--font-geist), Arial, sans-serif;
+  font: 650 11px/1.2 var(--body-font);
   letter-spacing: .04em;
   text-transform: uppercase;
 }
 
 .selectAllCount {
-  color: var(--cyan);
-  font: 800 11px/1.2 'Nunito', var(--font-geist), Arial, sans-serif;
+  color: var(--accent-ink);
+  font: 700 11px/1.2 var(--data-font);
   letter-spacing: .02em;
   font-variant-numeric: tabular-nums;
 }

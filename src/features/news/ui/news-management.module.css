@@ -1,4 +1,3 @@
-/* Migrated from admin.css */
 .newsToolbar { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, .75fr); align-items: end; }
 
 .newsToolbar :global(.component-field), .newsToolbar :global([class*="adminSearchField"]) { width: 100%; min-width: 0; flex: initial; }
@@ -11,20 +10,21 @@
 
 .newsWindow span:first-child { color: var(--ink); }
 
-.newsToggle.isActive { color: var(--warm); }
+.newsToggle.isActive { color: var(--danger); }
 
-.newsToggle.isInactive { color: var(--green); }
+.newsToggle.isInactive { color: var(--success); }
 
 .newsToggle:hover { border-color: currentColor; }
 
-.newsDelete:hover { border-color: var(--warm); color: var(--warm); }
+.newsDelete:hover { border-color: color-mix(in srgb, var(--danger) 40%, var(--line)); color: var(--danger); }
 
 .newsThumb {
   width: 64px;
   height: 40px;
   flex: 0 0 auto;
   border: 1px solid var(--line);
-  background: #05070a;
+  border-radius: 8px;
+  background: var(--surface-2);
   overflow: hidden;
 }
 
@@ -45,12 +45,13 @@
 
 .coverWarning {
   margin: 0;
-  padding: 8px 10px;
-  border: 1px solid rgba(255, 213, 47, .35);
-  background: rgba(255, 213, 47, .08);
-  color: var(--accent);
+  padding: 10px 12px;
+  border: 1px solid color-mix(in srgb, var(--warning) 38%, var(--line));
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--warning) 10%, var(--surface));
+  color: var(--warning);
   font-size: 12px;
-  line-height: 1.4;
+  line-height: 1.45;
 }
 
 .visuallyHidden {
@@ -75,8 +76,8 @@
 }
 
 .adminNewsDialog :global(h2) {
-  font: 800 20px/1.3 'Nunito', var(--font-geist), Arial, sans-serif;
-  letter-spacing: -.02em;
+  font: 700 22px/1.2 var(--display-font);
+  letter-spacing: -.025em;
   text-transform: none;
   text-shadow: none;
 }
@@ -107,9 +108,10 @@
 .newsFormSection {
   display: grid;
   gap: 12px;
-  padding: 14px;
+  padding: 16px;
   border: 1px solid var(--line);
-  background: rgba(8, 12, 18, .45);
+  border-radius: 14px;
+  background: var(--surface-2);
 }
 
 .newsFormSectionHead {
@@ -119,9 +121,8 @@
 
 .newsFormSectionHead h3 {
   margin: 0;
-  font: 700 12px/1.3 'Nunito', var(--font-geist), Arial, sans-serif;
-  text-transform: uppercase;
-  letter-spacing: .04em;
+  color: var(--ink);
+  font: 650 13px/1.3 var(--body-font);
 }
 
 .newsFormSectionHead p {
@@ -161,8 +162,9 @@
   flex: 1;
   min-height: 100%;
   padding: 12px 14px;
-  border: 2px solid var(--line);
-  background: #0b1118;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
 }
 
 .coverBlock {
@@ -177,11 +179,9 @@
   max-height: 200px;
   display: grid;
   place-items: center;
-  border: 2px dashed var(--line);
-  background:
-    radial-gradient(rgba(83, 190, 229, .08) 0.7px, transparent 0.8px),
-    #05070a;
-  background-size: 8px 8px, auto;
+  border: 1px dashed var(--line-strong);
+  border-radius: 12px;
+  background: var(--surface);
   color: var(--muted);
   overflow: hidden;
 }
@@ -227,12 +227,12 @@
   margin: 0 -28px 0;
   padding: 14px 28px 18px;
   border-top: 1px solid var(--line);
-  background: linear-gradient(180deg, rgba(12, 18, 25, .92), rgba(10, 14, 20, .98));
+  background: var(--surface);
 }
 
 .isDanger {
-  border-color: var(--warm);
-  background: rgba(255, 91, 85, .08);
+  border-color: color-mix(in srgb, var(--danger) 40%, var(--line));
+  background: color-mix(in srgb, var(--danger) 10%, var(--surface));
 }
 
 @media (max-width: 680px) {
@@ -255,10 +255,10 @@
   display: grid;
   gap: 16px;
   margin-bottom: 18px;
-  padding: 16px 18px;
-  border: 2px solid var(--line);
-  background: linear-gradient(145deg, rgba(16, 24, 32, .96), rgba(12, 18, 25, .95));
-  box-shadow: 4px 4px 0 #05070a;
+  padding: 18px 20px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
 }
 
 .newsSettingsHeader {
@@ -275,36 +275,34 @@
 }
 
 .newsSettingsEyebrow {
-  margin: 0;
-  color: var(--accent);
-  font: 8px/1.4 var(--pixel-font);
-  letter-spacing: .06em;
-  text-transform: uppercase;
+  display: none;
 }
 
 .newsSettingsCopy h2 {
   margin: 0;
-  font: 700 15px/1.3 'Nunito', var(--font-geist), Arial, sans-serif;
-  text-transform: uppercase;
+  color: var(--ink);
+  font: 700 18px/1.25 var(--display-font);
+  letter-spacing: -.02em;
+  text-transform: none;
 }
 
 .newsSettingsCopy p {
   margin: 0;
-  max-width: 42ch;
+  max-width: 52ch;
   color: var(--muted);
-  font-size: 13px;
-  line-height: 1.45;
+  font-size: 14px;
+  line-height: 1.5;
 }
 
 .newsSettingsBadge {
   flex: 0 0 auto;
-  padding: 7px 10px;
-  border: 2px solid var(--line-strong);
-  background: rgba(255, 213, 47, .1);
-  color: var(--accent);
-  font: 8px/1 var(--pixel-font);
+  padding: 5px 12px;
+  border: 1px solid color-mix(in srgb, var(--accent) 32%, var(--line));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 10%, var(--surface));
+  color: var(--accent-ink);
+  font: 650 11px/1.3 var(--data-font);
   text-transform: uppercase;
-  box-shadow: 2px 2px 0 #05070a;
 }
 
 .newsSettingsForm {
@@ -320,5 +318,5 @@
 }
 
 .newsSettingsForm :global(.button) {
-  min-height: 42px;
+  min-height: 44px;
 }

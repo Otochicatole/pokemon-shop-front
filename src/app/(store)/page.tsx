@@ -94,18 +94,6 @@ export default async function Home() {
 
       <HomeHero />
 
-      <section className={styles.trustStrip} aria-label="Tipos de productos">
-        <span>
-          <Layers3 size={16} aria-hidden="true" /> Cartas sueltas
-        </span>
-        <span>
-          <Package size={16} aria-hidden="true" /> Productos sellados
-        </span>
-        <span>
-          <Gem size={16} aria-hidden="true" /> Accesorios
-        </span>
-      </section>
-
       <section className={styles.collectionLinks} aria-label="Explorar colecciones">
         {collections.map(({ href, label, icon: Icon, toneClass }) => (
           <Link className={`${styles.collectionLink} ${toneClass}`} href={href} key={label}>

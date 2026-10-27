@@ -10,50 +10,48 @@
 
 .searchDialog:global(.dialog) > h2 {
   padding-right: 48px;
-  font-family: inherit;
-  font-size: 22px;
-  font-weight: 800;
-  line-height: 1.3;
+  font: 700 24px/1.2 var(--display-font);
+  letter-spacing: -0.025em;
   text-transform: none;
 }
 
 .searchDialog:global(.dialog) > p { flex-shrink: 0; }
-.searchDialog :global(.dialog-close) { width: 44px; height: 44px; }
-.searchBar { flex-shrink: 0; margin-top: 24px; }
-.searchBar > label { display: block; margin-bottom: 8px; font-size: 13px; font-weight: 800; }
+.searchDialog :global(.dialog-close) { width: 40px; height: 40px; }
+.searchBar { flex-shrink: 0; margin-top: 20px; }
+.searchBar > label { display: block; margin-bottom: 8px; font-size: 13px; font-weight: 600; color: var(--ink); }
 .searchControls { display: flex; gap: 12px; }
 .searchControls > input {
   width: 100%;
   min-width: 0;
-  min-height: 48px;
-  padding: 12px 14px;
-  border: 2px solid var(--line-strong);
-  border-radius: 0;
-  background: var(--paper);
+  min-height: 44px;
+  padding: 10px 14px;
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  background: var(--surface);
   color: var(--ink);
   font: inherit;
-  font-size: 16px;
+  font-size: 15px;
 }
 .searchControls > input::placeholder { color: var(--muted); opacity: 1; }
 .searchButton, .selectButton {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 8px;
   min-height: 44px;
-  padding: 12px 18px;
-  border: 2px solid var(--accent);
-  border-radius: 0;
+  padding: 10px 18px;
+  border: 1px solid var(--accent);
+  border-radius: 10px;
   background: var(--accent);
   color: var(--accent-dark);
   font: inherit;
   font-size: 14px;
-  font-weight: 800;
+  font-weight: 600;
   white-space: nowrap;
   cursor: pointer;
-  transition: background-color 140ms, border-color 140ms;
+  transition: background-color 140ms, border-color 140ms, color 140ms;
 }
-.searchButton:hover:not(:disabled) { background: #ffe469; border-color: #ffe469; }
+.searchButton:hover:not(:disabled) { background: var(--accent-ink); border-color: var(--accent-ink); }
 .searchButton:disabled, .selectButton:disabled { opacity: .55; cursor: not-allowed; }
 .searchButton:disabled { cursor: default; }
 .resultsHeading {
@@ -66,7 +64,7 @@
   padding: 0 0 12px;
   color: var(--ink);
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 600;
 }
 .resultsHeading > span + span { color: var(--muted); font-size: 12px; font-weight: 400; }
 .pagination {
@@ -83,8 +81,8 @@
 }
 .pagination > span { color: var(--muted); font-size: 13px; text-align: center; font-variant-numeric: tabular-nums; }
 .pagination strong { color: var(--ink); }
-.pagination button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 8px 12px; border: 1px solid var(--line-strong); background: var(--paper); color: var(--ink); font-size: 13px; font-weight: 700; }
-.pagination button:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+.pagination button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 40px; padding: 8px 12px; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--surface); color: var(--ink); font-size: 13px; font-weight: 600; cursor: pointer; }
+.pagination button:hover:not(:disabled) { border-color: var(--ink-soft); background: var(--surface-2); }
 .pagination button:disabled { opacity: .5; cursor: not-allowed; }
 .results {
   display: flex;
@@ -103,16 +101,17 @@
   gap: 18px 24px;
   flex-shrink: 0;
   padding: 20px;
-  border: 1px solid var(--line-strong);
-  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface-2);
   transition: border-color 140ms;
 }
 .result:focus-within { border-color: var(--accent); }
-.artwork { align-self: start; display: grid; place-items: center; aspect-ratio: 112 / 156; background: var(--surface); }
+.artwork { align-self: start; display: grid; place-items: center; aspect-ratio: 112 / 156; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); overflow: hidden; }
 .artwork img { display: block; width: 100%; height: auto; max-height: 160px; object-fit: contain; }
 .noImage { display: flex; flex-direction: column; align-items: center; gap: 10px; color: var(--muted); font-size: 12px; }
 .cardInfo { min-width: 0; }
-.cardInfo h3 { margin: 0 0 18px; color: var(--ink); font-size: 20px; font-weight: 800; line-height: 1.25; overflow-wrap: anywhere; }
+.cardInfo h3 { margin: 0 0 16px; color: var(--ink); font: 700 20px/1.25 var(--display-font); letter-spacing: -0.02em; overflow-wrap: anywhere; }
 .metadata { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px 18px; margin: 0; }
 .metadata > div { min-width: 0; }
 .metadata dt { margin: 0 0 3px; color: var(--muted); font-size: 12px; line-height: 1.4; }
@@ -120,38 +119,38 @@
 .metadata dd.missing { color: var(--muted); font-weight: 400; }
 .quote { display: flex; flex-direction: column; align-items: flex-start; border-left: 1px solid var(--line); padding-left: 20px; }
 .quoteLabel { color: var(--muted); font-size: 12px; }
-.amount { margin-top: 5px; color: var(--ink); font-size: 23px; font-weight: 800; font-variant-numeric: tabular-nums; line-height: 1.3; overflow-wrap: anywhere; }
+.amount { margin-top: 5px; color: var(--ink); font: 700 22px/1.3 var(--data-font); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
 .quoteSource { margin-top: 6px; font-size: 12px; line-height: 1.4; }
 .quoteDate { margin-top: 4px; color: var(--muted); font-size: 12px; }
-.selectButton { width: 100%; margin-top: 20px; padding: 10px 12px; background: transparent; color: var(--accent); }
-.selectButton:hover:not(:disabled) { background: var(--accent); color: var(--accent-dark); }
+.selectButton { width: 100%; margin-top: 20px; padding: 10px 12px; background: var(--surface); border-color: var(--line-strong); color: var(--ink); }
+.selectButton:hover:not(:disabled) { background: var(--accent); border-color: var(--accent); color: var(--accent-dark); }
 .priceTrigger { margin-top: 8px; }
-.historyToggle { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; width: 100%; margin-top: 8px; padding: 8px 0; border: 0; background: transparent; color: var(--cyan); font-size: 13px; font-weight: 700; text-align: left; }
+.historyToggle { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 40px; width: 100%; margin-top: 8px; padding: 8px 0; border: 0; background: transparent; color: var(--accent-ink); font-size: 13px; font-weight: 600; text-align: left; cursor: pointer; }
 .historyToggle svg { flex-shrink: 0; }
 .historyToggle:hover { text-decoration: underline; text-underline-offset: 3px; }
 .historyDialog:global(.dialog) { height: min(92dvh, 960px); padding-top: 22px; }
 .historyDialog:global(.dialog) > h2 { padding-right: 230px; }
-.backButton { position: absolute; top: 17px; right: 84px; display: inline-flex; align-items: center; align-self: flex-start; gap: 8px; flex-shrink: 0; min-height: 44px; padding: 8px 0; border: 0; background: transparent; color: var(--cyan); font: inherit; font-size: 13px; font-weight: 700; }
+.backButton { position: absolute; top: 17px; right: 84px; display: inline-flex; align-items: center; align-self: flex-start; gap: 8px; flex-shrink: 0; min-height: 40px; padding: 8px 0; border: 0; background: transparent; color: var(--accent-ink); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
 .backButton:hover { text-decoration: underline; text-underline-offset: 3px; }
 .historyCard { display: grid; grid-template-columns: 48px minmax(0, 1fr) auto; align-items: center; gap: 14px; flex-shrink: 0; padding: 16px 0; border-bottom: 1px solid var(--line); }
 .historyCard .artwork { grid-column: 1; grid-row: 1; align-self: center; }
 .historyCard .noImage { gap: 4px; font-size: 10px; text-align: center; }
 .historyIdentity { min-width: 0; }
-.historyIdentity h3 { margin: 0 0 4px; font-size: 19px; font-weight: 800; line-height: 1.3; overflow-wrap: anywhere; }
+.historyIdentity h3 { margin: 0 0 4px; font-size: 18px; font-weight: 700; line-height: 1.3; overflow-wrap: anywhere; }
 .historyIdentity p { margin: 0; color: var(--ink); font-size: 13px; overflow-wrap: anywhere; }
 .historyIdentity > span { display: block; margin-top: 3px; color: var(--muted); font-size: 12px; }
 .currentQuote { display: grid; grid-template-columns: auto auto; align-items: center; gap: 3px 18px; padding-left: 18px; border-left: 1px solid var(--line); }
 .currentQuote > span { grid-column: 1; color: var(--muted); font-size: 12px; }
-.currentQuote > strong { grid-column: 1; font-size: 22px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.currentQuote > strong { grid-column: 1; font: 700 20px/1.2 var(--data-font); font-variant-numeric: tabular-nums; }
 .currentQuote > button { grid-column: 2; grid-row: 1 / 4; }
 .historyBody { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; padding: 18px 8px 3px 3px; margin-left: -3px; }
-.tableApply { min-height: 44px; padding: 8px 12px; border: 1px solid var(--accent); background: transparent; color: var(--accent); font-weight: 700; }
-.tableApply:hover { background: var(--accent); color: var(--accent-dark); }
+.tableApply { min-height: 38px; padding: 8px 12px; border: 1px solid var(--line-strong); border-radius: 8px; background: var(--surface); color: var(--ink); font-weight: 600; cursor: pointer; }
+.tableApply:hover { background: var(--accent); border-color: var(--accent); color: var(--accent-dark); }
 .currencyNote { color: var(--muted); }
-.noPrice { margin: 8px 0 0; color: var(--ink); font-size: 15px; font-weight: 700; line-height: 1.4; }
+.noPrice { margin: 8px 0 0; color: var(--ink); font-size: 15px; font-weight: 600; line-height: 1.4; }
 .noPrice > span { display: block; margin-top: 6px; color: var(--muted); font-size: 12px; font-weight: 400; }
 .priceDetails { grid-column: 2 / -1; border-top: 1px solid var(--line); }
-.priceDetails summary { display: flex; align-items: center; gap: 8px; min-height: 44px; color: var(--cyan); font-size: 13px; font-weight: 700; cursor: pointer; list-style: none; }
+.priceDetails summary { display: flex; align-items: center; gap: 8px; min-height: 44px; color: var(--accent-ink); font-size: 13px; font-weight: 600; cursor: pointer; list-style: none; }
 .priceDetails summary::-webkit-details-marker { display: none; }
 .priceDetails summary > svg { flex-shrink: 0; transition: transform 140ms; }
 .priceDetails[open] summary > svg { transform: rotate(180deg); }
@@ -161,15 +160,15 @@
 .priceTable caption { padding: 0 0 12px; color: var(--muted); font-size: 12px; line-height: 1.5; text-align: left; }
 .priceTable th, .priceTable td { padding: 10px 12px 10px 0; border-top: 1px solid var(--line); vertical-align: top; }
 .priceTable thead th { color: var(--muted); font-weight: 600; }
-.priceTable tbody th { min-width: 120px; font-weight: 700; }
+.priceTable tbody th { min-width: 120px; font-weight: 600; }
 .priceTable tbody th > span { display: block; margin-top: 3px; font-weight: 400; }
 .priceTable td { white-space: nowrap; }
-.emptyState, .errorState { display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 40px 24px; border: 1px dashed var(--line-strong); color: var(--muted); text-align: center; }
-.emptyState p { margin: 0; color: var(--ink); font-size: 17px; font-weight: 700; }
+.emptyState, .errorState { display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 40px 24px; border: 1px dashed var(--line-strong); border-radius: 12px; background: var(--surface-2); color: var(--muted); text-align: center; }
+.emptyState p { margin: 0; color: var(--ink); font-size: 17px; font-weight: 600; }
 .emptyState p > span { display: block; max-width: 450px; margin-top: 10px; color: var(--muted); font-size: 14px; font-weight: 400; line-height: 1.6; }
-.errorState { border-color: var(--warm); color: var(--ink); }
+.errorState { border-color: color-mix(in srgb, var(--warm) 35%, var(--line)); background: color-mix(in srgb, var(--warm) 8%, var(--surface)); color: var(--ink); }
 .errorState p { margin: 0; }
-.errorState button { min-height: 44px; padding: 10px 16px; border: 1px solid var(--accent); background: transparent; color: var(--accent); font: inherit; cursor: pointer; }
+.errorState button { min-height: 40px; padding: 10px 16px; border: 1px solid var(--accent); border-radius: 10px; background: var(--surface); color: var(--accent-ink); font: inherit; font-weight: 600; cursor: pointer; }
 .searchDialog:global(.dialog) > .footerNote { margin-top: 14px; padding: 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
 .spin { animation: spin 1s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }

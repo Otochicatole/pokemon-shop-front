@@ -1,21 +1,20 @@
 .button {
-  min-height: 46px;
-  border: 2px solid var(--line-strong);
-  border-radius: 0;
-  padding: 0 17px;
+  min-height: 44px;
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  padding: 10px 18px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  font: 9px var(--pixel-font);
-  text-transform: uppercase;
-  transition: transform .16s, background .16s, color .16s;
+  font: 650 14px/1.25 var(--body-font);
+  letter-spacing: 0;
+  transition: transform .18s ease, background-color .18s ease, color .18s ease, border-color .18s ease, box-shadow .18s ease;
   cursor: pointer;
 }
 
-.button:hover:not(:disabled) {
-  transform: translate(-2px, -2px);
-  box-shadow: 4px 4px 0 #05070a;
+.button:active:not(:disabled) {
+  transform: scale(.98);
 }
 
 .button:disabled {
@@ -26,21 +25,25 @@
 .primary {
   border-color: var(--accent);
   background: var(--accent);
-  color: #080a0e;
+  color: var(--accent-dark);
+  box-shadow: 0 7px 18px rgb(120 23 33 / 15%);
 }
 
 .primary:hover:not(:disabled) {
-  background: #ffe36e;
+  border-color: var(--accent-hover);
+  background: var(--accent-hover);
+  box-shadow: 0 9px 22px rgb(120 23 33 / 21%);
 }
 
 .secondary {
-  background: var(--surface);
+  border-color: var(--line-strong);
+  background: var(--surface-2);
   color: var(--ink);
 }
 
 .secondary:hover:not(:disabled) {
-  border-color: var(--accent);
-  color: var(--accent);
+  border-color: var(--line-strong);
+  background: var(--surface-raised);
 }
 
 .ghost {
@@ -49,8 +52,18 @@
   color: var(--muted);
 }
 
+.ghost:hover:not(:disabled) {
+  color: var(--ink);
+  background: var(--surface-2);
+}
+
 .danger {
-  border-color: var(--warm);
-  background: rgba(255, 91, 85, .12);
-  color: var(--warm);
+  border-color: color-mix(in srgb, var(--danger) 42%, var(--line));
+  background: color-mix(in srgb, var(--danger) 12%, var(--surface));
+  color: var(--danger);
+}
+
+.danger:hover:not(:disabled) {
+  border-color: var(--danger);
+  background: color-mix(in srgb, var(--danger) 18%, var(--surface));
 }

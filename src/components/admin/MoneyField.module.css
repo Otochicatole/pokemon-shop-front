@@ -10,13 +10,18 @@
   display: grid;
   place-items: center;
   padding: 0 12px;
-  border: 2px solid var(--line);
+  border: 1px solid var(--line-strong);
   border-right: 0;
-  background: var(--accent);
-  color: #05070a;
-  font: 700 12px/1.4 'Nunito', var(--font-geist), Arial, sans-serif;
+  border-radius: 10px 0 0 10px;
+  background: var(--surface-2);
+  color: var(--muted);
+  font: 650 12px/1.4 var(--data-font);
 }
 
 .adminMoneyInput input {
   width: 100%;
+  border-top-left-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+  font-family: var(--data-font) !important;
+  font-variant-numeric: tabular-nums;
 }

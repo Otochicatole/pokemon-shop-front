@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
-import { ShieldCheck } from 'lucide-react';
 import { AdminLoginForm, getAdminServerSession } from '@/features/admin-auth';
+import { config } from '@/shared/config/env';
 
 import styles from './page.module.css';
 import shell from '@/components/admin/AdminShell.module.css';
@@ -15,11 +15,9 @@ export default async function AdminLoginPage({ searchParams }: { searchParams: P
     <main className={styles.adminLoginPage}>
       <section className={styles.adminLoginIntro}>
         <div className={shell.adminBrand}>
-          <span className={shell.adminBrandMark}>
-            <ShieldCheck size={21} aria-hidden="true" />
-          </span>
+          <span className={shell.adminBrandMark} aria-hidden="true" />
           <span>
-            Card Shop
+            {config.storeName}
             <small>Control central</small>
           </span>
         </div>

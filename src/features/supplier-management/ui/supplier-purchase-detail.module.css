@@ -20,9 +20,10 @@
 }
 
 .itemCard {
-  padding: 16px;
-  border: 2px solid var(--line);
-  background: rgba(10, 16, 22, .9);
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface-2);
 }
 
 .itemHeader {
@@ -33,7 +34,7 @@
   gap: 12px;
   margin-bottom: 14px;
   padding-bottom: 12px;
-  border-bottom: 1px dashed var(--line);
+  border-bottom: 1px solid var(--line);
 }
 
 .itemTitle {
@@ -49,15 +50,15 @@
 }
 
 .itemTitle strong {
-  font: 700 11px/1.4 'Nunito', var(--font-geist), Arial, sans-serif;
+  font: 650 11px/1.4 var(--data-font);
   text-transform: uppercase;
   color: var(--muted);
 }
 
 .itemTitle h3 {
   margin: 0;
-  font-size: 16px;
-  line-height: 1.35;
+  color: var(--ink);
+  font: 700 17px/1.3 var(--display-font);
   overflow-wrap: anywhere;
 }
 
@@ -67,7 +68,8 @@
   height: 76px;
   flex: 0 0 auto;
   border: 1px solid var(--line);
-  background: #05070a;
+  border-radius: 8px;
+  background: var(--surface);
   object-fit: contain;
 }
 
@@ -83,7 +85,7 @@
 
 .itemColumns h4 {
   margin: 0 0 10px;
-  font: 700 12px/1.4 'Nunito', var(--font-geist), Arial, sans-serif;
+  font: 650 12px/1.4 var(--body-font);
   text-transform: uppercase;
   color: var(--muted);
 }
@@ -94,10 +96,9 @@
   justify-content: space-between;
   gap: 12px;
   margin-top: 14px;
-  padding-top: 12px;
-  border-top: 2px solid var(--line);
-  font: 700 13px/1.4 'Nunito', var(--font-geist), Arial, sans-serif;
-  text-transform: uppercase;
+  padding-top: 14px;
+  border-top: 1px solid var(--line-strong);
+  font: 650 14px/1.4 var(--body-font);
 }
 
 .errorActions {

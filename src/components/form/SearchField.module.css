@@ -1,25 +1,29 @@
 .searchBox {
   flex: 1;
   max-width: 560px;
-  min-height: 48px;
-  border: 2px solid var(--line);
+  min-height: 46px;
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
   background: var(--surface);
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 0 14px;
   color: var(--muted);
+  transition: border-color .18s ease, box-shadow .18s ease;
 }
 
 .searchBox:focus-within {
   border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgb(173 32 45 / 14%);
 }
 
 .searchBox input {
   width: 100%;
-  border: 0;
-  outline: 0;
-  background: none;
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+  background: none !important;
   color: var(--ink);
-  font-size: 13px;
+  font-size: 14px;
 }

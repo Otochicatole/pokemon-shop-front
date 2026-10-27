@@ -1,26 +1,38 @@
 @import "tailwindcss";
 
 :root {
-  --ink: #f4f6f7;
-  --muted: #93a0ad;
-  --paper: #070a0f;
-  --surface: #10161d;
-  --surface-2: #161e27;
-  --line: #2b3947;
-  --line-strong: #47596a;
-  --accent: #ffd52f;
-  --accent-dark: #1d1a08;
-  --warm: #ff5b55;
-  --cyan: #53bee5;
-  --green: #79c96b;
-  --purple: #b77be1;
-  --pixel-font: 'Press Start 2P', monospace;
+  --paper: #f4f0e8;
+  --surface: #fffdf8;
+  --surface-2: #eee9df;
+  --surface-raised: #e6dfd3;
+  --ink: #171615;
+  --muted: #68635d;
+  --line: #ded7cc;
+  --line-strong: #b9ae9f;
+  --accent: #ad202d;
+  --accent-hover: #c52c39;
+  --accent-dark: #fffdf8;
+  --accent-ink: #a51f2b;
+  --success: #397052;
+  --danger: #a51f2b;
+  --warning: #8d651b;
+  --warm: #a51f2b;
+  --cyan: #387789;
+  --green: #397052;
+  --purple: #705b8c;
+  --display-font: 'Palatino Linotype', 'Book Antiqua', Georgia, serif;
+  --body-font: var(--font-geist), 'Nunito', Arial, sans-serif;
+  --data-font: var(--font-mono), ui-monospace, monospace;
+  --pixel-font: var(--display-font);
+  --shadow: 0 18px 48px rgb(35 27 18 / 12%);
+  --border-radius: 14px;
   --scrollbar-size: 10px;
-  --scrollbar-track: #0a0e14;
-  --scrollbar-thumb: #3a4a5a;
-  --scrollbar-thumb-hover: var(--accent);
-  --scrollbar-thumb-active: var(--cyan);
-  --scrollbar-border: #070a0f;
+  --scrollbar-track: #f4f0e8;
+  --scrollbar-thumb: #c2b8aa;
+  --scrollbar-thumb-hover: #8f8578;
+  --scrollbar-thumb-active: var(--accent-hover);
+  --scrollbar-border: #f4f0e8;
+  color-scheme: light;
 }
 
 * {
@@ -37,11 +49,11 @@ body {
   margin: 0;
   background: var(--paper);
   color: var(--ink);
-  font-family: 'Nunito', var(--font-geist), Arial, sans-serif;
-  background-image: radial-gradient(#1c2732 1px, transparent 1px);
-  background-size: 18px 18px;
+  font-family: var(--body-font);
   overflow-x: clip;
   min-width: 0;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 a {
@@ -66,13 +78,13 @@ button:disabled {
 }
 
 :focus-visible {
-  outline: 3px solid var(--accent);
+  outline: 2px solid var(--accent);
   outline-offset: 3px;
 }
 
 ::selection {
-  color: #05070a;
-  background: var(--accent);
+  color: #fff;
+  background: #8f1e2d;
 }
 
 /* Custom scrollbars — store + admin + nested overflow panels */
@@ -244,45 +256,48 @@ button:disabled {
 
 /* Shared interactive primitives used by Links and feature modules */
 .button {
-  min-height: 46px;
-  border: 2px solid var(--line-strong);
-  border-radius: 0;
-  padding: 0 17px;
+  min-height: 44px;
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  padding: 10px 18px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  font: 9px var(--pixel-font);
-  text-transform: uppercase;
-  transition: transform .16s, background .16s, color .16s;
+  font: 650 14px/1.25 var(--body-font);
+  letter-spacing: 0;
+  transition: transform .18s ease, background-color .18s ease, color .18s ease, border-color .18s ease, box-shadow .18s ease;
   cursor: pointer;
   text-decoration: none;
   color: inherit;
 }
 
-.button:hover:not(:disabled) {
-  transform: translate(-2px, -2px);
-  box-shadow: 4px 4px 0 #05070a;
+.button:active:not(:disabled) {
+  transform: scale(.98);
 }
 
 .button-primary {
   border-color: var(--accent);
   background: var(--accent);
-  color: #080a0e;
+  color: var(--accent-dark);
+  box-shadow: 0 7px 18px rgb(120 23 33 / 15%);
 }
 
 .button-primary:hover:not(:disabled) {
-  background: #ffe36e;
+  border-color: var(--accent-hover);
+  background: var(--accent-hover);
+  box-shadow: 0 9px 22px rgb(120 23 33 / 21%);
 }
 
 .button-secondary {
-  background: var(--surface);
+  border-color: var(--line-strong);
+  background: var(--surface-2);
   color: var(--ink);
 }
 
 .button-secondary:hover:not(:disabled) {
-  border-color: var(--accent);
-  color: var(--accent);
+  border-color: var(--line-strong);
+  background: var(--surface-raised);
 }
 
 .button-ghost {
@@ -291,10 +306,20 @@ button:disabled {
   color: var(--muted);
 }
 
+.button-ghost:hover:not(:disabled) {
+  color: var(--ink);
+  background: var(--surface-2);
+}
+
 .button-danger {
-  border-color: var(--warm);
-  background: rgba(255, 91, 85, .12);
-  color: var(--warm);
+  border-color: color-mix(in srgb, var(--danger) 42%, var(--line));
+  background: color-mix(in srgb, var(--danger) 12%, var(--surface));
+  color: var(--danger);
+}
+
+.button-danger:hover:not(:disabled) {
+  border-color: var(--danger);
+  background: color-mix(in srgb, var(--danger) 18%, var(--surface));
 }
 
 .back-link {

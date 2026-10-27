@@ -1,14 +1,123 @@
-.scene { position: relative; display: grid; align-content: center; justify-self: end; width: 100%; max-width: 540px; min-width: 0; }
-.artwork { position: relative; display: grid; place-items: center; aspect-ratio: 1.15; isolation: isolate; overflow: hidden; border: 1px solid var(--line-strong); border-radius: 22px; background-color: var(--surface-2); background-image: linear-gradient(135deg, rgb(244 240 232 / 5%), rgb(23 22 21 / 5%) 42%, rgb(23 22 21 / 24%)), url('https://pocket-pixel-design-system.t3rry327.chatgpt.site/world/kanto-route.png'); background-position: center; background-size: cover; box-shadow: 0 20px 44px rgb(45 36 25 / 14%); }
-.artwork :global([data-pokemon-stage]) { --pokemon-stage-bottom: 5%; --pokemon-platform-height: 46px; --pokemon-contact-line: 20px; width: min(78%, 330px); }
-.companionBar { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 0 24px; padding: 14px 0 2px; border-top: 1px solid var(--line); }
-.caption { display: grid; gap: 3px; }
-.caption strong { font-size: 16px; font-weight: 900; }
-.caption span { font-size: 12px; color: var(--muted); }
-.selector { display: flex; gap: 7px; }
-.selector button { width: 48px; height: 48px; padding: 4px; display: grid; place-items: center; border: 1px solid var(--line-strong); border-radius: 14px; background: var(--surface); transition: transform .18s ease,border-color .18s ease,background-color .18s ease; }
-.selector button:hover { transform: translateY(-2px); }
-.selector button[aria-pressed='true'] { background: color-mix(in srgb,var(--accent) 12%,var(--surface)); border-color: var(--accent); box-shadow: 0 0 0 2px rgb(173 32 45 / 12%); }
-.selector img { width: 36px; height: 36px; object-fit: contain; image-rendering: pixelated; }
-@media(max-width:767px) { .scene { justify-self: center; max-width: 480px; } .artwork { aspect-ratio: 1.35; border-radius: 18px; } .artwork :global([data-pokemon-stage]) { --pokemon-stage-bottom: 4%; --pokemon-platform-height: 28px; --pokemon-contact-line: 12px; width: min(70%, 300px); } .companionBar { margin: 0 4px; padding-top: 14px; } .selector button { width: 46px; height: 46px; } .caption strong { font-size: 16px; } }
-@media(prefers-reduced-motion:reduce) { .selector button { transition: none; } }
+.scene {
+    position: relative;
+    display: grid;
+    align-content: center;
+    justify-self: end;
+    width: 100%;
+    max-width: 540px;
+    min-width: 0;
+}
+
+.artwork {
+    position: relative;
+    display: grid;
+    place-items: center;
+    aspect-ratio: 1.4;
+    isolation: isolate;
+    overflow: hidden;
+}
+
+.artwork :global([data-pokemon-stage]) {
+    --pokemon-stage-bottom: 10%;
+    --pokemon-platform-height: 46px;
+    --pokemon-contact-line: 20px;
+    width: min(78%, 500px);
+}
+
+.companionBar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin: 0 24px;
+    padding: 14px 0 2px;
+    border-top: 1px solid var(--line);
+}
+
+.caption {
+    display: grid;
+    gap: 3px;
+}
+
+.caption strong {
+    font-size: 16px;
+    font-weight: 900;
+}
+
+.caption span {
+    font-size: 12px;
+    color: var(--muted);
+}
+
+.selector {
+    display: flex;
+    gap: 7px;
+}
+
+.selector button {
+    width: 48px;
+    height: 48px;
+    padding: 4px;
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--line-strong);
+    border-radius: 14px;
+    background: var(--surface);
+    transition: transform .18s ease, border-color .22s ease, background-color .22s ease, box-shadow .22s ease;
+}
+
+.selector button:hover {
+    transform: translateY(-2px);
+}
+
+.selector button[aria-pressed='true'] {
+    background: color-mix(in srgb, var(--companion-bg, var(--accent)) 18%, var(--surface));
+    border-color: var(--companion-bg, var(--accent));
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--companion-bg, var(--accent)) 20%, transparent);
+}
+
+.selector img {
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+    image-rendering: pixelated;
+}
+
+@media(max-width:767px) {
+    .scene {
+        justify-self: center;
+        max-width: 480px;
+    }
+
+    .artwork {
+        aspect-ratio: 1.35;
+        border-radius: 18px;
+    }
+
+    .artwork :global([data-pokemon-stage]) {
+        --pokemon-stage-bottom: 4%;
+        --pokemon-platform-height: 28px;
+        --pokemon-contact-line: 12px;
+        width: min(70%, 300px);
+    }
+
+    .companionBar {
+        margin: 0 4px;
+        padding-top: 14px;
+    }
+
+    .selector button {
+        width: 46px;
+        height: 46px;
+    }
+
+    .caption strong {
+        font-size: 16px;
+    }
+}
+
+@media(prefers-reduced-motion:reduce) {
+    .selector button {
+        transition: none;
+    }
+}

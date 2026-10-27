@@ -1,55 +1,71 @@
 .adminStatCard {
   min-height: 132px;
   position: relative;
-  padding: 20px;
-  border: 2px solid var(--line);
-  background: linear-gradient(145deg, rgba(22, 30, 39, .96), rgba(16, 22, 29, .98));
-  box-shadow: 5px 5px 0 #05070a;
+  padding: 20px 22px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
   overflow: hidden;
-  transition: transform .16s, border-color .16s, box-shadow .16s;
+  transition: border-color .18s ease, background-color .18s ease;
 }
 
 .adminStatCard:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: 7px 7px 0 #05070a;
   border-color: var(--line-strong);
-}
-
-.adminStatCard::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 5px;
-  background: currentColor;
 }
 
 .adminStatLabel {
   display: flex;
   align-items: center;
   gap: 8px;
+  color: var(--muted);
+  font: 650 13px/1.4 var(--body-font);
+  letter-spacing: 0;
+}
+
+.adminStatLabel> :first-child {
+  width: 28px;
+  height: 28px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 8px;
+  padding: 4px;
+  background: color-mix(in srgb, currentColor 12%, var(--surface));
   color: currentColor;
-  font: 700 12px/1.5 'Nunito', var(--font-geist), Arial, sans-serif;
-  text-transform: uppercase;
 }
 
-.adminStatCard > strong {
+.adminStatCard>strong {
   display: block;
-  margin-top: 18px;
+  margin-top: 16px;
   color: var(--ink);
-  font: 800 26px/1.2 'Nunito', var(--font-geist), Arial, sans-serif;
+  font: 700 28px/1.15 var(--data-font);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -.02em;
 }
 
-.adminStatCard > small {
+.adminStatCard>small {
   display: block;
-  margin-top: 9px;
+  margin-top: 8px;
   color: var(--muted);
   font-size: 13px;
+  line-height: 1.45;
 }
 
-.toneYellow { color: var(--accent); }
-.toneCyan { color: var(--cyan); }
-.toneGreen { color: var(--green); }
-.toneRed { color: var(--warm); }
-.tonePurple { color: var(--purple); }
+.toneYellow {
+  color: var(--warning);
+}
+
+.toneCyan {
+  color: var(--cyan);
+}
+
+.toneGreen {
+  color: var(--success);
+}
+
+.toneRed {
+  color: var(--danger);
+}
+
+.tonePurple {
+  color: var(--purple);
+}
