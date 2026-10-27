@@ -1,16 +1,16 @@
 .history { grid-column: 1 / -1; min-width: 0; padding-top: 18px; border-top: 1px solid var(--line); color: var(--ink); }
 .history.standalone { padding-top: 0; border-top: 0; }
-.history h4 { margin: 0 0 18px; font-size: 16px; font-weight: 800; line-height: 1.4; }
+.history h4 { margin: 0 0 18px; font-size: 16px; font-weight: 700; line-height: 1.4; }
 .srOnly { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
 .controls { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px 24px; }
 .seriesControl { flex: 1 1 300px; min-width: 0; }
 .seriesControl label, .periodControl legend { display: block; margin: 0 0 8px; padding: 0; color: var(--muted); font-size: 12px; font-weight: 600; }
-.seriesControl select { width: 100%; min-width: 0; min-height: 44px; padding: 10px 36px 10px 12px; border: 1px solid var(--line-strong); border-radius: 0; background-color: var(--surface); color: var(--ink); font: inherit; font-size: 14px; cursor: pointer; }
+.seriesControl select { width: 100%; min-width: 0; min-height: 44px; padding: 10px 36px 10px 12px; border: 1px solid var(--line-strong); border-radius: 10px; background-color: var(--surface); color: var(--ink); font: inherit; font-size: 14px; cursor: pointer; }
 .periodControl { min-width: 0; margin: 0; padding: 0; border: 0; }
 .periodControl > div { display: flex; gap: 8px; }
-.periodControl button { min-height: 44px; min-width: 70px; padding: 10px 14px; border: 1px solid var(--line-strong); border-radius: 8px; background: transparent; color: var(--muted); font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
+.periodControl button { min-height: 40px; min-width: 70px; padding: 8px 14px; border: 1px solid var(--line-strong); border-radius: 8px; background: var(--surface); color: var(--muted); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
 .periodControl button[aria-pressed="true"] { position: relative; border-color: var(--accent); background: var(--accent); color: var(--accent-dark); }
-.periodControl button:hover:not([aria-pressed="true"]) { color: var(--ink); background: var(--surface); }
+.periodControl button:hover:not([aria-pressed="true"]) { color: var(--ink); background: var(--surface-2); }
 .currencyNote, .periodNote { margin: 10px 0 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
 .chartLoading { display: flex; justify-content: center; align-items: center; gap: 10px; height: 360px; color: var(--muted); font-size: 14px; }
 .tableWrap { max-width: 100%; overflow-x: auto; scrollbar-color: var(--line-strong) var(--paper); }
@@ -21,11 +21,11 @@
 .table tbody th { font-weight: 600; white-space: nowrap; }
 .table td { white-space: nowrap; }
 .table th:last-child, .table td:last-child { padding-right: 0; }
-.applyButton, .tableFooter button, .error button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 8px 12px; border: 1px solid var(--line-strong); border-radius: 0; background: transparent; color: var(--ink); font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; }
-.applyButton { color: var(--accent); border-color: var(--accent); white-space: nowrap; }
-.applyButton:hover { background: var(--accent); color: var(--accent-dark); }
-.tableFooter button:hover:not(:disabled), .error button:hover:not(:disabled) { color: var(--accent); border-color: var(--accent); }
-.history button:focus-visible, .seriesControl select:focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; }
+.applyButton, .tableFooter button, .error button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 38px; padding: 8px 12px; border: 1px solid var(--line-strong); border-radius: 8px; background: var(--surface); color: var(--ink); font: inherit; font-size: 12px; font-weight: 600; cursor: pointer; }
+.applyButton { color: var(--accent-ink); border-color: color-mix(in srgb, var(--accent) 40%, var(--line)); white-space: nowrap; }
+.applyButton:hover { background: var(--accent); border-color: var(--accent); color: var(--accent-dark); }
+.tableFooter button:hover:not(:disabled), .error button:hover:not(:disabled) { color: var(--ink); border-color: var(--ink-soft); background: var(--surface-2); }
+.history button:focus-visible, .seriesControl select:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 3px; }
 .history button:disabled { opacity: .5; cursor: not-allowed; }
 .tableFooter { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; padding-top: 14px; border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
 .tableFooter nav { display: flex; align-items: center; gap: 10px; }

@@ -16,7 +16,9 @@
   place-items: center;
   margin: 0;
   padding: 28px 24px;
-  border: 2px dashed var(--line-strong);
+  border: 1px dashed var(--line-strong);
+  border-radius: 12px;
+  background: var(--surface-2);
   color: var(--muted);
   text-align: center;
   font-size: 14px;
@@ -25,9 +27,9 @@
 
 .adminFeedback.isError {
   border-style: solid;
-  border-color: var(--warm);
-  background: rgba(255, 91, 85, .06);
-  color: #ffaaa6;
+  border-color: color-mix(in srgb, var(--warm) 35%, var(--line));
+  background: color-mix(in srgb, var(--warm) 8%, var(--surface));
+  color: var(--warm);
 }
 
 .adminMetricGrid {
@@ -42,21 +44,22 @@
   padding: 18px;
   display: flex;
   flex-direction: column;
-  border: 2px solid var(--line);
-  background: linear-gradient(145deg, rgba(22, 30, 39, .94), rgba(16, 22, 29, .98));
-  box-shadow: 5px 5px 0 #05070a;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+  box-shadow: none;
 }
 
 .adminMetricCard > span {
   color: var(--muted);
-  font: 700 12px/1.4 'Nunito', var(--font-geist), Arial, sans-serif;
-  text-transform: uppercase;
+  font: 600 12px/1.4 var(--body-font);
 }
 
 .adminMetricCard > strong {
   margin: auto 0 6px;
   color: var(--ink);
-  font: 800 20px/1.3 'Nunito', var(--font-geist), Arial, sans-serif;
+  font: 700 22px/1.3 var(--data-font);
+  font-variant-numeric: tabular-nums;
 }
 
 .adminMetricCard > small {
@@ -75,7 +78,7 @@
 
 :global([class*="adminPanel"]) > .adminInlineFilter {
   padding: 16px 18px;
-  border-bottom: 2px solid var(--line);
+  border-bottom: 1px solid var(--line);
 }
 
 :global([class*="adminPanel"]) > .adminInlineFilter:last-child { border-bottom: 0; }
@@ -100,23 +103,23 @@
   grid-template-columns: auto minmax(0, 1fr);
   align-items: center;
   gap: 14px;
-  border: 2px solid var(--line);
-  background: #0b1118;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
   text-decoration: none;
-  transition: border-color .16s, transform .16s, box-shadow .16s;
+  transition: border-color .16s, background-color .16s;
 }
 
-.adminAffiliateQueueLinks a > svg { color: var(--cyan); flex-shrink: 0; }
+.adminAffiliateQueueLinks a > svg { color: var(--accent-ink); flex-shrink: 0; }
 
 .adminAffiliateQueueLinks a:hover {
-  border-color: var(--cyan);
-  transform: translate(-2px, -2px);
-  box-shadow: 4px 4px 0 #05070a;
+  border-color: var(--line-strong);
+  background: var(--surface-2);
 }
 
-.adminAffiliateQueueLinks a > span { display: grid; gap: 6px; min-width: 0; }
+.adminAffiliateQueueLinks a > span { display: grid; gap: 4px; min-width: 0; }
 
-.adminAffiliateQueueLinks strong { color: var(--ink); font: 700 13px/1.4 'Nunito', var(--font-geist), Arial, sans-serif; text-transform: uppercase; }
+.adminAffiliateQueueLinks strong { color: var(--ink); font: 600 14px/1.4 var(--body-font); }
 
 .adminAffiliateQueueLinks small { display: block; color: var(--muted); font-size: 13px; line-height: 1.45; font-weight: 400; text-transform: none; }
 
@@ -128,11 +131,11 @@
 
 .adminDetailLink { display: grid; gap: 4px; color: inherit; text-decoration: none; }
 
-.adminDetailLink strong { color: var(--cyan); font-weight: 800; }
+.adminDetailLink strong { color: var(--ink); font-weight: 600; transition: color .15s; }
 
 .adminDetailLink span { color: var(--muted); font-size: 13px; }
 
-.adminDetailLink:hover strong { color: var(--accent); }
+.adminDetailLink:hover strong { color: var(--accent-ink); }
 
 .adminDetailLine {
   display: flex;
@@ -144,15 +147,16 @@
   font-size: 13px;
 }
 
-.adminDetailLine strong { color: var(--ink); }
+.adminDetailLine strong { color: var(--ink); font-variant-numeric: tabular-nums; }
 
 .adminPayoutDetail { display: grid; gap: 20px; }
 
 .adminPayoutHero {
   padding: 24px;
-  border: 2px solid var(--line-strong);
-  background: linear-gradient(135deg, rgba(255, 213, 47, .1), rgba(16, 22, 29, .98) 55%);
-  box-shadow: 6px 6px 0 #05070a;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+  box-shadow: none;
 }
 
 .adminPayoutHeroTop {
@@ -160,35 +164,50 @@
   align-items: center;
   justify-content: space-between;
   gap: 14px;
-  margin-bottom: 18px;
+  margin-bottom: 16px;
 }
 
 .adminPayoutKicker {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  color: var(--accent);
-  font: 700 12px/1.4 'Nunito', var(--font-geist), Arial, sans-serif;
-  text-transform: uppercase;
+  color: var(--muted);
+  font: 600 12px/1.4 var(--body-font);
 }
 
 .adminPayoutStatus {
   display: inline-flex;
   align-items: center;
-  min-height: 28px;
-  padding: 0 10px;
-  border: 2px solid currentColor;
-  font: 700 12px/1.4 'Nunito', var(--font-geist), Arial, sans-serif;
-  text-transform: uppercase;
+  min-height: 26px;
+  padding: 2px 10px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font: 600 12px/1.4 var(--body-font);
 }
 
-.adminPayoutStatus.isRequested { color: var(--accent); }
+.adminPayoutStatus.isRequested {
+  color: var(--warning);
+  border-color: color-mix(in srgb, var(--warning) 30%, var(--line));
+  background: color-mix(in srgb, var(--warning) 10%, var(--surface));
+}
 
-.adminPayoutStatus.isProcessing { color: var(--cyan); }
+.adminPayoutStatus.isProcessing {
+  color: var(--cyan);
+  border-color: color-mix(in srgb, var(--cyan) 30%, var(--line));
+  background: color-mix(in srgb, var(--cyan) 10%, var(--surface));
+}
 
-.adminPayoutStatus.isPaid { color: var(--green); }
+.adminPayoutStatus.isPaid {
+  color: var(--green);
+  border-color: color-mix(in srgb, var(--green) 30%, var(--line));
+  background: color-mix(in srgb, var(--green) 10%, var(--surface));
+}
 
-.adminPayoutStatus.isRejected { color: var(--warm); }
+.adminPayoutStatus.isRejected {
+  color: var(--warm);
+  border-color: color-mix(in srgb, var(--warm) 30%, var(--line));
+  background: color-mix(in srgb, var(--warm) 10%, var(--surface));
+}
 
 .adminPayoutHeroCopy {
   display: flex;
@@ -198,9 +217,10 @@
 }
 
 .adminPayoutHeroCopy h2 {
-  margin: 0 0 8px;
-  font: 700 clamp(24px, 3vw, 34px)/1.25 'Nunito', var(--font-geist), Arial, sans-serif;
-  text-transform: uppercase;
+  margin: 0 0 6px;
+  color: var(--ink);
+  font: 700 clamp(22px, 2.5vw, 30px)/1.15 var(--display-font);
+  letter-spacing: -0.025em;
 }
 
 .adminPayoutHeroCopy p { margin: 0; color: var(--muted); }
@@ -209,15 +229,15 @@
 
 .adminPayoutAmount span {
   display: block;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   color: var(--muted);
-  font: 700 12px/1.4 'Nunito', var(--font-geist), Arial, sans-serif;
-  text-transform: uppercase;
+  font: 600 12px/1.4 var(--body-font);
 }
 
 .adminPayoutAmount strong {
-  color: var(--accent);
-  font: 800 24px/1.25 'Nunito', var(--font-geist), Arial, sans-serif;
+  color: var(--ink);
+  font: 700 24px/1.25 var(--data-font);
+  font-variant-numeric: tabular-nums;
 }
 
 .adminPayoutSummary {
@@ -227,18 +247,19 @@
 }
 
 .adminPayoutSummaryCard {
-  min-height: 120px;
+  min-height: 112px;
   padding: 18px;
   display: flex;
   flex-direction: column;
-  border: 2px solid var(--line);
-  background: rgba(16, 22, 29, .97);
-  box-shadow: 4px 4px 0 #05070a;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+  box-shadow: none;
 }
 
 .adminPayoutSummaryCard.isHighlight {
-  border-color: rgba(255, 213, 47, .55);
-  background: linear-gradient(145deg, rgba(255, 213, 47, .12), rgba(16, 22, 29, .98));
+  border-color: color-mix(in srgb, var(--accent) 30%, var(--line));
+  background: color-mix(in srgb, var(--accent) 5%, var(--surface));
 }
 
 .adminPayoutSummaryCard > span {
@@ -251,7 +272,9 @@
 
 .adminPayoutSummaryCard > strong {
   margin: auto 0 6px;
-  font: 800 20px/1.3 'Nunito', var(--font-geist), Arial, sans-serif;
+  color: var(--ink);
+  font: 700 20px/1.3 var(--data-font);
+  font-variant-numeric: tabular-nums;
 }
 
 .adminPayoutSummaryCard > small { color: var(--muted); font-size: 12px; }
@@ -268,9 +291,10 @@
 
 .adminPayoutCard {
   padding: 20px;
-  border: 2px solid var(--line);
-  background: linear-gradient(145deg, rgba(22, 30, 39, .94), rgba(16, 22, 29, .98));
-  box-shadow: 5px 5px 0 #05070a;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+  box-shadow: none;
 }
 
 .adminPayoutSectionHeading {
@@ -281,33 +305,31 @@
 }
 
 .adminPayoutIcon {
-  width: 42px;
-  height: 42px;
+  width: 40px;
+  height: 40px;
   display: grid;
   place-items: center;
-  border: 2px solid var(--accent);
-  background: rgba(255, 213, 47, .1);
-  color: var(--accent);
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--accent) 25%, var(--line));
+  background: color-mix(in srgb, var(--accent) 10%, var(--surface));
+  color: var(--accent-ink);
 }
 
 .adminPayoutIcon.isCyan {
-  border-color: var(--cyan);
-  background: rgba(83, 190, 229, .1);
+  border-color: color-mix(in srgb, var(--cyan) 25%, var(--line));
+  background: color-mix(in srgb, var(--cyan) 10%, var(--surface));
   color: var(--cyan);
 }
 
 .adminPayoutSectionHeading span {
-  display: block;
-  margin-bottom: 6px;
-  color: var(--accent);
-  font: 700 11px/1.4 'Nunito', var(--font-geist), Arial, sans-serif;
-  text-transform: uppercase;
+  display: none;
 }
 
 .adminPayoutSectionHeading h3 {
   margin: 0;
-  font: 700 14px/1.4 'Nunito', var(--font-geist), Arial, sans-serif;
-  text-transform: uppercase;
+  color: var(--ink);
+  font: 700 17px/1.3 var(--display-font);
+  letter-spacing: -0.02em;
 }
 
 .adminPayoutMeta {
@@ -321,10 +343,9 @@
 .adminPayoutReveal span,
 .adminPayoutAsideLabel {
   display: block;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
   color: var(--muted);
-  font: 700 12px/1.4 'Nunito', var(--font-geist), Arial, sans-serif;
-  text-transform: uppercase;
+  font: 600 12px/1.4 var(--body-font);
 }
 
 .adminPayoutMeta strong,
@@ -337,13 +358,21 @@
   gap: 14px;
   margin-bottom: 16px;
   padding: 14px;
-  border: 2px solid var(--line);
-  background: #0b1118;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-2);
 }
 
 .adminPayoutActions { display: grid; gap: 12px; }
 
-.adminPayoutLedger { display: grid; gap: 0; border: 2px solid var(--line); background: #0b1118; }
+.adminPayoutLedger {
+  display: grid;
+  gap: 0;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-2);
+  overflow: hidden;
+}
 
 .adminPayoutLedgerRow {
   display: flex;
@@ -360,13 +389,15 @@
 
 .adminPayoutLedgerBucket {
   color: var(--cyan);
-  font: 700 11px/1.4 'Nunito', var(--font-geist), Arial, sans-serif;
-  text-transform: uppercase;
+  font: 600 11px/1.4 var(--body-font);
 }
 
 .adminPayoutLedgerCopy small { color: var(--muted); font-size: 12px; }
 
-.adminPayoutLedgerAmount { font: 700 14px/1.4 'Nunito', var(--font-geist), Arial, sans-serif; }
+.adminPayoutLedgerAmount {
+  font: 600 14px/1.4 var(--data-font);
+  font-variant-numeric: tabular-nums;
+}
 
 .adminPayoutLedgerAmount.isPositive { color: var(--green); }
 
@@ -380,7 +411,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #c8d4dc;
+  color: var(--ink);
   font-size: 13px;
 }
 
@@ -388,9 +419,10 @@
 
 .adminListingHero {
   padding: 22px;
-  border: 2px solid var(--line);
-  background: linear-gradient(145deg, rgba(22, 30, 39, .96), rgba(16, 22, 29, .98));
-  box-shadow: 5px 5px 0 #05070a;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+  box-shadow: none;
 }
 
 .adminListingHeroTop {
@@ -398,38 +430,56 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 18px;
+  margin-bottom: 16px;
 }
 
 .adminListingKicker {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  color: var(--accent);
-  font: 700 12px/1.4 'Nunito', var(--font-geist), Arial, sans-serif;
-  letter-spacing: .05em;
-  text-transform: uppercase;
+  color: var(--muted);
+  font: 600 12px/1.4 var(--body-font);
 }
 
 .adminListingStatus {
   display: inline-grid;
   place-items: center;
-  min-height: 28px;
-  padding: 4px 10px;
-  border: 2px solid currentColor;
-  font: 700 11px/1.3 'Nunito', var(--font-geist), Arial, sans-serif;
-  text-transform: uppercase;
+  min-height: 26px;
+  padding: 2px 10px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font: 600 12px/1.3 var(--body-font);
 }
 
-.adminListingStatus.isDraft { color: var(--muted); }
+.adminListingStatus.isDraft {
+  color: var(--muted);
+  border-color: var(--line-strong);
+  background: var(--surface-2);
+}
 
-.adminListingStatus.isPendingReview { color: var(--accent); }
+.adminListingStatus.isPendingReview {
+  color: var(--warning);
+  border-color: color-mix(in srgb, var(--warning) 30%, var(--line));
+  background: color-mix(in srgb, var(--warning) 10%, var(--surface));
+}
 
-.adminListingStatus.isChangesRequested { color: var(--cyan); }
+.adminListingStatus.isChangesRequested {
+  color: var(--cyan);
+  border-color: color-mix(in srgb, var(--cyan) 30%, var(--line));
+  background: color-mix(in srgb, var(--cyan) 10%, var(--surface));
+}
 
-.adminListingStatus.isRejected { color: var(--warm); }
+.adminListingStatus.isRejected {
+  color: var(--warm);
+  border-color: color-mix(in srgb, var(--warm) 30%, var(--line));
+  background: color-mix(in srgb, var(--warm) 10%, var(--surface));
+}
 
-.adminListingStatus.isApproved { color: var(--green); }
+.adminListingStatus.isApproved {
+  color: var(--green);
+  border-color: color-mix(in srgb, var(--green) 30%, var(--line));
+  background: color-mix(in srgb, var(--green) 10%, var(--surface));
+}
 
 .adminListingHeroCopy {
   display: flex;
@@ -439,13 +489,15 @@
 }
 
 .adminListingHeroCopy h2 {
-  margin: 0 0 8px;
-  font: 800 clamp(22px, 3vw, 30px)/1.25 'Nunito', var(--font-geist), Arial, sans-serif;
+  margin: 0 0 6px;
+  color: var(--ink);
+  font: 700 clamp(22px, 2.5vw, 30px)/1.15 var(--display-font);
+  letter-spacing: -0.025em;
 }
 
 .adminListingHeroCopy p { margin: 0; color: var(--muted); }
 
-.adminListingHeroCopy a { color: var(--cyan); font-weight: 800; }
+.adminListingHeroCopy a { color: var(--accent-ink); font-weight: 600; }
 
 .adminListingHeroCopy a:hover { color: var(--accent); }
 
@@ -453,15 +505,15 @@
 
 .adminListingPrice span {
   display: block;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
   color: var(--muted);
-  font: 700 12px/1.4 'Nunito', var(--font-geist), Arial, sans-serif;
-  text-transform: uppercase;
+  font: 600 12px/1.4 var(--body-font);
 }
 
 .adminListingPrice strong {
-  color: var(--accent);
-  font: 800 28px/1.2 'Nunito', var(--font-geist), Arial, sans-serif;
+  color: var(--ink);
+  font: 700 26px/1.2 var(--data-font);
+  font-variant-numeric: tabular-nums;
 }
 
 .adminListingSummary {
@@ -472,23 +524,24 @@
 
 .adminListingSummaryCard {
   padding: 16px;
-  border: 2px solid var(--line);
+  border: 1px solid var(--line);
+  border-radius: 14px;
   background: var(--surface);
-  box-shadow: 3px 3px 0 #05070a;
+  box-shadow: none;
 }
 
 .adminListingSummaryCard span {
   display: block;
   color: var(--muted);
-  font: 700 11px/1.4 'Nunito', var(--font-geist), Arial, sans-serif;
-  text-transform: uppercase;
+  font: 600 12px/1.4 var(--body-font);
 }
 
 .adminListingSummaryCard strong {
   display: block;
-  margin-top: 10px;
+  margin-top: 8px;
   color: var(--ink);
-  font: 800 18px/1.3 'Nunito', var(--font-geist), Arial, sans-serif;
+  font: 700 18px/1.3 var(--data-font);
+  font-variant-numeric: tabular-nums;
 }
 
 .adminListingColumns {
@@ -517,9 +570,10 @@
   gap: 12px;
   align-items: flex-start;
   padding: 14px;
-  border: 2px solid rgba(121, 201, 107, .45);
-  background: rgba(121, 201, 107, .08);
-  color: #d7f0cf;
+  border: 1px solid color-mix(in srgb, var(--green) 35%, var(--line));
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--green) 8%, var(--surface));
+  color: var(--green);
 }
 
 .adminListingComplete strong { display: block; margin-bottom: 4px; color: var(--ink); }
@@ -528,13 +582,14 @@
 
 .adminListingNote {
   padding: 14px;
-  border: 2px solid rgba(255, 213, 47, .4);
-  background: rgba(255, 213, 47, .08);
+  border: 1px solid color-mix(in srgb, var(--warning) 35%, var(--line));
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--warning) 8%, var(--surface));
 }
 
 .adminListingNote p {
   margin: 8px 0 0;
-  color: #f0e3a8;
+  color: var(--ink);
   line-height: 1.55;
   white-space: pre-wrap;
 }
@@ -553,9 +608,9 @@
 
 .affiliateAdminPublicationsList li { padding-inline: 0; transition: background .15s ease; }
 
-.affiliateAdminPublicationsList .affiliateAdminRow { padding-inline: 30px; }
+.affiliateAdminPublicationsList .affiliateAdminRow { padding-inline: 24px; }
 
-.affiliateAdminPublicationsList li:hover { background: rgba(83, 190, 229, .045); }
+.affiliateAdminPublicationsList li:hover { background: color-mix(in srgb, var(--surface-2) 65%, var(--surface)); }
 
 .affiliateAdminPublicationsList .affiliateAdminRow > div:first-child { display: grid; gap: 4px; }
 
@@ -573,9 +628,9 @@
   text-decoration: none;
 }
 
-.affiliateAdminPublicationName:hover strong { color: var(--cyan); }
+.affiliateAdminPublicationName:hover strong { color: var(--accent-ink); }
 
-.affiliateAdminPublicationName:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+.affiliateAdminPublicationName:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 4px; }
 
 .affiliateAdminPublicationName span { color: var(--muted); font-size: 13px; }
 
@@ -595,8 +650,9 @@
   display: grid;
   place-items: center;
   overflow: hidden;
-  border: 2px solid var(--line-strong);
-  background: #080c12;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-2);
   color: var(--muted);
 }
 
@@ -616,11 +672,13 @@
 .affiliateAdminPreviewThumbnails button {
   width: 72px;
   height: 72px;
-  padding: 3px;
+  padding: 4px;
   overflow: hidden;
-  border: 2px solid var(--line);
-  background: #080c12;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-2);
   cursor: pointer;
+  transition: border-color .15s;
 }
 
 .affiliateAdminPreviewThumbnails button:hover,
@@ -642,11 +700,11 @@
 .affiliateAdminPreviewDetails h3 {
   margin: 0;
   color: var(--ink);
-  font: 800 20px / 1.35 'Nunito', var(--font-geist), Arial, sans-serif;
-  text-transform: uppercase;
+  font: 700 22px / 1.25 var(--display-font);
+  letter-spacing: -0.02em;
 }
 
-.affiliateAdminPreviewSeller { margin: 8px 0 0; color: var(--muted); }
+.affiliateAdminPreviewSeller { margin: 6px 0 0; color: var(--muted); }
 
 .affiliateAdminPreviewData {
   display: grid;
@@ -666,19 +724,20 @@
 .affiliateAdminPreviewData dd {
   margin: 5px 0 0;
   color: var(--ink);
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .affiliateAdminPreviewPrice {
-  color: var(--accent) !important;
-  font: 800 18px / 1.3 'Nunito', var(--font-geist), Arial, sans-serif;
+  color: var(--ink) !important;
+  font: 700 18px / 1.3 var(--data-font);
+  font-variant-numeric: tabular-nums;
 }
 
 .affiliateAdminPreviewDescription { padding-top: 2px; }
 
 .affiliateAdminPreviewDescription p {
   margin: 7px 0 0;
-  color: #c5cfd7;
+  color: var(--ink-soft);
   line-height: 1.6;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
@@ -697,14 +756,15 @@
 .affiliateAdminSettingsPanel { overflow: hidden; }
 
 .affiliateAdminSettingsHeader {
-  min-height: 72px;
+  min-height: 68px;
   padding: 18px 22px;
 }
 
 .affiliateAdminSettingsHeader h2 {
   margin: 0;
-  font: 800 15px / 1.35 'Nunito', var(--font-geist), Arial, sans-serif;
-  text-transform: uppercase;
+  color: var(--ink);
+  font: 700 18px / 1.25 var(--display-font);
+  letter-spacing: -0.02em;
 }
 
 .affiliateAdminSettingsForm {
@@ -724,9 +784,10 @@
   gap: 16px;
   align-content: start;
   padding: 20px;
-  border: 2px solid var(--line);
-  background: linear-gradient(160deg, rgba(18, 25, 33, .96), rgba(10, 15, 21, .98));
-  box-shadow: 4px 4px 0 #05070a;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface-2);
+  box-shadow: none;
 }
 
 .affiliateAdminSettingHeading {
@@ -741,16 +802,16 @@
   place-items: center;
   width: 36px;
   height: 36px;
-  border: 2px solid rgba(83, 190, 229, .35);
-  background: rgba(83, 190, 229, .1);
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--cyan) 25%, var(--line));
+  background: color-mix(in srgb, var(--cyan) 10%, var(--surface));
   color: var(--cyan);
 }
 
 .affiliateAdminSettingHeading strong {
   display: block;
   color: var(--ink);
-  font: 800 13px / 1.35 'Nunito', var(--font-geist), Arial, sans-serif;
-  text-transform: uppercase;
+  font: 600 14px / 1.35 var(--body-font);
 }
 
 .affiliateAdminSettingHeading span:last-child {
@@ -767,8 +828,9 @@
   gap: 12px;
   align-items: start;
   padding: 16px 18px;
-  border: 2px solid rgba(83, 190, 229, .4);
-  background: rgba(83, 190, 229, .08);
+  border: 1px solid color-mix(in srgb, var(--cyan) 30%, var(--line));
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--cyan) 8%, var(--surface));
 }
 
 .affiliateAdminSettingsNoteIcon {
@@ -782,13 +844,12 @@
 .affiliateAdminSettingsNote strong {
   display: block;
   color: var(--cyan);
-  font: 700 12px / 1.4 'Nunito', var(--font-geist), Arial, sans-serif;
-  text-transform: uppercase;
+  font: 600 13px / 1.4 var(--body-font);
 }
 
 .affiliateAdminSettingsNote p {
-  margin: 6px 0 0;
-  color: #c8d6dd;
+  margin: 4px 0 0;
+  color: var(--ink-soft);
   font-size: 13px;
   line-height: 1.55;
 }
@@ -799,7 +860,7 @@
   justify-content: space-between;
   gap: 16px;
   padding-top: 20px;
-  border-top: 2px solid var(--line);
+  border-top: 1px solid var(--line);
 }
 
 .affiliateAdminSettingsActions > span {
@@ -819,8 +880,8 @@
 
 .affiliateAdminSectionStack > h3 {
   margin: 0;
-  font: 700 13px/1.4 'Nunito', var(--font-geist), Arial, sans-serif;
-  text-transform: uppercase;
+  color: var(--ink);
+  font: 600 14px/1.4 var(--body-font);
 }
 
 .affiliateAdminActionsRow {
@@ -834,9 +895,10 @@
 
 .adminOrderHero {
   padding: 24px;
-  border: 2px solid var(--line-strong);
-  background: linear-gradient(135deg, rgba(83, 190, 229, .1), rgba(16, 22, 29, .98) 55%);
-  box-shadow: 6px 6px 0 #05070a;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+  box-shadow: none;
 }
 
 .adminOrderHeroTop {
@@ -844,36 +906,59 @@
   align-items: center;
   justify-content: space-between;
   gap: 14px;
-  margin-bottom: 18px;
+  margin-bottom: 16px;
 }
 
 .adminOrderKicker {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  color: var(--cyan);
-  font: 700 12px/1.4 'Nunito', var(--font-geist), Arial, sans-serif;
-  text-transform: uppercase;
+  color: var(--muted);
+  font: 600 12px/1.4 var(--body-font);
 }
 
 .adminOrderStatus {
   display: inline-flex;
   align-items: center;
-  min-height: 28px;
-  padding: 0 10px;
-  border: 2px solid currentColor;
-  font: 700 12px/1.4 'Nunito', var(--font-geist), Arial, sans-serif;
-  text-transform: uppercase;
+  min-height: 26px;
+  padding: 2px 10px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font: 600 12px/1.4 var(--body-font);
 }
 
-.adminOrderStatus.isPendingPayment { color: var(--muted); }
-.adminOrderStatus.isPaid { color: var(--accent); }
-.adminOrderStatus.isPreparing { color: var(--cyan); }
-.adminOrderStatus.isReady { color: var(--cyan); }
-.adminOrderStatus.isShipped { color: var(--cyan); }
-.adminOrderStatus.isCompleted { color: var(--green); }
-.adminOrderStatus.isWarning { color: var(--accent); }
-.adminOrderStatus.isCancelled { color: var(--warm); }
+.adminOrderStatus.isPendingPayment {
+  color: var(--muted);
+  border-color: var(--line-strong);
+  background: var(--surface-2);
+}
+.adminOrderStatus.isPaid {
+  color: var(--warning);
+  border-color: color-mix(in srgb, var(--warning) 30%, var(--line));
+  background: color-mix(in srgb, var(--warning) 10%, var(--surface));
+}
+.adminOrderStatus.isPreparing,
+.adminOrderStatus.isReady,
+.adminOrderStatus.isShipped {
+  color: var(--cyan);
+  border-color: color-mix(in srgb, var(--cyan) 30%, var(--line));
+  background: color-mix(in srgb, var(--cyan) 10%, var(--surface));
+}
+.adminOrderStatus.isCompleted {
+  color: var(--green);
+  border-color: color-mix(in srgb, var(--green) 30%, var(--line));
+  background: color-mix(in srgb, var(--green) 10%, var(--surface));
+}
+.adminOrderStatus.isWarning {
+  color: var(--warning);
+  border-color: color-mix(in srgb, var(--warning) 30%, var(--line));
+  background: color-mix(in srgb, var(--warning) 10%, var(--surface));
+}
+.adminOrderStatus.isCancelled {
+  color: var(--warm);
+  border-color: color-mix(in srgb, var(--warm) 30%, var(--line));
+  background: color-mix(in srgb, var(--warm) 10%, var(--surface));
+}
 
 .adminOrderHeroCopy {
   display: flex;
@@ -883,14 +968,15 @@
 }
 
 .adminOrderHeroCopy h2 {
-  margin: 0 0 8px;
-  font: 700 clamp(24px, 3vw, 34px)/1.25 'Nunito', var(--font-geist), Arial, sans-serif;
-  text-transform: uppercase;
+  margin: 0 0 6px;
+  color: var(--ink);
+  font: 700 clamp(22px, 2.5vw, 30px)/1.15 var(--display-font);
+  letter-spacing: -0.025em;
 }
 
 .adminOrderHeroCopy p { margin: 0; color: var(--muted); }
 
-.adminOrderHeroCopy a { color: var(--cyan); font-weight: 800; }
+.adminOrderHeroCopy a { color: var(--accent-ink); font-weight: 600; }
 
 .adminOrderHeroCopy a:hover { color: var(--accent); }
 
@@ -898,15 +984,15 @@
 
 .adminOrderAmount span {
   display: block;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   color: var(--muted);
-  font: 700 12px/1.4 'Nunito', var(--font-geist), Arial, sans-serif;
-  text-transform: uppercase;
+  font: 600 12px/1.4 var(--body-font);
 }
 
 .adminOrderAmount strong {
-  color: var(--accent);
-  font: 800 24px/1.25 'Nunito', var(--font-geist), Arial, sans-serif;
+  color: var(--ink);
+  font: 700 24px/1.25 var(--data-font);
+  font-variant-numeric: tabular-nums;
 }
 
 .adminOrderSummary {
@@ -916,18 +1002,19 @@
 }
 
 .adminOrderSummaryCard {
-  min-height: 120px;
+  min-height: 112px;
   padding: 18px;
   display: flex;
   flex-direction: column;
-  border: 2px solid var(--line);
-  background: rgba(16, 22, 29, .97);
-  box-shadow: 4px 4px 0 #05070a;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+  box-shadow: none;
 }
 
 .adminOrderSummaryCard.isHighlight {
-  border-color: rgba(255, 213, 47, .55);
-  background: linear-gradient(145deg, rgba(255, 213, 47, .12), rgba(16, 22, 29, .98));
+  border-color: color-mix(in srgb, var(--accent) 30%, var(--line));
+  background: color-mix(in srgb, var(--accent) 5%, var(--surface));
 }
 
 .adminOrderSummaryCard > span {
@@ -935,13 +1022,14 @@
   align-items: center;
   gap: 8px;
   color: var(--muted);
-  font: 700 11px/1.4 'Nunito', var(--font-geist), Arial, sans-serif;
-  text-transform: uppercase;
+  font: 600 12px/1.4 var(--body-font);
 }
 
 .adminOrderSummaryCard > strong {
   margin: auto 0 6px;
-  font: 800 20px/1.3 'Nunito', var(--font-geist), Arial, sans-serif;
+  color: var(--ink);
+  font: 700 20px/1.3 var(--data-font);
+  font-variant-numeric: tabular-nums;
 }
 
 .adminOrderSummaryCard > small { color: var(--muted); font-size: 12px; }
@@ -958,9 +1046,10 @@
 
 .adminOrderCard {
   padding: 20px;
-  border: 2px solid var(--line);
-  background: linear-gradient(145deg, rgba(22, 30, 39, .94), rgba(16, 22, 29, .98));
-  box-shadow: 5px 5px 0 #05070a;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+  box-shadow: none;
 }
 
 .adminOrderSectionHeading {
@@ -971,33 +1060,31 @@
 }
 
 .adminOrderIcon {
-  width: 42px;
-  height: 42px;
+  width: 40px;
+  height: 40px;
   display: grid;
   place-items: center;
-  border: 2px solid var(--accent);
-  background: rgba(255, 213, 47, .1);
-  color: var(--accent);
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--accent) 25%, var(--line));
+  background: color-mix(in srgb, var(--accent) 10%, var(--surface));
+  color: var(--accent-ink);
 }
 
 .adminOrderIcon.isCyan {
-  border-color: var(--cyan);
-  background: rgba(83, 190, 229, .1);
+  border-color: color-mix(in srgb, var(--cyan) 25%, var(--line));
+  background: color-mix(in srgb, var(--cyan) 10%, var(--surface));
   color: var(--cyan);
 }
 
 .adminOrderSectionHeading span {
-  display: block;
-  margin-bottom: 6px;
-  color: var(--accent);
-  font: 700 11px/1.4 'Nunito', var(--font-geist), Arial, sans-serif;
-  text-transform: uppercase;
+  display: none;
 }
 
 .adminOrderSectionHeading h3 {
   margin: 0;
-  font: 700 14px/1.4 'Nunito', var(--font-geist), Arial, sans-serif;
-  text-transform: uppercase;
+  color: var(--ink);
+  font: 700 17px/1.3 var(--display-font);
+  letter-spacing: -0.02em;
 }
 
 .adminOrderItems { display: grid; gap: 0; }
@@ -1035,23 +1122,23 @@
 
 .adminOrderDelivery dt {
   color: var(--muted);
-  font: 700 11px/1.4 'Nunito', var(--font-geist), Arial, sans-serif;
-  text-transform: uppercase;
+  font: 600 12px/1.4 var(--body-font);
 }
 
 .adminOrderDelivery dd {
   margin: 6px 0 0;
   color: var(--ink);
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.45;
 }
 
 .adminOrderMutedNote {
   margin: 0 0 16px;
   padding: 14px 16px;
-  border: 2px solid rgba(83, 190, 229, .35);
-  background: rgba(83, 190, 229, .08);
-  color: #c8d6dd;
+  border: 1px solid color-mix(in srgb, var(--cyan) 30%, var(--line));
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--cyan) 8%, var(--surface));
+  color: var(--ink-soft);
   font-size: 13px;
   line-height: 1.55;
 }
@@ -1067,8 +1154,7 @@
   display: block;
   margin-bottom: 6px;
   color: var(--muted);
-  font: 700 11px/1.4 'Nunito', var(--font-geist), Arial, sans-serif;
-  text-transform: uppercase;
+  font: 600 12px/1.4 var(--body-font);
 }
 
 .adminOrderTracking strong {
@@ -1082,8 +1168,7 @@
 .adminOrderAsideLabel {
   display: block;
   color: var(--muted);
-  font: 700 12px/1.4 'Nunito', var(--font-geist), Arial, sans-serif;
-  text-transform: uppercase;
+  font: 600 12px/1.4 var(--body-font);
 }
 
 .adminOrderAsideCard > p {
@@ -1106,9 +1191,10 @@
   align-items: center;
   gap: 10px;
   padding: 12px 14px;
-  border: 2px solid rgba(83, 190, 229, .35);
-  background: rgba(83, 190, 229, .08);
-  color: #c8d6dd;
+  border: 1px solid color-mix(in srgb, var(--cyan) 30%, var(--line));
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--cyan) 8%, var(--surface));
+  color: var(--ink-soft);
   font-size: 13px;
   line-height: 1.45;
 }
@@ -1128,11 +1214,10 @@
 
 .adminOrderMetaList span {
   color: var(--muted);
-  font: 700 11px/1.4 'Nunito', var(--font-geist), Arial, sans-serif;
-  text-transform: uppercase;
+  font: 600 12px/1.4 var(--body-font);
 }
 
-.adminOrderMetaList strong { color: var(--ink); text-align: right; }
+.adminOrderMetaList strong { color: var(--ink); text-align: right; font-variant-numeric: tabular-nums; }
 
 @media (max-width: 1100px) {
   .adminMetricGrid,

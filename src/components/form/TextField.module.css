@@ -1,23 +1,33 @@
 .componentField {
   display: grid;
   gap: 7px;
-  color: var(--muted);
-  font: 9px var(--pixel-font);
-  text-transform: uppercase;
+  min-width: 0;
+  color: var(--ink);
+  font: 600 13px/1.4 var(--body-font);
 }
 
 .componentField input {
-  min-height: 43px;
-  border: 2px solid var(--line);
-  border-radius: 0;
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
   background: var(--surface);
   color: var(--ink);
+  font-size: 14px;
   padding: 0 12px;
   outline: 0;
+  transition: border-color .18s ease, box-shadow .18s ease;
+}
+
+.componentField input::placeholder {
+  color: #7b746b;
+  opacity: 1;
 }
 
 .componentField input:focus {
   border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgb(173 32 45 / 14%);
 }
 
 .componentField .formError {

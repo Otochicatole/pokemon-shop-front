@@ -1,11 +1,10 @@
-/* Migrated from admin.css */
 .adminCardSection { padding-top: 18px; }
 
-.adminSectionActions { display: flex; justify-content: flex-end; margin-bottom: 14px; }
+.adminSectionActions { display: flex; justify-content: flex-end; margin-bottom: 16px; }
 
-.adminConfigGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.adminConfigGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
 
-.adminConfigCard { display: grid; gap: 16px; padding: 18px; border: 2px solid var(--line); background: rgba(16, 22, 29, .97); box-shadow: 5px 5px 0 #05070a; }
+.adminConfigCard { display: grid; gap: 16px; padding: 20px; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); }
 
 .adminConfigCard header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 
@@ -17,27 +16,31 @@
 
 .adminCardActions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; margin-left: auto; }
 
-.adminDeleteButton:hover { border-color: var(--warm); color: var(--warm); }
+.adminDeleteButton:hover { border-color: color-mix(in srgb, var(--danger) 42%, var(--line)); color: var(--danger); }
 
-.adminConfigCard h2 { margin: 0; font: 700 13px/1.4 'Nunito', var(--font-geist), Arial, sans-serif; text-transform: uppercase; }
+.adminConfigCard h2 { margin: 0; color: var(--ink); font: 700 17px/1.3 var(--display-font); letter-spacing: -.015em; text-transform: none; }
 
 .adminConfigCard header small, .adminConfigCard p { color: var(--muted); }
 
 .adminConfigCard p { margin: 0; line-height: 1.55; }
 
-.adminConfigIcon { width: 42px; height: 42px; display: grid; place-items: center; border: 2px solid var(--cyan); color: var(--cyan); }
+.adminConfigIcon { width: 42px; height: 42px; display: grid; place-items: center; border: 1px solid color-mix(in srgb, var(--cyan) 35%, var(--line)); border-radius: 10px; background: color-mix(in srgb, var(--cyan) 10%, var(--surface)); color: var(--cyan); }
 
 .adminConfigCard ul { margin: 0; padding: 0; border-top: 1px solid var(--line); list-style: none; }
 
-.adminConfigCard li { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.adminConfigCard li { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
 
-.adminRateList { border: 2px solid var(--line); }
+.adminRateList { border: 1px solid var(--line); border-radius: 14px; overflow: hidden; background: var(--surface); }
 
 .adminRateList :global([class*="adminPanelHeader"]) { min-height: 48px; }
 
-.adminRateRow { display: grid; grid-template-columns: 1.4fr 1fr auto auto; align-items: end; gap: 10px; padding: 12px; border-top: 1px solid var(--line); }
+.adminRateRow { display: grid; grid-template-columns: 1.4fr 1fr auto auto; align-items: end; gap: 10px; padding: 14px; border-top: 1px solid var(--line); }
 
-.adminTextDanger { min-height: 42px; border: 0; background: transparent; color: var(--warm); cursor: pointer; }
+.adminTextDanger { min-height: 42px; border: 0; background: transparent; color: var(--danger); font-weight: 600; cursor: pointer; }
+
+@media (max-width: 900px) {
+  .adminConfigGrid { grid-template-columns: 1fr; }
+}
 
 @media (max-width: 680px) {
   .adminRateRow { grid-template-columns: 1fr; align-items: stretch; }

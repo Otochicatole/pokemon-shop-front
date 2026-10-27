@@ -65,7 +65,7 @@ export function Header({ cartCount = 0, sessionSlot, className = '', showAffilia
         <div className={`${styles.headerInner} header-inner`}>
           <Link href="/" className={`${styles.brand} brand`} onClick={close}>
             <span className={`${styles.brandMark} brand-mark`} aria-hidden="true" />
-            <span>{config.storeName}<small>objetos para coleccionar</small></span>
+            <span>{config.storeName}<small>Cartas para coleccionar</small></span>
           </Link>
           <nav className={`${styles.mainNav} ${styles.desktopNav} main-nav`} aria-label="Navegación principal">
             {links}

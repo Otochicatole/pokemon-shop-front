@@ -1,13 +1,12 @@
-/* Migrated from admin.css */
-.adminConfigDirectory { border: 2px solid var(--line); background: rgba(16, 22, 29, .97); box-shadow: 5px 5px 0 #05070a; }
+.adminConfigDirectory { border: 1px solid var(--line); border-radius: 16px; background: var(--surface); overflow: hidden; }
 
-.adminConfigDirectoryHeader { display: flex; align-items: end; justify-content: space-between; gap: 18px; padding: 20px 22px; border-bottom: 2px solid var(--line); }
+.adminConfigDirectoryHeader { display: flex; align-items: end; justify-content: space-between; gap: 18px; padding: 20px 24px; border-bottom: 1px solid var(--line); }
 
-.adminConfigDirectoryKicker { color: var(--cyan); font: 700 12px/1.5 'Nunito', var(--font-geist), Arial, sans-serif; letter-spacing: .05em; text-transform: uppercase; }
+.adminConfigDirectoryKicker { display: none; }
 
-.adminConfigDirectoryHeader h2 { margin: 7px 0 0; font: 700 16px/1.4 'Nunito', var(--font-geist), Arial, sans-serif; text-transform: uppercase; }
+.adminConfigDirectoryHeader h2 { margin: 0; color: var(--ink); font: 700 20px/1.25 var(--display-font); letter-spacing: -.02em; text-transform: none; }
 
-.adminConfigDirectoryCount { padding: 6px 8px; border: 1px solid var(--line-strong); color: var(--muted); font: 700 11px/1.4 'Nunito', var(--font-geist), Arial, sans-serif; text-transform: uppercase; white-space: nowrap; }
+.adminConfigDirectoryCount { padding: 4px 10px; border: 1px solid var(--line-strong); border-radius: 999px; background: var(--surface-2); color: var(--muted); font: 600 11px/1.4 var(--data-font); text-transform: uppercase; white-space: nowrap; }
 
 .adminConfigDirectoryList { margin: 0; padding: 0; list-style: none; }
 
@@ -15,32 +14,31 @@
 
 .adminConfigDirectoryList li:last-child { border-bottom: 0; }
 
-.adminConfigDirectoryLink { display: grid; grid-template-columns: 54px minmax(0, 1fr) auto; align-items: center; gap: 18px; min-height: 116px; padding: 18px 22px; color: var(--ink); transition: background .15s ease, padding .15s ease; }
+.adminConfigDirectoryLink { display: grid; grid-template-columns: 50px minmax(0, 1fr) auto; align-items: center; gap: 18px; min-height: 108px; padding: 20px 24px; color: var(--ink); transition: background-color .16s ease; }
 
-.adminConfigDirectoryLink:hover { padding-left: 26px; background: rgba(83, 190, 229, .08); color: var(--ink); }
+.adminConfigDirectoryLink:hover { background: var(--surface-2); color: var(--ink); }
 
 .adminConfigDirectoryLink:focus-visible { outline: 2px solid var(--accent); outline-offset: -4px; }
 
-.adminConfigDirectoryIcon { width: 54px; height: 54px; display: grid; place-items: center; border: 2px solid var(--cyan); background: rgba(83, 190, 229, .08); color: var(--cyan); }
+.adminConfigDirectoryIcon { width: 50px; height: 50px; display: grid; place-items: center; border: 1px solid color-mix(in srgb, var(--accent) 28%, var(--line)); border-radius: 12px; background: color-mix(in srgb, var(--accent) 9%, var(--surface)); color: var(--accent-ink); }
 
 .adminConfigDirectoryCopy { min-width: 0; display: grid; gap: 4px; }
 
-.adminConfigDirectoryCategory { color: var(--cyan); font: 700 11px/1.4 'Nunito', var(--font-geist), Arial, sans-serif; letter-spacing: .04em; text-transform: uppercase; }
+.adminConfigDirectoryCategory { color: var(--muted); font: 650 11px/1.4 var(--data-font); letter-spacing: .04em; text-transform: uppercase; }
 
-.adminConfigDirectoryCopy strong { font-size: 16px; }
+.adminConfigDirectoryCopy strong { font-size: 16px; font-weight: 650; }
 
-.adminConfigDirectoryCopy > span:last-child { color: var(--muted); font-size: 13px; line-height: 1.45; }
+.adminConfigDirectoryCopy > span:last-child { color: var(--muted); font-size: 14px; line-height: 1.5; }
 
-.adminConfigDirectoryAction { display: inline-flex; align-items: center; gap: 8px; color: var(--accent); font: 700 12px/1.4 'Nunito', var(--font-geist), Arial, sans-serif; text-transform: uppercase; white-space: nowrap; }
+.adminConfigDirectoryAction { display: inline-flex; align-items: center; gap: 8px; color: var(--accent-ink); font: 650 13px/1.4 var(--body-font); white-space: nowrap; }
 
-.adminConfigDirectoryAction svg { transition: transform .15s ease; }
+.adminConfigDirectoryAction svg { transition: transform .16s ease; }
 
 .adminConfigDirectoryLink:hover .adminConfigDirectoryAction svg { transform: translateX(3px); }
 
 @media (max-width: 680px) {
   .adminConfigDirectoryHeader { align-items: flex-start; flex-direction: column; }
   .adminConfigDirectoryLink { grid-template-columns: 44px minmax(0, 1fr); gap: 14px; min-height: 0; padding: 16px; }
-  .adminConfigDirectoryLink:hover { padding-left: 20px; }
   .adminConfigDirectoryIcon { width: 44px; height: 44px; }
   .adminConfigDirectoryAction { grid-column: 2; justify-self: start; }
 }

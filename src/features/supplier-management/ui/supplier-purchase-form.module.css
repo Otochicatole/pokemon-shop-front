@@ -9,9 +9,10 @@
 }
 
 .lineCard {
-  padding: 16px;
-  border: 2px solid var(--line);
-  background: rgba(10, 16, 22, .9);
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface-2);
 }
 
 .lineMeta {
@@ -24,14 +25,13 @@
 }
 
 .lineMeta strong {
-  font: 700 13px/1.4 'Nunito', var(--font-geist), Arial, sans-serif;
-  text-transform: uppercase;
+  font: 650 13px/1.4 var(--body-font);
 }
 
 .cardFields {
   margin-top: 14px;
-  padding-top: 12px;
-  border-top: 1px dashed var(--line);
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
 }
 
 .cardFieldsHeading {
@@ -45,7 +45,7 @@
 
 .cardFieldsHeading h3 {
   margin: 0;
-  font: 700 12px/1.4 'Nunito', var(--font-geist), Arial, sans-serif;
+  font: 650 12px/1.4 var(--body-font);
   text-transform: uppercase;
   color: var(--muted);
 }
@@ -55,10 +55,11 @@
   align-items: center;
   gap: 8px;
   margin: 0 0 14px;
-  padding: 11px 13px;
-  border: 1px solid var(--green);
-  background: rgba(121, 201, 107, .08);
-  color: #d9f1d4;
+  padding: 11px 14px;
+  border: 1px solid color-mix(in srgb, var(--success) 38%, var(--line));
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--success) 10%, var(--surface));
+  color: var(--success);
   font-size: 13px;
 }
 
@@ -66,13 +67,12 @@
   margin-top: 10px;
   border: 0;
   background: transparent;
-  color: var(--warm);
-  font: 700 12px/1.4 'Nunito', var(--font-geist), Arial, sans-serif;
-  text-transform: uppercase;
+  color: var(--danger);
+  font: 650 13px/1.4 var(--body-font);
   cursor: pointer;
 }
 
 .isDanger {
-  border-color: var(--warm);
-  color: var(--warm);
+  border-color: var(--danger);
+  color: var(--danger);
 }

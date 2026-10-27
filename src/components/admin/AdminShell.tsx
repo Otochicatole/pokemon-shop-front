@@ -2,9 +2,10 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LogOut, Menu, ShieldCheck, X } from 'lucide-react';
+import { ArrowUpRight, LogOut, Menu, X } from 'lucide-react';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { NotificationBell } from '@/features/notifications';
+import { config } from '@/shared/config/env';
 
 import styles from './AdminShell.module.css';
 
@@ -70,8 +71,8 @@ export function AdminShell({ adminName, adminEmail, navigation, onLogout, childr
       {menuOpen && <button className={styles.adminSidebarBackdrop} aria-label="Cerrar navegación" onClick={() => setMenuOpen(false)} />}
       <aside ref={sidebarRef} className={`${styles.adminSidebar} ${menuOpen ? styles.isOpen : ''}`} aria-label="Navegación administrativa">
         <div className={styles.adminBrand}>
-          <span className={styles.adminBrandMark}><ShieldCheck size={21} /></span>
-          <span>Card Shop<small>Control central</small></span>
+          <span className={styles.adminBrandMark} aria-hidden="true" />
+          <span>{config.storeName}<small>Control central</small></span>
           <button type="button" className={styles.adminSidebarClose} onClick={() => setMenuOpen(false)} aria-label="Cerrar menú"><X size={20} /></button>
         </div>
         <nav className={styles.adminNavigation}>
@@ -110,7 +111,7 @@ export function AdminShell({ adminName, adminEmail, navigation, onLogout, childr
           </nav>
           <div className={styles.adminTopbarActions}>
             <NotificationBell variant="admin" />
-            <Link href="/" target="_blank" rel="noreferrer">Ver tienda ↗</Link>
+            <Link href="/" target="_blank" rel="noreferrer">Ver tienda <ArrowUpRight size={15} aria-hidden="true" /></Link>
           </div>
         </header>
         <main id="admin-content" className={styles.adminContent}>{children}</main>

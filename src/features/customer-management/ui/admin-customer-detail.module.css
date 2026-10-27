@@ -1,8 +1,7 @@
-/* Migrated from admin.css */
 .adminStats {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 14px;
+  gap: 16px;
   margin-bottom: 24px;
 }
 
@@ -15,13 +14,15 @@
 }
 
 .adminCustomerOrders {
-  margin-top: 20px;
+  margin-top: 24px;
 }
 
 .adminCustomerOrders > h2 {
   margin: 0 0 14px;
-  font: 700 14px/1.4 'Nunito', var(--font-geist), Arial, sans-serif;
-  text-transform: uppercase;
+  color: var(--ink);
+  font: 700 20px/1.25 var(--display-font);
+  letter-spacing: -.02em;
+  text-transform: none;
 }
 
 @media (max-width: 1180px) {

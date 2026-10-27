@@ -1,29 +1,30 @@
-/* Migrated from admin.css */
 .adminLoyaltyStats {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
+  gap: 16px;
   margin-bottom: 24px;
 }
 
 .adminLoyaltyPreview {
   padding: 20px;
-  border: 2px dashed var(--line-strong);
-  background: rgba(83, 190, 229, .06);
+  border: 1px dashed var(--line-strong);
+  border-radius: 14px;
+  background: var(--surface-2);
 }
 
 .adminLoyaltyPreview > span {
-  color: var(--cyan);
-  font: 700 12px/1.5 'Nunito', var(--font-geist), Arial, sans-serif;
+  color: var(--accent-ink);
+  font: 650 12px/1.4 var(--data-font);
+  letter-spacing: .04em;
   text-transform: uppercase;
 }
 
 .adminLoyaltyPreview > p {
-  max-width: 900px;
-  margin: 12px 0 0;
-  color: #cad3da;
+  max-width: 68ch;
+  margin: 10px 0 0;
+  color: var(--ink);
   font-size: 14px;
-  line-height: 1.7;
+  line-height: 1.65;
 }
 
 @media (max-width: 1180px) {

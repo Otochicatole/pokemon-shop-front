@@ -1,13 +1,16 @@
 .notice {
   margin-top: 18px;
-  padding: 13px;
-  border: 2px solid rgba(255, 213, 47, .45);
-  background: rgba(255, 213, 47, .1);
-  color: #f7df7b;
-  font-size: 12px;
+  padding: 14px 16px;
+  border: 1px solid color-mix(in srgb, var(--warning) 30%, var(--line));
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--warning) 8%, var(--surface));
+  color: var(--ink);
+  font-size: 13px;
+  line-height: 1.5;
 }
 
 .notice a {
   text-decoration: underline;
-  font-weight: 700;
+  font-weight: 600;
+  color: var(--accent-ink);
 }

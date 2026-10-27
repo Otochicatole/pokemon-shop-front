@@ -4,11 +4,11 @@
 .chart figcaption span { color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
 .axisLabel { margin-bottom: 4px; color: var(--muted); font-size: 12px; font-weight: 600; }
 .plot { width: 100%; height: 280px; min-width: 0; font-variant-numeric: tabular-nums; }
-.plot :global(.recharts-surface):focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; }
+.plot :global(.recharts-surface):focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 3px; }
 .plot :global(.recharts-tooltip-wrapper) { z-index: 3; }
-.tooltip { display: flex; flex-direction: column; gap: 6px; max-width: min(260px, 70vw); padding: 14px 16px; border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink); font-size: 13px; line-height: 1.4; }
+.tooltip { display: flex; flex-direction: column; gap: 6px; max-width: min(260px, 70vw); padding: 14px 16px; border: 1px solid var(--line-strong); border-radius: 12px; background: var(--surface); box-shadow: var(--shadow); color: var(--ink); font-size: 13px; line-height: 1.4; }
 .tooltip time { color: var(--muted); font-size: 12px; }
-.tooltip strong { font-size: 20px; font-weight: 800; overflow-wrap: anywhere; }
+.tooltip strong { font: 700 18px/1.2 var(--data-font); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
 .tooltip span { font-size: 12px; overflow-wrap: anywhere; }
 .help { margin: 12px 0 0; color: var(--muted); font-size: 12px; line-height: 1.6; }
 .empty { margin: 24px 0; color: var(--muted); font-size: 14px; }
@@ -22,5 +22,5 @@
   .chart figcaption { display: flex; flex-direction: column; margin-bottom: 14px; }
   .plot { height: 240px; }
   .tooltip { max-width: 210px; padding: 10px 12px; }
-  .tooltip strong { font-size: 18px; }
+  .tooltip strong { font-size: 16px; }
 }

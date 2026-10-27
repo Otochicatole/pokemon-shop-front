@@ -1,13 +1,15 @@
 .uploadBox {
   margin-top: 18px;
-  padding: 15px;
+  padding: 16px;
   display: grid;
   gap: 8px;
-  border: 2px dashed var(--cyan);
-  color: var(--cyan);
-  font: 9px var(--pixel-font);
+  border: 1px dashed var(--line-strong);
+  border-radius: 12px;
+  background: var(--surface-2);
+  color: var(--ink);
+  font: 600 13px/1.4 var(--body-font);
 }
 
 .uploadBox input {
-  font: 11px var(--font-geist), Arial, sans-serif;
+  font: 13px var(--body-font);
 }

@@ -6,7 +6,8 @@
   align-items: center;
   justify-content: center;
   padding: 20px;
-  background: rgba(0, 0, 0, .72);
+  background: rgb(23 22 21 / 42%);
+  backdrop-filter: blur(4px);
 }
 
 .dialog {
@@ -15,21 +16,24 @@
   max-height: min(90vh, 900px);
   overflow-y: auto;
   padding: 28px 28px 24px;
-  border: 2px solid var(--line-strong);
-  background: linear-gradient(145deg, rgba(22, 30, 39, .98), var(--surface) 55%);
-  box-shadow: 8px 8px 0 #05070a;
+  border: 1px solid var(--line-strong);
+  border-radius: 16px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  color: var(--ink);
 }
 
 .dialog h2 {
   margin: 0;
-  padding-right: 36px;
-  font: 13px/1.45 var(--pixel-font);
-  text-transform: uppercase;
+  padding-right: 40px;
+  font: 700 22px/1.2 var(--display-font);
+  letter-spacing: -.025em;
+  text-transform: none;
   overflow-wrap: anywhere;
 }
 
 .dialog > p {
-  margin: 12px 0 0;
+  margin: 10px 0 0;
   padding-right: 12px;
   color: var(--muted);
   font-size: 14px;
@@ -38,22 +42,24 @@
 
 .close {
   position: absolute;
-  top: 14px;
-  right: 14px;
-  width: 34px;
-  height: 34px;
+  top: 16px;
+  right: 16px;
+  width: 38px;
+  height: 38px;
   display: grid;
   place-items: center;
-  border: 2px solid var(--line);
+  border: 1px solid var(--line);
+  border-radius: 10px;
   background: var(--surface);
   color: var(--muted);
   font-size: 18px;
   line-height: 1;
   cursor: pointer;
-  transition: border-color .16s, color .16s;
+  transition: border-color .18s ease, color .18s ease, background-color .18s ease;
 }
 
 .close:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+  border-color: var(--line-strong);
+  background: var(--surface-2);
+  color: var(--ink);
 }

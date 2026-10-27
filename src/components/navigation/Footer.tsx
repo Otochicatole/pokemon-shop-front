@@ -7,13 +7,6 @@ export function Footer({ className = '' }: { className?: string }) {
     <footer className={`${styles.siteFooter} site-footer ${className}`.trim()}>
       <div className={styles.footerInner}>
         <div className={styles.footerBrand}>
-          <Link href="/" className={`${styles.brand} brand`} aria-label={`${config.storeName}, ir al inicio`}>
-            <span className={`${styles.brandMark} brand-mark`} aria-hidden="true" />
-            <span className={styles.footerWordmark} aria-hidden="true">
-              <span>Nevada</span>
-              <span>TCG</span>
-            </span>
-          </Link>
           <p className={styles.footerTagline}>
             Cartas y coleccionables Pokémon para seguir ampliando tu colección.
           </p>

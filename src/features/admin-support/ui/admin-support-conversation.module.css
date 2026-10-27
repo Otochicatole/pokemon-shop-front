@@ -1,14 +1,12 @@
-/* Migrated from admin.css — fullscreen support conversation */
+/* Fullscreen support conversation */
 .adminSupportFullscreen {
-  /* Break out of AdminShell .adminContent padding (32px clamp(20px, 3vw, 48px) 72px)
-     to match former .admin-content:has(.admin-support-fullscreen) padding. */
   margin-inline: calc(-1 * clamp(20px, 3vw, 48px));
-  margin-top: -32px;
+  margin-top: -36px;
   margin-bottom: -72px;
   width: auto;
   max-width: none;
-  min-height: calc(100dvh - 64px);
-  padding: 18px clamp(18px, 2.6vw, 42px) 22px;
+  min-height: calc(100dvh - 70px);
+  padding: 20px clamp(18px, 2.6vw, 42px) 24px;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -18,66 +16,66 @@
   flex: 0 0 auto;
 }
 
-.adminSupportBack { display: inline-flex; align-items: center; gap: 7px; margin-bottom: 18px; color: var(--cyan); font: 700 12px/1.4 'Nunito', var(--font-geist), Arial, sans-serif; text-transform: uppercase; }
+.adminSupportBack { display: inline-flex; align-items: center; gap: 7px; margin-bottom: 18px; color: var(--muted); font: 600 13px/1.4 var(--body-font); transition: color .16s ease; }
 
-.adminSupportBack:hover { color: var(--accent); }
+.adminSupportBack:hover { color: var(--ink); }
 
 .adminSupportDetailGrid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(290px, 340px); gap: 18px; align-items: start; }
 
 .adminSupportFullscreen .adminSupportDetailGrid { min-height: 0; flex: 1; align-items: stretch; }
 
-.adminSupportChat { min-width: 0; min-height: 0; display: flex; flex-direction: column; overflow: hidden; border: 2px solid var(--line-strong); background: rgba(12, 18, 25, .98); box-shadow: 5px 5px 0 #05070a; }
+.adminSupportChat { min-width: 0; min-height: 0; display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); }
 
-.adminSupportChat > header { min-height: 62px; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 13px 16px; border-bottom: 2px solid var(--line); background: #0a0f15; }
+.adminSupportChat > header { min-height: 62px; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 18px; border-bottom: 1px solid var(--line); background: var(--surface-2); }
 
-.adminSupportChat > header > div { display: flex; align-items: center; gap: 10px; color: var(--cyan); }
+.adminSupportChat > header > div { display: flex; align-items: center; gap: 10px; color: var(--accent-ink); }
 
 .adminSupportChat > header span,
 .adminSupportChat > header strong { display: block; }
 
 .adminSupportChat > header span { color: var(--muted); font-size: 12px; }
 
-.adminSupportChat > header strong { margin-top: 3px; color: var(--ink); }
+.adminSupportChat > header strong { margin-top: 2px; color: var(--ink); font-size: 14px; }
 
-.adminSupportLive { display: flex !important; align-items: center; gap: 7px; color: var(--green) !important; font: 700 12px/1.4 'Nunito', var(--font-geist), Arial, sans-serif; text-transform: uppercase; }
+.adminSupportLive { display: flex !important; align-items: center; gap: 7px; color: var(--success) !important; font: 650 12px/1.4 var(--data-font); text-transform: uppercase; }
 
-.adminSupportLive i { width: 8px; height: 8px; background: var(--green); box-shadow: 0 0 10px rgba(121, 201, 107, .7); animation: admin-blink 1.4s steps(1, end) infinite; }
+.adminSupportLive i { width: 8px; height: 8px; border-radius: 50%; background: var(--success); }
 
-.adminSupportLive.isOffline { color: var(--accent) !important; }
+.adminSupportLive.isOffline { color: var(--warning) !important; }
 
-.adminSupportLive.isOffline i { background: var(--accent); box-shadow: none; }
+.adminSupportLive.isOffline i { background: var(--warning); box-shadow: none; }
 
-.adminSupportMessageList { min-height: 0; flex: 1; height: auto; overflow-y: auto; padding: 22px; background-image: radial-gradient(rgba(71, 89, 106, .55) 1px, transparent 1px); background-size: 18px 18px; }
+.adminSupportMessageList { min-height: 0; flex: 1; height: auto; overflow-y: auto; padding: 22px; background: var(--paper); }
 
 .adminSupportMessageList ol { display: grid; gap: 14px; margin: 0; padding: 0; list-style: none; }
 
 .adminSupportLoadOlder { width: 100%; margin-bottom: 18px; }
 
-.adminSupportMessage { width: min(76%, 720px); padding: 13px 15px; border: 2px solid var(--line); background: #111923; box-shadow: 3px 3px 0 #05070a; }
+.adminSupportMessage { width: min(76%, 720px); padding: 14px 16px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); }
 
-.adminSupportMessage.isAdmin { justify-self: end; border-color: rgba(255, 213, 47, .58); background: rgba(255, 213, 47, .08); }
+.adminSupportMessage.isAdmin { justify-self: end; border-color: color-mix(in srgb, var(--accent) 28%, var(--line)); background: color-mix(in srgb, var(--accent) 7%, var(--surface)); }
 
-.adminSupportMessage.isCustomer { justify-self: start; border-color: rgba(83, 190, 229, .58); background: rgba(83, 190, 229, .08); }
+.adminSupportMessage.isCustomer { justify-self: start; border-color: var(--line-strong); background: var(--surface); }
 
 .adminSupportMessageMeta { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 
-.adminSupportMessageMeta strong { color: var(--ink); font-size: 13px; }
+.adminSupportMessageMeta strong { color: var(--ink); font-size: 13px; font-weight: 650; }
 
-.adminSupportMessageMeta time { color: var(--muted); font-size: 11px; white-space: nowrap; }
+.adminSupportMessageMeta time { color: var(--muted); font-size: 11px; font-family: var(--data-font); white-space: nowrap; }
 
-.adminSupportMessage p { margin: 9px 0 0; color: #dce4ea; line-height: 1.55; overflow-wrap: anywhere; white-space: pre-wrap; }
+.adminSupportMessage p { margin: 8px 0 0; color: var(--ink); font-size: 14px; line-height: 1.6; overflow-wrap: anywhere; white-space: pre-wrap; }
 
 .adminSupportNoMessages { display: grid; min-height: 250px; place-items: center; margin: 0; color: var(--muted); text-align: center; }
 
-.adminSupportComposer { display: grid; gap: 9px; padding: 16px; border-top: 2px solid var(--line); background: #0a0f15; }
+.adminSupportComposer { display: grid; gap: 10px; padding: 16px 18px; border-top: 1px solid var(--line); background: var(--surface); }
 
-.adminSupportComposer > label { color: #dce4ea; font: 700 12px/1.5 'Nunito', var(--font-geist), Arial, sans-serif; text-transform: uppercase; }
+.adminSupportComposer > label { color: var(--ink); font: 600 13px/1.4 var(--body-font); }
 
-.adminSupportComposer textarea { width: 100%; min-height: 108px; max-height: 240px; padding: 12px 13px; resize: vertical; }
+.adminSupportComposer textarea { width: 100%; min-height: 100px; max-height: 240px; padding: 12px 14px; resize: vertical; }
 
 .adminSupportComposer footer { display: flex; align-items: center; justify-content: space-between; gap: 15px; }
 
-.adminSupportComposer footer > span { color: var(--muted); font-size: 11px; }
+.adminSupportComposer footer > span { color: var(--muted); font-size: 12px; }
 
 .adminSupportContext { min-height: 0; display: grid; gap: 16px; align-content: start; overflow-y: auto; scrollbar-color: var(--line-strong) transparent; }
 
@@ -87,17 +85,17 @@
 
 .adminSupportStatusControl :global(.button) { width: 100%; }
 
-.adminSupportStatusControl p { margin: 0; color: var(--warm); font-size: 12px; line-height: 1.5; }
+.adminSupportStatusControl p { margin: 0; color: var(--danger); font-size: 12px; line-height: 1.5; }
 
-.adminSupportCustomerCard { display: grid; gap: 7px; color: var(--cyan); }
+.adminSupportCustomerCard { display: grid; gap: 7px; color: var(--accent-ink); }
 
-.adminSupportCustomerCard strong { margin-top: 3px; color: var(--ink); font-size: 16px; }
+.adminSupportCustomerCard strong { margin-top: 3px; color: var(--ink); font-size: 16px; font-weight: 650; }
 
 .adminSupportCustomerCard a { overflow-wrap: anywhere; color: var(--muted); font-size: 13px; }
 
-.adminSupportCustomerCard a:last-child { margin-top: 8px; color: var(--cyan); font: 700 12px/1.5 'Nunito', var(--font-geist), Arial, sans-serif; text-transform: uppercase; }
+.adminSupportCustomerCard a:last-child { display: inline-flex; align-items: center; gap: 5px; margin-top: 8px; color: var(--accent-ink); font: 650 13px/1.4 var(--body-font); }
 
-.adminSupportResolutionNote { display: flex; gap: 11px; padding: 14px; border: 2px solid var(--green); background: rgba(121, 201, 107, .07); color: var(--green); }
+.adminSupportResolutionNote { display: flex; gap: 11px; padding: 14px; border: 1px solid color-mix(in srgb, var(--success) 38%, var(--line)); border-radius: 12px; background: color-mix(in srgb, var(--success) 10%, var(--surface)); color: var(--success); }
 
 .adminSupportResolutionNote > div { min-width: 0; }
 
@@ -106,7 +104,7 @@
 
 .adminSupportResolutionNote strong { color: var(--ink); }
 
-.adminSupportResolutionNote span { margin-top: 5px; color: var(--muted); font-size: 12px; line-height: 1.45; }
+.adminSupportResolutionNote span { margin-top: 4px; color: var(--muted); font-size: 12px; line-height: 1.45; }
 
 .adminSupportTimeNote { display: flex; align-items: flex-start; gap: 9px; padding: 0 4px; color: var(--muted); font-size: 12px; line-height: 1.45; }
 
@@ -122,7 +120,7 @@
     margin-top: -26px;
     margin-bottom: -64px;
     padding: 16px 18px 18px;
-    min-height: calc(100dvh - 64px);
+    min-height: calc(100dvh - 70px);
   }
   .adminSupportMessageList { min-height: 0; }
 }

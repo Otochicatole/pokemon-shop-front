@@ -1,4 +1,3 @@
-/* Migrated from admin.css */
 .affiliateAdminRow { align-items: flex-start; padding: 14px 0; border-bottom: 1px solid var(--line); }
 
 .affiliateAdminRow:last-child { border-bottom: 0; }
@@ -15,14 +14,14 @@
 .affiliateAdminDirectoryList,
 .affiliateAdminPublicationsList { margin: 0; }
 
-.affiliateAdminDirectoryList li { padding-inline: 30px; }
+.affiliateAdminDirectoryList li { padding-inline: 24px; }
 
-.affiliateAdminPublicationsList li { padding-inline: 0; transition: background .15s ease; }
+.affiliateAdminPublicationsList li { padding-inline: 0; transition: background-color .15s ease; }
 
-.affiliateAdminPublicationsList .affiliateAdminRow { padding-inline: 30px; }
+.affiliateAdminPublicationsList .affiliateAdminRow { padding-inline: 24px; }
 
 .affiliateAdminDirectoryList li:hover,
-.affiliateAdminPublicationsList li:hover { background: rgba(83, 190, 229, .045); }
+.affiliateAdminPublicationsList li:hover { background: var(--surface-2); }
 
 .affiliateAdminPublicationsList .affiliateAdminRow > div:first-child { display: grid; gap: 4px; }
 
@@ -30,7 +29,7 @@
 
 .affiliateAdminPublicationName { display: grid; gap: 4px; width: 100%; padding: 0; border: 0; background: transparent; color: var(--ink); font: inherit; text-align: left; cursor: pointer; text-decoration: none; }
 
-.affiliateAdminPublicationName:hover strong { color: var(--cyan); }
+.affiliateAdminPublicationName:hover strong { color: var(--accent-ink); }
 
 .affiliateAdminPublicationName:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
 
@@ -42,13 +41,13 @@
 
 .affiliateAdminPreviewMedia { min-width: 0; }
 
-.affiliateAdminPreviewImage { aspect-ratio: 1; display: grid; place-items: center; overflow: hidden; border: 2px solid var(--line-strong); background: #080c12; color: var(--muted); }
+.affiliateAdminPreviewImage { aspect-ratio: 1; display: grid; place-items: center; overflow: hidden; border: 1px solid var(--line); border-radius: 14px; background: var(--surface-2); color: var(--muted); }
 
 .affiliateAdminPreviewImage img { width: 100%; height: 100%; object-fit: contain; }
 
 .affiliateAdminPreviewThumbnails { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
 
-.affiliateAdminPreviewThumbnails button { width: 72px; height: 72px; padding: 3px; overflow: hidden; border: 2px solid var(--line); background: #080c12; cursor: pointer; }
+.affiliateAdminPreviewThumbnails button { width: 72px; height: 72px; padding: 4px; overflow: hidden; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-2); cursor: pointer; }
 
 .affiliateAdminPreviewThumbnails button:hover,
 .affiliateAdminPreviewThumbnails button.isActive { border-color: var(--accent); }
@@ -57,7 +56,7 @@
 
 .affiliateAdminPreviewDetails { display: grid; align-content: start; gap: 20px; min-width: 0; }
 
-.affiliateAdminPreviewDetails h3 { margin: 0; color: var(--ink); font: 800 20px/1.35 'Nunito', var(--font-geist), Arial, sans-serif; text-transform: uppercase; }
+.affiliateAdminPreviewDetails h3 { margin: 0; color: var(--ink); font: 700 22px/1.25 var(--display-font); text-transform: none; }
 
 .affiliateAdminPreviewSeller { margin: 8px 0 0; color: var(--muted); }
 
@@ -67,13 +66,13 @@
 
 .affiliateAdminPreviewData dt { color: var(--muted); font-size: 12px; }
 
-.affiliateAdminPreviewData dd { margin: 5px 0 0; color: var(--ink); font-weight: 700; }
+.affiliateAdminPreviewData dd { margin: 5px 0 0; color: var(--ink); font-weight: 650; }
 
-.affiliateAdminPreviewPrice { color: var(--accent) !important; font: 800 18px/1.3 'Nunito', var(--font-geist), Arial, sans-serif; }
+.affiliateAdminPreviewPrice { color: var(--accent-ink) !important; font: 700 18px/1.3 var(--data-font); font-variant-numeric: tabular-nums; }
 
 .affiliateAdminPreviewDescription { padding-top: 2px; }
 
-.affiliateAdminPreviewDescription p { margin: 7px 0 0; color: #c5cfd7; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere; }
+.affiliateAdminPreviewDescription p { margin: 7px 0 0; color: var(--ink); line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere; }
 
 .affiliateAdminUserSearch { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 10px; }
 
@@ -81,7 +80,7 @@
 
 .affiliateAdminSearchState { margin: 0; color: var(--muted); font-size: 13px; }
 
-.affiliateAdminUserResults { max-height: 240px; overflow-y: auto; margin: 0; padding: 0; border: 2px solid var(--line); list-style: none; }
+.affiliateAdminUserResults { max-height: 240px; overflow-y: auto; margin: 0; padding: 0; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); list-style: none; }
 
 .affiliateAdminUserResults li { border-bottom: 1px solid var(--line); }
 
@@ -89,18 +88,18 @@
 
 .affiliateAdminUserResults button { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 11px; width: 100%; padding: 13px; border: 0; background: transparent; color: var(--ink); text-align: left; }
 
-.affiliateAdminUserResults button:hover { background: rgba(83, 190, 229, .08); }
+.affiliateAdminUserResults button:hover { background: var(--surface-2); }
 
-.affiliateAdminUserResults button > svg { color: var(--cyan); }
+.affiliateAdminUserResults button > svg { color: var(--accent-ink); }
 
 .affiliateAdminUserResults button strong,
 .affiliateAdminUserResults button small { display: block; }
 
 .affiliateAdminUserResults button small { margin-top: 4px; color: var(--muted); font-size: 12px; overflow-wrap: anywhere; }
 
-.affiliateAdminSelectedUser { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 11px; padding: 13px; border: 2px solid var(--cyan); background: rgba(83, 190, 229, .08); }
+.affiliateAdminSelectedUser { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 11px; padding: 13px 16px; border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--line)); border-radius: 12px; background: color-mix(in srgb, var(--accent) 8%, var(--surface)); }
 
-.affiliateAdminSelectedUser > svg { color: var(--cyan); }
+.affiliateAdminSelectedUser > svg { color: var(--accent-ink); }
 
 .affiliateAdminSelectedUser strong,
 .affiliateAdminSelectedUser span,
@@ -108,11 +107,11 @@
 
 .affiliateAdminSelectedUser span { margin-top: 4px; color: var(--muted); font-size: 13px; }
 
-.affiliateAdminSelectedUser small { margin-top: 5px; color: var(--muted); font: 10px ui-monospace, SFMono-Regular, Consolas, monospace; overflow-wrap: anywhere; }
+.affiliateAdminSelectedUser small { margin-top: 5px; color: var(--muted); font: 11px var(--data-font); overflow-wrap: anywhere; }
 
-.affiliateAdminUserChange { align-self: start; border: 0; background: transparent; color: var(--cyan); font: 700 12px/1.4 'Nunito', var(--font-geist), Arial, sans-serif; text-transform: uppercase; cursor: pointer; }
+.affiliateAdminUserChange { align-self: start; border: 0; background: transparent; color: var(--accent-ink); font: 650 12px/1.4 var(--body-font); cursor: pointer; }
 
-.affiliateAdminUserChange:hover { color: var(--accent); }
+.affiliateAdminUserChange:hover { color: var(--accent-hover); }
 
 .affiliateAdminLayout { display: grid; grid-template-columns: minmax(200px, 240px) minmax(0, 1fr); align-items: start; gap: 24px; }
 
@@ -129,7 +128,7 @@
 
 .affiliateAdminContent > .adminFeedback { margin: 0; }
 
-.affiliateAdminContent :global([class*="adminPanelHeader"]) { min-height: 64px; padding: 14px 18px; }
+.affiliateAdminContent :global([class*="adminPanelHeader"]) { min-height: 60px; padding: 14px 20px; }
 
 .affiliateAdminContent :global([class*="adminPanelHeader"]) > div:first-child { min-width: 0; }
 
@@ -143,11 +142,12 @@
 :global([class*="adminPanelHeader"]) select {
   min-height: 40px;
   min-width: 180px;
-  padding: 0 12px;
-  border: 2px solid var(--line);
-  background: #0b1118;
+  padding: 0 34px 0 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  background-color: var(--surface);
   color: var(--ink);
-  font: 700 12px/1.4 'Nunito', var(--font-geist), Arial, sans-serif;
+  font: 600 13px/1.4 var(--body-font);
 }
 
 .affiliateAdminPanelFilter select:focus,
@@ -155,23 +155,23 @@
 
 .affiliateAdminContent :global([class*="adminList"]) li { padding: 0; }
 
-.affiliateAdminContent :global([class*="adminList"]) :global([class*="adminListRow"]) { gap: 16px; padding: 16px 4px; }
+.affiliateAdminContent :global([class*="adminList"]) :global([class*="adminListRow"]) { gap: 16px; padding: 14px 10px; }
 
 .affiliateAdminContent .affiliateAdminDirectoryList .affiliateAdminRow,
-.affiliateAdminContent .affiliateAdminPublicationsList .affiliateAdminRow { padding: 16px 30px; }
+.affiliateAdminContent .affiliateAdminPublicationsList .affiliateAdminRow { padding: 16px 24px; }
 
 .affiliateAdminContent :global([class*="adminList"]) :global([class*="adminListRow"]) > a,
 .affiliateAdminContent :global([class*="adminList"]) :global([class*="adminListRow"]) > div:first-child { min-width: 0; flex: 1; display: grid; gap: 4px; text-decoration: none; color: inherit; }
 
 .affiliateAdminContent :global([class*="adminList"]) :global([class*="adminListRow"]) small { display: block; margin-top: 2px; color: var(--muted); font-size: 12px; }
 
-.affiliateAdminContent :global([class*="adminList"]) :global([class*="adminListRow"]) > a:hover strong { color: var(--cyan); }
+.affiliateAdminContent :global([class*="adminList"]) :global([class*="adminListRow"]) > a:hover strong { color: var(--accent-ink); }
 
 .affiliateAdminContent :global([class*="adminPanel"]) + :global([class*="adminPanel"]) { margin-top: 0; }
 
 .affiliateAdminSectionStack { display: grid; gap: 16px; }
 
-.affiliateAdminSectionStack > h3 { margin: 0; font: 700 13px/1.4 'Nunito', var(--font-geist), Arial, sans-serif; text-transform: uppercase; }
+.affiliateAdminSectionStack > h3 { margin: 0; color: var(--ink); font: 700 17px/1.3 var(--display-font); }
 
 .affiliateAdminActionsRow { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
 
@@ -186,50 +186,51 @@
   gap: 8px;
   min-height: 96px;
   padding: 16px;
-  border: 2px solid var(--line);
-  background: rgba(10, 15, 21, .72);
-  box-shadow: 3px 3px 0 #05070a;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
 }
 
 .affiliateAdminOrderMetrics > div > span {
   color: var(--muted);
-  font: 700 11px/1.4 'Nunito', var(--font-geist), Arial, sans-serif;
+  font: 650 11px/1.4 var(--body-font);
   text-transform: uppercase;
 }
 
 .affiliateAdminOrderMetrics > div > strong {
   margin-top: auto;
   color: var(--ink);
-  font: 800 18px/1.3 'Nunito', var(--font-geist), Arial, sans-serif;
+  font: 700 18px/1.3 var(--data-font);
+  font-variant-numeric: tabular-nums;
 }
 
 .affiliateAdminSettingsPanel { overflow: hidden; }
 
-.affiliateAdminSettingsHeader { min-height: 76px; padding: 20px 24px; }
+.affiliateAdminSettingsHeader { min-height: 70px; padding: 18px 24px; }
 
-.affiliateAdminSettingsHeader h2 { font-size: 13px; }
+.affiliateAdminSettingsHeader h2 { font-size: 18px; }
 
-.affiliateAdminSettingsForm { display: grid; gap: 26px; padding: 28px; }
+.affiliateAdminSettingsForm { display: grid; gap: 24px; padding: 24px; }
 
 .affiliateAdminSettingsFields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; max-width: 980px; }
 
-.affiliateAdminSettingCard { display: grid; gap: 13px; margin-top: 0; padding: 20px; border: 2px solid var(--line); background: rgba(10, 15, 21, .72); }
+.affiliateAdminSettingCard { display: grid; gap: 13px; margin-top: 0; padding: 20px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface-2); }
 
-.affiliateAdminSettingDescription { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.55; }
+.affiliateAdminSettingDescription { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.55; }
 
-.affiliateAdminSettingsNote { display: grid; gap: 7px; max-width: 980px; margin-top: 0; padding: 16px 18px; border: 2px solid rgba(83, 190, 229, .4); background: rgba(83, 190, 229, .08); }
+.affiliateAdminSettingsNote { display: grid; gap: 7px; max-width: 980px; margin-top: 0; padding: 16px 18px; border: 1px solid color-mix(in srgb, var(--cyan) 38%, var(--line)); border-radius: 12px; background: color-mix(in srgb, var(--cyan) 10%, var(--surface)); }
 
-.affiliateAdminSettingsNote strong { color: var(--cyan); font: 700 12px/1.4 'Nunito', var(--font-geist), Arial, sans-serif; text-transform: uppercase; }
+.affiliateAdminSettingsNote strong { color: var(--cyan); font: 650 12px/1.4 var(--data-font); text-transform: uppercase; }
 
-.affiliateAdminSettingsNote p { margin: 0; color: #c8d6dd; font-size: 13px; line-height: 1.55; }
+.affiliateAdminSettingsNote p { margin: 0; color: var(--ink); font-size: 13px; line-height: 1.55; }
 
-.affiliateAdminSettingsActions { display: flex; align-items: center; justify-content: space-between; gap: 20px; max-width: 980px; margin-top: 0; padding-top: 22px; border-top: 2px solid var(--line); }
+.affiliateAdminSettingsActions { display: flex; align-items: center; justify-content: space-between; gap: 20px; max-width: 980px; margin-top: 0; padding-top: 22px; border-top: 1px solid var(--line); }
 
-.affiliateAdminSettingsActions > span { color: var(--muted); font-size: 12px; }
+.affiliateAdminSettingsActions > span { color: var(--muted); font-size: 13px; }
 
 .affiliateAdminSettingsActions :global(.button) { min-width: 0; }
 
-.affiliateAdminInlineError { padding: 20px; color: var(--warm); line-height: 1.5; }
+.affiliateAdminInlineError { padding: 20px; color: var(--danger); line-height: 1.5; }
 
 @media (max-width: 900px) {
   .affiliateAdminLayout { grid-template-columns: 1fr; gap: 18px; }
