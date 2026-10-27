@@ -8,14 +8,14 @@ export function Footer({ className = '' }: { className?: string }) {
       <div className={styles.footerInner}>
         <div className={styles.footerBrand}>
           <Link href="/" className={`${styles.brand} brand`} aria-label={`${config.storeName}, ir al inicio`}>
-            <span className={`${styles.brandMark} brand-mark`} aria-hidden="true">✦</span>
+            <span className={`${styles.brandMark} brand-mark`} aria-hidden="true" />
             <span className={styles.footerWordmark} aria-hidden="true">
               <span>Nevada</span>
               <span>TCG</span>
             </span>
           </Link>
           <p className={styles.footerTagline}>
-            Tu tienda de confianza para la próxima aventura Pokémon.
+            Cartas y coleccionables Pokémon para seguir ampliando tu colección.
           </p>
         </div>
 

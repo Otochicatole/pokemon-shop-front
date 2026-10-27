@@ -1,7 +1,7 @@
 'use client';
 
 import { useId, useState } from 'react';
-import { RotateCcw } from 'lucide-react';
+import { Check, RotateCcw, SlidersHorizontal } from 'lucide-react';
 import { Button } from '@/components/button';
 import type { CatalogFacetOption, CatalogFilters } from '@/shared/api/contracts';
 import { validateCatalogPriceRange } from '../application/catalog-filter-codec';
@@ -58,7 +58,7 @@ function FacetGroup({ label, filterKey, options, selected, onToggle, labels, typ
             key={option.value}
             onClick={() => onToggle(filterKey, option.value)}
           >
-            <span className={`${styles.catalogFilterMarker} catalog-filter-marker`} aria-hidden="true">{selected.includes(option.value) ? '◆' : '◇'}</span>
+            <span className={`${styles.catalogFilterMarker} catalog-filter-marker`} aria-hidden="true">{selected.includes(option.value) && <Check size={12} />}</span>
             {typeDots && <i className={`${styles.catalogTypeDot} type-${option.value.toLowerCase()} catalog-type-dot`} aria-hidden="true" />}
             <span>{labels?.[option.value] ?? option.value}</span>
             {(option.count > 0 || options.some((item) => item.count > 0)) && <small>{option.count}</small>}
@@ -91,7 +91,7 @@ function SingleValueFacetGroup({ label, options, value, onChange, initiallyOpen 
             key={option.value}
             onClick={() => onChange(value === option.value ? '' : option.value)}
           >
-            <span className={`${styles.catalogFilterMarker} catalog-filter-marker`} aria-hidden="true">{value === option.value ? '◆' : '◇'}</span>
+            <span className={`${styles.catalogFilterMarker} catalog-filter-marker`} aria-hidden="true">{value === option.value && <Check size={12} />}</span>
             <span>{option.value}</span>
             {(option.count > 0 || options.some((item) => item.count > 0)) && <small>{option.count}</small>}
           </button>
@@ -114,7 +114,7 @@ export function CatalogFilterPanel({ filters, facets, onToggle, onChange, onClea
   return (
     <div className={`${styles.catalogFilterPanel} catalog-filter-panel`} aria-labelledby={labelledBy}>
       <div className={`${styles.catalogFilterPanelHeading} catalog-filter-panel-heading`}>
-        <div><span aria-hidden="true">◆</span><strong>Filtros</strong></div>
+        <div><SlidersHorizontal size={17} aria-hidden="true" /><strong>Filtros</strong></div>
         <button type="button" className={`${styles.catalogClear} catalog-clear`} onClick={onClear}><RotateCcw size={13} /> Limpiar</button>
       </div>
 
@@ -135,7 +135,7 @@ export function CatalogFilterPanel({ filters, facets, onToggle, onChange, onClea
       <FacetGroup label="Empresa de grading" filterKey="gradingCompanies" options={facets?.gradingCompanies ?? []} selected={filters.gradingCompanies} onToggle={onToggle} />
 
       <details className={`${styles.catalogFilterGroup} catalog-filter-group`} open={filters.minPrice !== '' || filters.maxPrice !== ''}>
-        <summary>Precio<span>{filters.minPrice || filters.maxPrice ? '●' : ''}</span></summary>
+        <summary>Precio<span>{filters.minPrice || filters.maxPrice ? '1' : ''}</span></summary>
         <PriceRangeFields
           key={`${filters.minPrice}-${filters.maxPrice}-${rateMicros ?? 'none'}`}
           id={id}
@@ -201,7 +201,7 @@ function BinaryFilter({ label, value, trueLabel, falseLabel, trueCount, falseCou
           key={String(option.value)}
           onClick={() => onChange(option.value)}
         >
-          <span className={`${styles.catalogFilterMarker} catalog-filter-marker`} aria-hidden="true">{value === option.value ? '◆' : '◇'}</span>
+          <span className={`${styles.catalogFilterMarker} catalog-filter-marker`} aria-hidden="true">{value === option.value && <Check size={12} />}</span>
           <span>{option.label}</span>
           {typeof option.count === 'number' && <small>{option.count}</small>}
         </button>

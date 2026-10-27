@@ -37,6 +37,7 @@ export function CatalogProductCard({ product }: { product: Product }) {
         name: product.name,
         slug: product.slug,
         eyebrow: card?.setName ?? product.sku,
+        eyebrowData: !card?.setName,
         kindLabel,
         price: product.price,
         available: product.available,

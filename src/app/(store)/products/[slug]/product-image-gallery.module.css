@@ -4,9 +4,10 @@
 
 .mainImage {
   position: relative;
-  height: clamp(500px, 48vw, 640px);
-  border: 1px solid var(--line-strong);
-  background: #0c1218;
+  height: clamp(460px, 46vw, 620px);
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--surface-2);
 }
 
 .expandImage {
@@ -33,19 +34,24 @@
   width: max-content;
   max-width: calc(100% - 24px);
   transform: translateX(-50%);
-  color: var(--muted);
+  min-height: 36px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--ink);
   font-size: 13px;
   font-weight: 700;
 }
 
 .expandImage:hover .zoomHint,
-.expandImage:focus-visible .zoomHint { color: var(--accent); }
+.expandImage:focus-visible .zoomHint { color: var(--ink); }
 
 .counter {
   position: absolute;
   top: 12px;
   right: 12px;
   padding: 5px 9px;
+  border-radius: 6px;
   background: var(--surface);
   color: var(--ink);
   font-size: 12px;
@@ -71,13 +77,16 @@
   height: 94px;
   padding: 0;
   border: 1px solid var(--line);
-  background: #0c1218;
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--surface-2);
   color: var(--muted);
+  cursor: pointer;
 }
 
 .thumbnail img { padding: 5px; object-fit: contain; }
-.thumbnail:hover, .thumbnail.active { border-color: var(--accent); }
-.thumbnail.active { box-shadow: inset 0 -3px var(--accent); }
+.thumbnail:hover, .thumbnail.active { border-color: var(--ink); }
+.thumbnail.active { border-color: var(--ink); outline: 2px solid var(--accent); outline-offset: 2px; }
 
 .sku {
   display: flex;
@@ -174,13 +183,18 @@
   min-height: 44px;
   padding: 9px 12px;
   border: 1px solid var(--line-strong);
+  border-radius: 10px;
   background: var(--surface);
   color: var(--ink);
+  font-family: inherit;
   font-weight: 700;
   flex-shrink: 0;
+  cursor: pointer;
 }
 .zoomControls button:hover,
-.zoomToolbar button:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+.zoomToolbar button:hover:not(:disabled) { border-color: var(--ink); color: var(--ink); }
+.zoomControls button:active, .zoomToolbar button:active { transform: scale(.98); }
+.zoomToolbar button:disabled { opacity: .5; cursor: not-allowed; }
 
 @media (max-width: 800px) {
   .mainImage { height: clamp(360px, 100vw, 560px); }

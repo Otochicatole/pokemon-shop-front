@@ -586,7 +586,7 @@ type FormShellProps = {
 };
 
 function AffiliateListingFormShell({
-  eyebrow, title, description, backHref, onBack, backLabel = 'Volver', backDisabled, reviewNote,
+  title, description, backHref, onBack, backLabel = 'Volver', backDisabled, reviewNote,
   values, errors, onChange, saving, onSubmit, onSubmitForReview, onOpenPokemonTcg, onApplyPrice, pokemonTcgSelectedImage, priceNote,
   createFiles, onCreateFilesChange, images, onMoveImage, onAltChange, onRemoveImage,
   uploadFiles, onUploadFilesChange, onUpload, imageBusy,
@@ -601,7 +601,6 @@ function AffiliateListingFormShell({
     <>
       <header className={styles.affiliateHeader}>
         <div>
-          <p className="eyebrow">{eyebrow}</p>
           <h1>{title}</h1>
           <p className={styles.affiliateHeaderDescription}>{description}</p>
           {reviewNote ? <p className={styles.affiliateReviewNote}>Nota de revisión: {reviewNote}</p> : null}

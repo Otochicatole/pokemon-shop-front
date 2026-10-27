@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
+import { Geist, Geist_Mono, Outfit } from 'next/font/google';
 import '@fontsource/press-start-2p/400.css';
 import '@fontsource/nunito/400.css';
 import '@fontsource/nunito/700.css';
@@ -14,6 +14,13 @@ const geistSans = Geist({ variable: '--font-geist', subsets: ['latin'] });
 const geistMono = Geist_Mono({
   variable: '--font-mono',
   subsets: ['latin'],
+});
+
+const outfit = Outfit({
+  variable: '--font-outfit',
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700', '800'],
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
@@ -77,7 +84,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="es-AR">
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} ${outfit.variable}`}>
         <Providers>{children}</Providers>
       </body>
     </html>

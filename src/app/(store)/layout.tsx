@@ -1,7 +1,7 @@
 import { Footer } from '@/components/navigation';
 import { StoreHeader } from '@/app/store-header';
-import styles from './layout.module.css';
+import './storefront.css';
 
 export default function StoreLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <><StoreHeader /><main className="site-main">{children}</main><Footer /></>;
+  return <div className="storefront"><a className="skip-link" href="#main-content">Saltar al contenido</a><StoreHeader /><main id="main-content" className="site-main" tabIndex={-1}>{children}</main><Footer /></div>;
 }

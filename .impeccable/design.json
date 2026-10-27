@@ -1,0 +1,124 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-13T19:27:03-03:00",
+  "title": "Design System: Nevada TCG Collector Boutique",
+  "extensions": {
+    "colorMeta": {
+      "paper": { "role": "neutral", "displayName": "Warm ivory paper" },
+      "surface": { "role": "neutral", "displayName": "Card ivory" },
+      "surface-2": { "role": "neutral", "displayName": "Warm inset" },
+      "surface-raised": { "role": "neutral", "displayName": "Raised sand" },
+      "ink": { "role": "neutral", "displayName": "Near-black ink" },
+      "muted": { "role": "neutral", "displayName": "Warm secondary copy" },
+      "line": { "role": "neutral", "displayName": "Sand divider" },
+      "line-strong": { "role": "neutral", "displayName": "Control outline" },
+      "accent": { "role": "primary", "displayName": "Poké Ball red" },
+      "accent-hover": { "role": "primary", "displayName": "Deep red hover" },
+      "accent-dark": { "role": "neutral", "displayName": "Ivory on red" },
+      "accent-ink": { "role": "primary", "displayName": "Readable red ink" },
+      "success": { "role": "semantic", "displayName": "Collector green" },
+      "danger": { "role": "semantic", "displayName": "Error red" },
+      "warning": { "role": "semantic", "displayName": "Warm warning" },
+      "cyan": { "role": "supporting", "displayName": "Water type" },
+      "purple": { "role": "supporting", "displayName": "Psychic type" }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Editorial display", "purpose": "Home promise and primary customer page titles." },
+      "headline": { "displayName": "Section headline", "purpose": "Main customer page title and major content group." },
+      "section": { "displayName": "Compact heading", "purpose": "Product titles and short panel headings." },
+      "body": { "displayName": "Storefront body", "purpose": "Spanish copy, forms, and purchase guidance." },
+      "label": { "displayName": "Control label", "purpose": "Navigation, buttons, and field labels." },
+      "data": { "displayName": "Numeric data", "purpose": "Price, stock, SKU, card number, and totals." }
+    },
+    "shadows": [
+      { "name": "collector-card", "value": "0 10px 28px rgb(45 36 25 / 7%)", "purpose": "Soft separation for product, account, and summary panels." },
+      { "name": "collector-card-hover", "value": "0 16px 38px rgb(45 36 25 / 12%)", "purpose": "A restrained lift for interactive product cards." },
+      { "name": "pokemon-artwork", "value": "0 20px 44px rgb(45 36 25 / 14%)", "purpose": "Keeps the original map scene distinct from surrounding paper." }
+    ],
+    "motion": [
+      { "name": "control-transition", "value": ".18s ease", "purpose": "Subtle color, border, and surface feedback." },
+      { "name": "card-transition", "value": ".22s ease", "purpose": "Small lift and outline change on product cards." },
+      { "name": "companion-idle", "value": "1.4s steps(2,end) infinite", "purpose": "Preserves the grounded pixel sprite idle motion." },
+      { "name": "reduced-motion-duration", "value": ".01ms", "purpose": "Removes nonessential motion for reduced-motion preferences." }
+    ],
+    "breakpoints": [
+      { "name": "catalog-single-column-max", "value": "360px" },
+      { "name": "store-mobile-max", "value": "760px" },
+      { "name": "home-stack-max", "value": "767px" },
+      { "name": "auth-stack-max", "value": "900px" },
+      { "name": "catalog-drawer-max", "value": "1050px" },
+      { "name": "catalog-four-columns-min", "value": "1500px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Single clear red action with an ivory label and a soft hover lift.",
+      "html": "<button class=\"ds-primary\">Explorar catálogo <span aria-hidden=\"true\">→</span></button>",
+      "css": ".ds-primary{display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:44px;padding:12px 20px;border:1px solid #ad202d;border-radius:10px;background:#ad202d;color:#fffdf8;font:650 14px/1.25 var(--font-geist),Arial,sans-serif;box-shadow:0 7px 18px rgb(120 23 33 / 15%);cursor:pointer;transition:transform .18s ease,background-color .18s ease,box-shadow .18s ease}.ds-primary:hover{background:#c52c39;transform:translateY(-1px);box-shadow:0 9px 22px rgb(120 23 33 / 21%)}.ds-primary:focus-visible{outline:2px solid #ad202d;outline-offset:3px}"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Quiet warm-neutral action for secondary steps and navigation.",
+      "html": "<button class=\"ds-secondary\">Volver al catálogo</button>",
+      "css": ".ds-secondary{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:12px 20px;border:1px solid #b9ae9f;border-radius:10px;background:#eee9df;color:#171615;font:650 14px/1.25 var(--font-geist),Arial,sans-serif;cursor:pointer;transition:background-color .18s ease,border-color .18s ease}.ds-secondary:hover{background:#e6dfd3;border-color:#b9ae9f}"
+    },
+    {
+      "name": "Text Field",
+      "kind": "input",
+      "refersTo": "text-field",
+      "description": "Clear ivory field with a warm outline and a visible red focus ring.",
+      "html": "<label class=\"ds-field\">Nombre<input class=\"ds-input\" type=\"text\" placeholder=\"Tu nombre\" /></label>",
+      "css": ".ds-field{display:grid;gap:8px;color:#171615;font:500 13px/1.5 var(--font-geist),Arial,sans-serif}.ds-input{min-height:46px;border:1px solid #b9ae9f;border-radius:10px;padding:10px 13px;background:#fffdf8;color:#171615;font:400 15px/1.5 var(--font-geist),Arial,sans-serif}.ds-input::placeholder{color:#68635d;opacity:1}.ds-input:focus-visible{border-color:#ad202d;outline:2px solid #ad202d;outline-offset:2px}"
+    },
+    {
+      "name": "Navigation",
+      "kind": "nav",
+      "refersTo": "navigation-link",
+      "description": "Warm, restrained shop navigation with a red current-page marker.",
+      "html": "<nav class=\"ds-nav\" aria-label=\"Tienda\"><a class=\"ds-nav-link\" href=\"/\" aria-current=\"page\">Inicio</a><a class=\"ds-nav-link\" href=\"/catalog\">Catálogo</a></nav>",
+      "css": ".ds-nav{display:flex;align-items:center;gap:26px;color:#68635d;font:600 14px/1.25 var(--font-geist),Arial,sans-serif}.ds-nav-link{padding:12px 0;border-bottom:2px solid transparent;color:inherit;text-decoration:none}.ds-nav-link:hover,.ds-nav-link[aria-current=page]{border-color:#c52c39;color:#171615}"
+    },
+    {
+      "name": "Product Card",
+      "kind": "card",
+      "refersTo": "product-card",
+      "description": "Warm ivory frame and subtle elevation that keeps real card art dominant.",
+      "html": "<article class=\"ds-product\"><div class=\"ds-product-image\">Imagen de producto</div><div class=\"ds-product-body\"><div class=\"ds-product-meta\">Cartas sueltas</div><p class=\"ds-product-collection\">Colección</p><a class=\"ds-product-name\" href=\"/catalog\"><h3>Nombre del producto</h3></a></div></article>",
+      "css": ".ds-product{min-width:0;overflow:hidden;border:1px solid #ded7cc;border-radius:16px;background:#fffdf8;color:#171615;box-shadow:0 10px 28px rgb(45 36 25 / 7%);transition:transform .22s ease,box-shadow .22s ease}.ds-product:hover{transform:translateY(-4px);box-shadow:0 16px 38px rgb(45 36 25 / 12%)}.ds-product-image{aspect-ratio:4/5;display:grid;place-items:center;background:#eee9df;color:#68635d}.ds-product-body{display:flex;flex-direction:column;padding:16px}.ds-product-meta,.ds-product-collection{color:#68635d;font:600 12px/1.5 var(--font-geist),Arial,sans-serif}.ds-product-name{color:inherit;text-decoration:none}.ds-product-name h3{font:700 19px/1.24 'Palatino Linotype','Book Antiqua',Georgia,serif}"
+    }
+  ],
+  "narrative": {
+    "northStar": "La Vitrina de Coleccionismo",
+    "overview": "A premium Pokémon collecting boutique in warm ivory, near-black ink, and measured Poké Ball red. Editorial serif titles pair with Geist Sans task copy and Geist Mono catalog data. Real card photography leads; the Kanto home map, separate Pueblo Primavera sign-in map, and crisp pixel sprites preserve Pokémon character. The admin console remains independent.",
+    "keyCharacteristics": [
+      "Warm ivory planes, sand dividers, near-black text, and restrained red actions.",
+      "Editorial serif titles, clear sans-serif task text, and monospaced comparable data.",
+      "Real card art stays central in a calm, generous collector catalogue.",
+      "Pixel art stays in the distinct Pokémon maps and crisp character sprites.",
+      "Accessible focus, responsive layouts, reduced motion, and factual product states."
+    ],
+    "rules": [
+      { "name": "The Measured Red Rule", "body": "Keep deep red for the main action, focus, and selected markers; leave large surfaces ivory and reserve semantic colors for outcomes.", "section": "colors" },
+      { "name": "The Editorial Type Rule", "body": "Use serif display titles, Geist Sans for reading and controls, and Geist Mono for comparable commerce data.", "section": "typography" },
+      { "name": "The Collector Surface Rule", "body": "Separate paper, cards, and controls with warm-neutral layering, fine outlines, and restrained depth.", "section": "surfaces" }
+    ],
+    "dos": [
+      "Use ivory, ink, and restrained red across customer routes.",
+      "Keep serif display, sans task text, and mono catalog data distinct.",
+      "Preserve separate Kanto and Pueblo Primavera maps and crisp sprites.",
+      "Keep real merchandise images, prices, stock, condition, and card identifiers visible.",
+      "Keep customer design tokens out of the independent admin system."
+    ],
+    "donts": [
+      "Do not restore the large circle behind the authentication character.",
+      "Do not apply pixel type, thick frames, hard shadows, or yellow primary actions to customer controls.",
+      "Do not substitute decorative Pokémon art for catalog merchandise.",
+      "Do not invent service guarantees or product claims."
+    ]
+  }
+}

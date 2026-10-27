@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
+import { Check } from 'lucide-react';
 import { toast } from '@/components/feedback';
 import { forgotPassword, resetPassword, verifyEmail } from '../infrastructure/api';
 import { refreshUserSessionFromCookie } from '../application/session-cache';
@@ -44,7 +45,7 @@ export function TokenForm({ mode }: { mode: 'verify' | 'forgot' | 'reset' }) {
   if (done) {
     return (
       <div className={`${styles.successMessage} success-message`}>
-        <span>✓</span>
+        <span><Check size={28} aria-hidden="true" /></span>
         <h2>{mode === 'forgot' ? 'Revisá tu correo' : mode === 'verify' ? 'Cuenta verificada' : 'Contraseña actualizada'}</h2>
         <p>{mode === 'forgot' ? 'Si existe una cuenta con ese email, vas a recibir instrucciones.' : 'Ya podés continuar con tu cuenta.'}</p>
         <Link href={mode === 'forgot' || mode === 'reset' ? '/auth/login' : '/'} className="button button-primary">

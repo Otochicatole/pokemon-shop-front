@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   Bell,
+  ArrowRight,
   Coins,
   Compass,
   Headphones,
@@ -111,7 +112,6 @@ export function AccountHome() {
     <div className={styles.accountHome}>
       <SectionHeading
         level="h1"
-        eyebrow="Cuenta personal"
         title={`Hola, ${query.data.name ?? 'coleccionista'}`}
         description={query.data.email}
         className={styles.heading}
@@ -142,6 +142,7 @@ export function AccountHome() {
               </span>
               <strong>{title}</strong>
               <small>{tile.description}</small>
+              <ArrowRight className={styles.cardArrow} size={18} aria-hidden="true" />
             </Link>
           );
         })}

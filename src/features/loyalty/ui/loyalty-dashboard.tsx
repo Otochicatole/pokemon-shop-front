@@ -54,7 +54,6 @@ export function LoyaltyDashboard() {
       </Link>
       <header className={styles.heading}>
         <div>
-          <p className="eyebrow">Club de entrenadores</p>
           <h1>Mis puntos</h1>
           <p>Tu saldo disponible se valida nuevamente cuando confirmás una compra.</p>
         </div>
@@ -86,7 +85,6 @@ export function LoyaltyDashboard() {
 
       <section className={styles.loyaltyRuleCard}>
         <div>
-          <p className="eyebrow">Regla vigente</p>
           <h2>{program.enabled ? 'Tus compras tienen recompensa' : 'Programa temporalmente pausado'}</h2>
         </div>
         {program.enabled && (

@@ -14,10 +14,10 @@ export function ProductPurchasePrice({ price }: { price: Money }) {
     <div className={styles.priceBlock}>
       <span className={styles.priceLabel}>Precio por unidad</span>
       <p className={styles.price}>
-        <strong>{hasConversion ? converted : formatMoney(price)}</strong>
-        <span>{hasConversion ? 'ARS' : price.currency}</span>
+        <strong className="product-data">{hasConversion ? converted : formatMoney(price)}</strong>
+        <span className="product-data">{hasConversion ? 'ARS' : price.currency}</span>
       </p>
-      {hasConversion && <p className={styles.basePrice}>Precio base: {formatMoney(price)} USD</p>}
+      {hasConversion && <p className={`${styles.basePrice} product-data`}>Precio base: {formatMoney(price)} USD</p>}
       <p className={styles.priceNote}>
         {hasConversion ? 'El importe en pesos se actualiza con la cotización vigente. El total se confirma al finalizar la compra.'
           : fx.isLoading ? 'Calculando el equivalente en pesos…'

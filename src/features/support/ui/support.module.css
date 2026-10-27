@@ -61,9 +61,11 @@
 .newCase,
 .history,
 .chatPanel {
-  border: 2px solid var(--line);
+  border: 1px solid var(--line);
   background: var(--surface);
-  box-shadow: 7px 7px 0 #05070a;
+  box-shadow: none;
+
+  border-radius: 12px;
 }
 
 .newCase {
@@ -103,7 +105,7 @@
 .panelHeading {
   gap: 13px;
   padding-bottom: 20px;
-  border-bottom: 2px solid var(--line);
+  border-bottom: 1px solid var(--line);
 }
 
 .iconBox {
@@ -112,21 +114,23 @@
   display: grid;
   place-items: center;
   flex: 0 0 42px;
-  border: 2px solid var(--accent);
-  color: var(--accent);
+  border: 1px solid var(--accent);
+  color: var(--ink);
+
+  border-radius: 12px;
 }
 
 .panelHeading h2,
 .historyHeading h2 {
   margin: 0;
-  font: 12px/1.5 var(--pixel-font);
-  text-transform: uppercase;
+  font: 700 14px/1.5 var(--pixel-font);
+  text-transform: none;
 }
 
 .panelHeading p {
   margin: 5px 0 0;
   color: var(--muted);
-  font-size: 12px;
+  font-size: 14px;
 }
 
 .form {
@@ -141,8 +145,8 @@
   display: grid;
   gap: 8px;
   color: var(--muted);
-  font: 8px var(--pixel-font);
-  text-transform: uppercase;
+  font: 700 14px var(--pixel-font);
+  text-transform: none;
 }
 
 .form input,
@@ -150,10 +154,10 @@
 .composer textarea,
 .filter select {
   width: 100%;
-  border: 2px solid var(--line);
-  border-radius: 0;
+  border: 1px solid var(--line);
+  border-radius: 10px;
   outline: 0;
-  background: #0a0f14;
+  background: var(--surface-2);
   color: var(--ink);
 }
 
@@ -174,13 +178,13 @@
 .form textarea:focus-visible,
 .composer textarea:focus-visible,
 .filter select:focus-visible {
-  border-color: var(--accent);
+  border-color: var(--ink);
 }
 
 .form label > small {
   justify-self: end;
-  color: #778692;
-  font: 10px var(--font-geist), Arial, sans-serif;
+  color: var(--muted);
+  font: 14px var(--font-geist), Arial, sans-serif;
   letter-spacing: 0;
   text-transform: none;
 }
@@ -188,11 +192,13 @@
 .formError {
   margin: 0;
   padding: 11px 12px;
-  border: 2px solid rgba(255, 91, 85, .55);
-  background: rgba(255, 91, 85, .12);
-  color: #ffaaa6;
-  font-size: 12px;
+  border: 1px solid rgba(255, 91, 85, .55);
+  background: color-mix(in srgb, var(--danger, #b42335) 8%, var(--surface));
+  color: var(--danger, #b42335);
+  font-size: 14px;
   line-height: 1.5;
+
+  border-radius: 12px;
 }
 
 .history {
@@ -204,7 +210,7 @@
   justify-content: space-between;
   gap: 18px;
   padding-bottom: 17px;
-  border-bottom: 2px solid var(--line);
+  border-bottom: 1px solid var(--line);
 }
 
 .historyHeading > div {
@@ -212,13 +218,13 @@
 }
 
 .historyHeading svg {
-  color: var(--cyan);
+  color: var(--ink);
 }
 
 .refreshButton {
   min-height: 36px;
   padding-inline: 8px;
-  font-size: 7px;
+  font-size: 14px;
 }
 
 .filter {
@@ -238,25 +244,27 @@
   padding: 17px;
   display: grid;
   gap: 10px;
-  border: 2px solid var(--line);
-  background: #0a0f14;
+  border: 1px solid var(--line);
+  background: var(--surface-2);
   transition: border-color .16s, transform .16s;
+
+  border-radius: 12px;
 }
 
 .conversationCard:hover,
 .conversationCard:focus-visible {
-  border-color: var(--accent);
+  border-color: var(--ink);
   outline: 0;
-  transform: translate(-2px, -2px);
-  box-shadow: 4px 4px 0 #05070a;
+  transform: translateY(-2px);
+  box-shadow: none;
 }
 
 .conversationCard > strong {
   overflow: hidden;
   color: var(--ink);
-  font: 11px/1.55 var(--pixel-font);
+  font: 700 14px/1.55 var(--pixel-font);
   text-overflow: ellipsis;
-  text-transform: uppercase;
+  text-transform: none;
   white-space: nowrap;
 }
 
@@ -264,7 +272,7 @@
   margin: 0;
   overflow: hidden;
   color: var(--muted);
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.5;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -274,8 +282,8 @@
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  color: #80909c;
-  font-size: 11px;
+  color: var(--muted);
+  font-size: 14px;
 }
 
 .cardTop {
@@ -290,9 +298,11 @@
 .unread {
   display: inline-grid;
   place-items: center;
-  border: 2px solid currentColor;
-  font: 7px var(--pixel-font);
-  text-transform: uppercase;
+  border: 1px solid currentColor;
+  font: 700 14px var(--pixel-font);
+  text-transform: none;
+
+  border-radius: 12px;
 }
 
 .status {
@@ -304,21 +314,21 @@
   min-width: 26px;
   min-height: 26px;
   padding: 4px;
-  border-color: var(--accent);
+  border-color: var(--ink);
   background: var(--accent);
-  color: #080a0e;
+  color: var(--accent-dark);
 }
 
 .statusOPEN {
-  color: var(--cyan);
+  color: var(--ink);
 }
 
 .statusIN_PROGRESS {
-  color: var(--accent);
+  color: var(--ink);
 }
 
 .statusRESOLVED {
-  color: var(--green);
+  color: var(--success, #227447);
 }
 
 .statusCLOSED {
@@ -332,26 +342,28 @@
   place-items: center;
   align-content: center;
   gap: 10px;
-  border: 2px dashed var(--line);
+  border: 1px dashed var(--line);
   color: var(--muted);
   text-align: center;
+
+  border-radius: 12px;
 }
 
 .emptyHistory svg {
-  color: var(--cyan);
+  color: var(--ink);
 }
 
 .emptyHistory h3 {
   margin: 5px 0 0;
   color: var(--ink);
-  font: 11px/1.55 var(--pixel-font);
-  text-transform: uppercase;
+  font: 700 14px/1.55 var(--pixel-font);
+  text-transform: none;
 }
 
 .emptyHistory p {
   max-width: 390px;
   margin: 0;
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.55;
 }
 
@@ -383,7 +395,7 @@
 
 .caseMeta {
   gap: 7px;
-  font-size: 12px;
+  font-size: 14px;
 }
 
 .chatPanel {
@@ -402,7 +414,7 @@
 
 .olderMessages button {
   min-height: 34px;
-  font-size: 7px;
+  font-size: 14px;
 }
 
 .messageLog {
@@ -414,18 +426,20 @@
   flex-direction: column;
   gap: 13px;
   overflow-y: auto;
-  background-color: #090d12;
-  background-image: radial-gradient(rgba(83, 190, 229, .18) 1px, transparent 1px);
+  background-color: var(--surface-2);
+  background-image: none;
   background-size: 18px 18px;
-  scrollbar-color: var(--line-strong) #090d12;
+  scrollbar-color: var(--line-strong) var(--paper);
 }
 
 .message {
   width: fit-content;
   max-width: min(76%, 680px);
   padding: 13px 15px;
-  border: 2px solid var(--line);
-  box-shadow: 3px 3px 0 rgba(0, 0, 0, .45);
+  border: 1px solid var(--line);
+  box-shadow: none;
+
+  border-radius: 12px;
 }
 
 .message p {
@@ -438,14 +452,14 @@
 
 .messageOwn {
   align-self: flex-end;
-  border-color: rgba(255, 213, 47, .65);
-  background: #282512;
+  border-color: color-mix(in srgb, var(--accent) 42%, var(--line));
+  background: color-mix(in srgb, var(--accent) 5%, var(--surface));
 }
 
 .messageAdmin {
   align-self: flex-start;
-  border-color: rgba(83, 190, 229, .65);
-  background: #10232c;
+  border-color: var(--line);
+  background: var(--surface);
 }
 
 .messageAuthor {
@@ -455,19 +469,19 @@
 
 .messageAuthor strong {
   color: var(--ink);
-  font: 7px var(--pixel-font);
-  text-transform: uppercase;
+  font: 700 14px var(--pixel-font);
+  text-transform: none;
 }
 
 .messageAuthor time {
-  color: #93a0aa;
-  font-size: 10px;
+  color: var(--muted);
+  font-size: 14px;
 }
 
 .composer {
   flex: 0 0 auto;
   padding: 20px;
-  border-top: 2px solid var(--line);
+  border-top: 1px solid var(--line);
   background: var(--surface);
 }
 
@@ -487,8 +501,8 @@
   justify-content: space-between;
   gap: 12px;
   margin-top: 8px;
-  color: #82909b;
-  font-size: 10px;
+  color: var(--muted);
+  font-size: 14px;
 }
 
 .liveState {
@@ -505,12 +519,12 @@
 }
 
 .liveStateConnected {
-  color: var(--green);
+  color: var(--success, #227447);
 }
 
 .liveStateConnected i {
-  background: var(--green);
-  box-shadow: 0 0 9px rgba(121, 201, 107, .75);
+  background: var(--success, #227447);
+  box-shadow: none;
 }
 
 .closedNotice {
@@ -518,18 +532,18 @@
   display: flex;
   align-items: center;
   gap: 13px;
-  border-top: 2px solid var(--line);
+  border-top: 1px solid var(--line);
 }
 
 .closedNotice strong {
-  font: 9px var(--pixel-font);
-  text-transform: uppercase;
+  font: 700 14px var(--pixel-font);
+  text-transform: none;
 }
 
 .closedNotice span {
   margin-right: auto;
   color: var(--muted);
-  font-size: 12px;
+  font-size: 14px;
 }
 
 @media (max-width: 900px) {

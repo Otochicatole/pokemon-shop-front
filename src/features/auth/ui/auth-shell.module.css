@@ -1,135 +1,17 @@
-.authPage {
-  min-height: calc(100vh - 118px);
-  display: grid;
-  grid-template-columns: .75fr 1fr;
+.authPage { width: min(1280px, calc(100% - 64px)); min-height: 630px; margin: 40px auto 72px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); overflow: hidden; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); }
+.authAside { position: relative; min-width: 0; display: flex; align-items: center; padding: 48px; background: var(--surface-2); border-right: 1px solid var(--line); }
+.authAside > p { max-width: 380px; color: var(--ink); font: 800 clamp(30px, 3.4vw, 44px)/1.14 var(--pixel-font); letter-spacing: -.035em; text-wrap: balance; }
+.authAsideHero { display: block; min-height: 630px; padding: 0; overflow: hidden; }
+.authAsideHero > :global(.hero-art.legendary-scene) { position: absolute; inset: 0; width: 100%; height: 100%; min-height: 100%; }
+.authPanel { min-width: 0; display: grid; align-items: center; padding: 48px clamp(28px, 4vw, 64px); }
+.authCard { width: min(100%, 400px); margin: auto; }
+.authCard h1 { margin: 0 0 12px; color: var(--ink); font: 800 clamp(28px, 3vw, 38px)/1.15 var(--pixel-font); letter-spacing: -.035em; text-wrap: balance; }
+.authCard h1.singleLineTitle { font-size: clamp(32px, 3vw, 48px) !important; white-space: nowrap; text-wrap: nowrap; }
+.intro { margin: 0 0 30px; color: var(--muted); font-size: 16px; line-height: 1.6; }
+@media (max-width: 900px) {
+  .authPage { width: min(640px, calc(100% - 40px)); grid-template-columns: 1fr; min-height: 0; margin-block: 28px 56px; }
+  .authPanel { order: -1; padding: 36px; }
+  .authAside { display: none; }
+  .authAsideHero { display: block; min-height: 450px; border-right: 0; border-top: 1px solid var(--line); }
 }
-
-.authAside {
-  padding: 60px clamp(28px, 7vw, 100px);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  border-right: 2px solid var(--line);
-  background: #0a0e14;
-  color: white;
-}
-
-.authAside > p {
-  max-width: 380px;
-  color: #d6dce2;
-  font: 25px/1.55 var(--pixel-font);
-  text-transform: uppercase;
-}
-
-.authAsideHero {
-  position: relative;
-  overflow: hidden;
-  padding: 0;
-  display: block;
-  min-height: 700px;
-}
-
-.authAsideHero > :global(.battle-scene) {
-  width: 100%;
-  height: 100%;
-  min-height: 610px;
-  border: 0;
-  box-shadow: none;
-}
-
-.authAsideHero > :global(.hero-art.legendary-scene) {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  min-height: 700px;
-  border: 0;
-  box-shadow: none;
-}
-
-.authPanel {
-  display: grid;
-  place-items: center;
-  padding: 50px 24px;
-}
-
-.authCard {
-  width: min(100%, 420px);
-  padding: 30px;
-  border: 2px solid var(--line-strong);
-  background: var(--surface);
-  box-shadow: 8px 8px 0 #05070a;
-}
-
-.authCard h1 {
-  margin: 18px 0 30px;
-  font-size: 25px;
-  line-height: 1.5;
-  font-family: var(--pixel-font);
-}
-
-@media (max-width: 1100px) {
-  .authPage {
-    display: flex;
-    flex-direction: column;
-    min-height: auto;
-    overflow-x: hidden;
-  }
-  .authPanel {
-    order: 1;
-    padding: 48px 24px 76px;
-  }
-  .authAsideHero {
-    order: 2;
-    min-height: clamp(360px, 48vw, 520px);
-    height: clamp(360px, 48vw, 520px);
-    border-right: 0;
-    border-bottom: 2px solid var(--line);
-  }
-  .authAsideHero > :global(.hero-art.legendary-scene) {
-    position: relative;
-    inset: auto;
-    min-height: 100%;
-    height: 100%;
-  }
-}
-
-@media (max-width: 760px) {
-  .authPage {
-    display: block;
-  }
-  .authAside {
-    min-height: 190px;
-    padding: 30px 24px;
-    border-right: 0;
-    border-bottom: 2px solid var(--line);
-  }
-  .authAside > p {
-    margin: 38px 0 0;
-    font-size: 17px;
-  }
-  .authAsideHero {
-    min-height: 420px;
-    height: 420px;
-    padding: 0;
-  }
-  .authAsideHero > :global(.battle-scene),
-  .authAsideHero > :global(.legendary-scene),
-  .authAsideHero > :global(.hero-art.legendary-scene) {
-    min-height: 420px;
-    height: 420px;
-    position: relative;
-    inset: auto;
-  }
-  .authPanel {
-    padding: 34px 16px 60px;
-  }
-  .authCard {
-    width: min(100%, 430px);
-    padding: 22px 18px;
-  }
-  .authCard h1 {
-    margin-bottom: 24px;
-    font-size: 21px;
-  }
-}
+@media (max-width: 480px) { .authPage { width: calc(100% - 32px); margin-top: 20px; } .authPanel { padding: 28px 20px; } .authAsideHero { min-height: 420px; } }

@@ -13,7 +13,9 @@ export function StorefrontMoney({
   raw?: boolean;
 }) {
   const fx = useStorefrontFx();
-  if (!money) return '—';
-  if (raw || money.currency === 'ARS') return formatRawMoney(money);
-  return fx.formatMoney(money as Money);
+  if (!money) return 'A confirmar';
+  if (raw || money.currency === 'ARS') return <span className="product-data money">{formatRawMoney(money)}</span>;
+  const converted = fx.formatMoney(money as Money);
+  if (converted !== '—') return <span className="product-data money">{converted}</span>;
+  return <span className="product-data money" title="Precio base en USD. El equivalente en pesos se confirma al finalizar la compra.">{formatRawMoney(money)} USD</span>;
 }

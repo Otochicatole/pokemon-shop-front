@@ -189,3 +189,16 @@
   font: 7px var(--pixel-font);
   text-transform: uppercase;
 }
+
+/* Store notification content inherits tokens from the storefront toast host. */
+.realtimeNotificationToast:not(.realtimeNotificationToastAdmin) { width: min(100%, 380px); padding: 20px; gap: 12px; border: 2px solid var(--line-strong); border-radius: 2px; background: var(--surface); color: var(--ink); box-shadow: 3px 3px 0 var(--line-strong); font-family: var(--pixel-font); transition: border-color .12s steps(2,end), background-color .12s steps(2,end); }
+.realtimeNotificationToast:not(.realtimeNotificationToastAdmin):hover { transform: none; border-color: var(--line-strong); background: var(--surface); box-shadow: 3px 3px 0 var(--line-strong); }
+.realtimeNotificationToast:not(.realtimeNotificationToastAdmin):focus-visible { outline-color: var(--accent-ink); }
+.realtimeNotificationToast:not(.realtimeNotificationToastAdmin) .toastIcon { width: 36px; height: 36px; flex-basis: 36px; border: 2px solid currentColor; border-radius: 2px; background: var(--surface-2); color: var(--muted); }
+.realtimeNotificationToast:not(.realtimeNotificationToastAdmin) .toastBadge { min-height: auto; padding: 0; border: 0; color: var(--muted); font: 750 12px/1.4 var(--pixel-font); text-transform: none; }
+.realtimeNotificationToast:not(.realtimeNotificationToastAdmin) .toastNew { min-height: 24px; padding: 3px 9px; border: 0; border-radius: 2px; background: var(--accent); color: var(--accent-dark); font: 400 10px/1.4 var(--pixel-font); text-transform: none; }
+.realtimeNotificationToast:not(.realtimeNotificationToastAdmin) .toastTitle { overflow: visible; white-space: normal; overflow-wrap: anywhere; font: 850 16px/1.4 var(--pixel-font); text-transform: none; }
+.realtimeNotificationToast:not(.realtimeNotificationToastAdmin) .toastMessage { font-size: 14px; line-height: 1.6; }
+.realtimeNotificationToast:not(.realtimeNotificationToastAdmin) .toastFooter { padding-top: 12px; border-color: var(--line); }
+.realtimeNotificationToast:not(.realtimeNotificationToastAdmin) .toastHint { color: var(--muted); font-size: 12px; }
+.realtimeNotificationToast:not(.realtimeNotificationToastAdmin) .toastOpen { color: var(--ink); font: 850 12px/1.4 var(--pixel-font); text-transform: none; }

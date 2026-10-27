@@ -1,6 +1,9 @@
+'use client';
+
 import Image from 'next/image';
 import Link from 'next/link';
-import type { ReactNode } from 'react';
+import { ImageOff } from 'lucide-react';
+import { useState, type ReactNode } from 'react';
 import type { ProductCardImage } from './ProductCard';
 import styles from './ProductImage.module.css';
 
@@ -19,12 +22,13 @@ export function ProductImage({
   badge?: ReactNode;
   className?: string;
 }) {
+  const [failedUrl, setFailedUrl] = useState<string | null>(null);
   const content = (
     <>
-      {image ? (
-        <Image src={image.url} alt={image.altText || alt} fill sizes="(max-width: 640px) 50vw, 25vw" />
+      {image && image.url !== failedUrl ? (
+        <Image src={image.url} alt={image.altText || alt} fill sizes="(max-width: 640px) 46vw, (max-width: 1024px) 30vw, 280px" onError={() => setFailedUrl(image.url)} />
       ) : (
-        <div className={`${styles.imagePlaceholder} image-placeholder`}><span>◈</span></div>
+        <div className={`${styles.imagePlaceholder} image-placeholder`}><ImageOff size={32} aria-hidden="true" /><span>Imagen no disponible</span></div>
       )}
       {(kind || badge) && (
         <div className={`${styles.productBadges} product-badges`}>
@@ -36,7 +40,7 @@ export function ProductImage({
   );
 
   return href ? (
-    <Link href={href} className={`${styles.productImage} product-image ${className}`.trim()}>{content}</Link>
+    <Link href={href} aria-label={alt} className={`${styles.productImage} product-image ${className}`.trim()}>{content}</Link>
   ) : (
     <div className={`${styles.productImage} product-image ${className}`.trim()}>{content}</div>
   );

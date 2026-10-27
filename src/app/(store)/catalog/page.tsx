@@ -22,9 +22,9 @@ export const metadata: Metadata = {
 };
 
 const shortcuts = [
-  { href: '/catalog?kind=SINGLE_CARD', label: 'Cartas sueltas', icon: Layers3, tone: styles.shortcutYellow },
-  { href: '/catalog?kind=SEALED_PRODUCT', label: 'Sobres y cajas', icon: Package, tone: styles.shortcutRed },
-  { href: '/catalog?kind=ACCESSORY', label: 'Accesorios', icon: Gem, tone: styles.shortcutCyan },
+  { href: '/catalog?kind=SINGLE_CARD', label: 'Cartas sueltas', icon: Layers3 },
+  { href: '/catalog?kind=SEALED_PRODUCT', label: 'Sobres y cajas', icon: Package },
+  { href: '/catalog?kind=ACCESSORY', label: 'Accesorios', icon: Gem },
 ] as const;
 
 export default function CatalogPage() {
@@ -33,13 +33,12 @@ export default function CatalogPage() {
       <div className={styles.pageIntro}>
         <PageHeading
           className={styles.pageHeading}
-          eyebrow="Explorá la colección"
           title="Catálogo"
           description="Cartas, sellados y accesorios con stock real. Filtrá, ordená y encontrá tu próxima pieza."
         />
         <nav className={styles.shortcuts} aria-label="Atajos del catálogo">
-          {shortcuts.map(({ href, label, icon: Icon, tone }) => (
-            <Link key={href} href={href} className={`${styles.shortcut} ${tone}`}>
+          {shortcuts.map(({ href, label, icon: Icon }) => (
+            <Link key={href} href={href} className={styles.shortcut}>
               <Icon size={16} aria-hidden="true" />
               <span>{label}</span>
             </Link>

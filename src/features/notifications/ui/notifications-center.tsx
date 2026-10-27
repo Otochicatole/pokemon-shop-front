@@ -186,7 +186,7 @@ export function NotificationsCenter({ role }: { role: Role }) {
 
     <header className={isAdmin ? headerStyles.adminPageHeader : styles.heading}>
       <div>
-        <p className={isAdmin ? headerStyles.adminEyebrow : styles.eyebrow}>{isAdmin ? 'Operaciones' : 'Centro de avisos'}</p>
+        {isAdmin && <p className={headerStyles.adminEyebrow}>Operaciones</p>}
         <h1>Notificaciones</h1>
         <p>
           {isAdmin
@@ -214,7 +214,6 @@ export function NotificationsCenter({ role }: { role: Role }) {
               </>
             ) : (
               <>
-                <p className={styles.panelKicker}>Bandeja</p>
                 <h2 id="notifications-list">Mis avisos</h2>
               </>
             )}

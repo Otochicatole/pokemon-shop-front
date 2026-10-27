@@ -18,47 +18,41 @@ export function LegendaryBattle() {
 
   return (
     <div className={`${styles.legendaryScene} hero-art legendary-scene`} aria-label="Elegí un Pokémon legendario">
-      <div className={`${styles.legendaryHud} legendary-hud`} aria-label={`${selected.name}, nivel ${selected.level}, ${selected.hp} puntos de salud`}>
-        <span>{selected.name}</span>
-        <b>Lv. {selected.level}</b>
-        <div aria-hidden="true"><i /><i /><i /><i /></div>
-        <small>HP {selected.hp} / {selected.maxHp}</small>
+      <div className={styles.legendaryArtwork}>
+        <PokemonStage
+          key={selected.id}
+          variant="legendary"
+          spriteUrl={selected.spriteUrl}
+          alt={`${selected.name[0]}${selected.name.slice(1).toLowerCase()} pixelado`}
+          groundOffset={groundOffsets[selected.id]}
+          priority
+        />
       </div>
 
-      <PokemonStage
-        key={selected.id}
-        variant="legendary"
-        spriteUrl={selected.spriteUrl}
-        alt={`${selected.name[0]}${selected.name.slice(1).toLowerCase()} pixelado`}
-        groundOffset={groundOffsets[selected.id]}
-        priority
-      />
-
-      <div className={`${styles.legendaryDialogue} legendary-dialogue`} aria-live="polite" aria-atomic="true">
-        <span aria-hidden="true">▶</span>
-        <div>
-          <b>{selected.name}</b>
+      <div className={styles.legendaryBar}>
+        <div className={styles.legendaryDialogue} aria-live="polite" aria-atomic="true">
+          <strong>{selected.name[0]}{selected.name.slice(1).toLowerCase()}</strong>
           <span>{selected.message}</span>
-          <small>{selected.detail}</small>
         </div>
-      </div>
+        <div className={`${styles.legendarySelector} legendary-selector`} role="group" aria-label="Elegir Pokémon legendario">
+          {legendaryCompanions.map((companion) => {
+            const name = companion.name[0] + companion.name.slice(1).toLowerCase();
+            const active = companion.id === selected.id;
 
-      <div className={`${styles.legendarySelector} legendary-selector`} role="group" aria-label="Elegir Pokémon legendario">
-        {legendaryCompanions.map((companion) => {
-          const active = companion.id === selected.id;
-          return (
-            <button
-              key={companion.id}
-              type="button"
-              className={`${styles.legendaryOption} ${active ? styles.active : ''} legendary-option legendary-${companion.type} ${active ? 'active' : ''}`}
-              aria-pressed={active}
-              onClick={() => setSelectedId(companion.id)}
-            >
-              <Image src={companion.spriteUrl} alt="" width={52} height={52} unoptimized />
-              <span>{companion.typeLabel}</span>
-            </button>
-          );
-        })}
+            return (
+              <button
+                key={companion.id}
+                type="button"
+                className={`${styles.legendaryOption} ${active ? styles.active : ''} legendary-option legendary-${companion.type} ${active ? 'active' : ''}`}
+                aria-label={`Elegir a ${name}, tipo ${companion.typeLabel.toLowerCase()}`}
+                aria-pressed={active}
+                onClick={() => setSelectedId(companion.id)}
+              >
+                <Image src={companion.spriteUrl} alt="" width={42} height={42} unoptimized />
+              </button>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

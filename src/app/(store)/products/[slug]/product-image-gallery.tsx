@@ -88,7 +88,7 @@ export function ProductImageGallery({
           ))}
         </div>
       )}
-      <p className={styles.sku}>SKU <span>{sku}</span></p>
+      <p className={styles.sku}>SKU <span className="product-data">{sku}</span></p>
       <Dialog open={zoomOpen} title={productName} onClose={() => { setZoomOpen(false); setDetailZoom(false); }} className={styles.zoomDialog}>
         <div className={styles.zoomContent} onKeyDown={(event) => {
           if (detailZoom) return;

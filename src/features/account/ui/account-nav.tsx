@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useEffect, useRef } from 'react';
 import { Bell, Coins, Headphones, LayoutGrid, Package, UserRound } from 'lucide-react';
 import styles from './account-nav.module.css';
 
@@ -21,10 +22,20 @@ function isActive(pathname: string, href: string, exact?: boolean) {
 
 export function AccountNav() {
   const pathname = usePathname() ?? '/account';
+  const navRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const nav = navRef.current;
+    const active = nav?.querySelector<HTMLElement>('[aria-current="page"]');
+    if (!nav || !active || nav.scrollWidth <= nav.clientWidth) return;
+    // Scroll only the tab strip; preserve the reader's vertical page position.
+    const navBox = nav.getBoundingClientRect();
+    const activeBox = active.getBoundingClientRect();
+    nav.scrollLeft += activeBox.left - navBox.left - (nav.clientWidth - activeBox.width) / 2;
+  }, [pathname]);
 
   return (
     <nav className={styles.nav} data-account-nav aria-label="Secciones de mi cuenta">
-      <div className={styles.inner}>
+      <div className={styles.inner} ref={navRef}>
         {links.map(({ href, label, icon: Icon, ...rest }) => {
           const exact = 'exact' in rest && rest.exact;
           const active = isActive(pathname, href, exact);

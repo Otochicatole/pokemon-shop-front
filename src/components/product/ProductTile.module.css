@@ -1,11 +1,11 @@
 .productTile {
   min-width: 0;
-  border: 2px solid var(--line);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 16px;
   background: var(--surface);
-  transition: border-color .16s, transform .16s;
+  transition: border-color .2s ease, transform .2s ease;
 }
-
-.productTile:hover {
-  border-color: var(--accent);
-  transform: translateY(-3px);
-}
+.productTile:hover { border-color: var(--line-strong); transform: translateY(-3px); }
+.productTile:focus-within { border-color: var(--line-strong); }
+@media (prefers-reduced-motion: reduce) { .productTile { transition: none; } .productTile:hover { transform: none; } }

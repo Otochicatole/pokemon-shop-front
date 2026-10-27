@@ -1,18 +1,4 @@
-.stockMuted,
-.stockWarn,
-.stockAvailable {
-  margin: 5px 0 0;
-  font: 7px var(--pixel-font);
-}
-
-.stockMuted {
-  color: var(--muted);
-}
-
-.stockWarn {
-  color: var(--warm);
-}
-
-.stockAvailable {
-  color: var(--green);
-}
+.stockMuted, .stockWarn, .stockAvailable { margin: 10px 0 0; font: 700 12px/1.4 'Nunito', sans-serif; }
+.stockMuted { color: var(--muted); }
+.stockWarn { color: var(--warning, var(--warm)); }
+.stockAvailable { color: var(--success, var(--green)); }

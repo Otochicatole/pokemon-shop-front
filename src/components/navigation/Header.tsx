@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { Menu, UserRound, X } from 'lucide-react';
+import { Menu, Search, UserRound, X } from 'lucide-react';
+import { usePathname } from 'next/navigation';
 import type { ReactNode } from 'react';
 import { useEffect, useRef, useState } from 'react';
 import { CartIndicator } from './CartIndicator';
@@ -12,6 +13,7 @@ import styles from './Header.module.css';
 
 export function Header({ cartCount = 0, sessionSlot, className = '', showAffiliateNav = false }: { cartCount?: number; sessionSlot?: ReactNode; className?: string; showAffiliateNav?: boolean }) {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
   const close = () => setOpen(false);
   const backdropPointer = useRef<{ x: number; y: number } | null>(null);
 
@@ -51,8 +53,8 @@ export function Header({ cartCount = 0, sessionSlot, className = '', showAffilia
 
   const links = (
     <>
-      <Link href="/" onClick={close}>Inicio</Link>
-      <Link href="/catalog" onClick={close}>Catálogo</Link>
+      <Link href="/" onClick={close} aria-current={pathname === '/' ? 'page' : undefined}>Inicio</Link>
+      <Link href="/catalog" onClick={close} aria-current={pathname.startsWith('/catalog') || pathname.startsWith('/products') ? 'page' : undefined}>Catálogo</Link>
       {showAffiliateNav && <Link href="/affiliate" onClick={close}>Vender</Link>}
     </>
   );
@@ -62,12 +64,16 @@ export function Header({ cartCount = 0, sessionSlot, className = '', showAffilia
       <header className={`${styles.siteHeader} site-header`}>
         <div className={`${styles.headerInner} header-inner`}>
           <Link href="/" className={`${styles.brand} brand`} onClick={close}>
-            <span className={`${styles.brandMark} brand-mark`}>✦</span>
+            <span className={`${styles.brandMark} brand-mark`} aria-hidden="true" />
             <span>{config.storeName}<small>objetos para coleccionar</small></span>
           </Link>
           <nav className={`${styles.mainNav} ${styles.desktopNav} main-nav`} aria-label="Navegación principal">
             {links}
           </nav>
+          <form action="/catalog" className={styles.headerSearch} role="search">
+            <Search size={18} aria-hidden="true" />
+            <input type="search" name="q" aria-label="Buscar en el catálogo" placeholder="Buscá tu próxima carta" />
+          </form>
           <div className={`${styles.headerActions} header-actions`}>
             {sessionSlot ?? <Link href="/account" className={`${styles.iconLink} icon-link`} aria-label="Mi cuenta"><UserRound size={18} /></Link>}
             <NotificationBell />
@@ -97,6 +103,10 @@ export function Header({ cartCount = 0, sessionSlot, className = '', showAffilia
           />
           <nav className={`${styles.mainNav} ${styles.mobileNavPanel} main-nav is-open`} aria-label="Navegación principal">
             {links}
+            <form action="/catalog" className={styles.mobileSearch} role="search" onSubmit={close}>
+              <label htmlFor="mobile-catalog-search">Buscar en el catálogo</label>
+              <div><input id="mobile-catalog-search" type="search" name="q" placeholder="Nombre de carta o expansión" /><button type="submit" aria-label="Buscar"><Search size={18} /></button></div>
+            </form>
           </nav>
         </>
       ) : null}

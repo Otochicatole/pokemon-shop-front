@@ -143,7 +143,7 @@ button:disabled {
 
 .support-page-container {
   min-height: calc(100dvh - 90px);
-  padding: 0 4vw 24px;
+  padding: 54px 4vw 24px;
 }
 
 .site-main:has(.support-page-container) + .site-footer {

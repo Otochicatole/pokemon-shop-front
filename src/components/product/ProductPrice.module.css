@@ -1,4 +1,2 @@
-.productPrice {
-  color: var(--accent);
-  font: 11px var(--pixel-font);
-}
+.productPrice { color: var(--ink); font: 900 17px/1.4 var(--data-font), ui-monospace, monospace; font-variant-numeric: tabular-nums; letter-spacing: -.02em; overflow-wrap: anywhere; }
+@media (max-width: 640px) { .productPrice { font-size: 15px; } }

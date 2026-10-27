@@ -3,62 +3,34 @@
 import Image from 'next/image';
 import { useState } from 'react';
 import { PokemonStage } from '@/components/pokemon-stage';
-import styles from './companion-battle.module.css';
 import { companions, type Companion } from '../domain/companion';
-
-const groundOffsets: Record<Companion['id'], string> = {
-  pikachu: '0%',
-  charmander: '0%',
-  squirtle: '0%',
-};
+import styles from './companion-battle.module.css';
 
 export function CompanionBattle() {
   const [selectedId, setSelectedId] = useState<Companion['id']>('pikachu');
   const selected = companions.find((companion) => companion.id === selectedId) ?? companions[0];
-
+  const displayName = selected.name[0] + selected.name.slice(1).toLowerCase();
   return (
-    <div className={`${styles.battleScene} hero-art battle-scene`} aria-label="Elegí tu compañero Pokémon">
-      <div className={`${styles.battleHud} battle-hud`} aria-label={`${selected.name}, nivel ${selected.level}, ${selected.hp} puntos de salud`}>
-        <span>{selected.name}</span>
-        <b>Lv. {selected.level}</b>
-        <div aria-hidden="true"><i /><i /><i /><i /></div>
-        <small>HP {selected.hp} / {selected.maxHp}</small>
+    <div className={styles.scene} aria-label="Elegí tu compañero Pokémon">
+      <div className={styles.artwork}>
+        <PokemonStage
+          key={selected.id}
+          variant="route"
+          spriteUrl={selected.spriteUrl}
+          alt={`${displayName} pixelado`}
+          priority
+          className={styles.heroSprite}
+        />
       </div>
-
-      <PokemonStage
-        key={selected.id}
-        variant="route"
-        spriteUrl={selected.spriteUrl}
-        alt={`${selected.name[0]}${selected.name.slice(1).toLowerCase()} pixelado`}
-        groundOffset={groundOffsets[selected.id]}
-        priority
-      />
-
-      <div className={`${styles.dialogue} dialogue`} aria-live="polite" aria-atomic="true">
-        <span aria-hidden="true">▶</span>
-        <div>
-          <b>{selected.name}</b>
-          <span>{selected.message}</span>
-          <small>{selected.detail}</small>
-        </div>
-      </div>
-
-      <div className={`${styles.companionSelector} companion-selector`} role="group" aria-label="Elegir compañero">
-        {companions.map((companion) => {
-          const active = companion.id === selected.id;
-          return (
-            <button
-              key={companion.id}
-              type="button"
-              className={`${styles.companionOption} ${active ? styles.active : ''} companion-option companion-${companion.type} ${active ? 'active' : ''}`}
-              aria-pressed={active}
-              onClick={() => setSelectedId(companion.id)}
-            >
-              <Image src={companion.spriteUrl} alt="" width={52} height={52} unoptimized />
-              <span>{companion.typeLabel}</span>
+      <div className={styles.companionBar}>
+        <div className={styles.caption} aria-live="polite"><strong>{displayName}</strong><span>Elegí tu compañero</span></div>
+        <div className={styles.selector} role="group" aria-label="Elegir compañero">
+          {companions.map((companion) => (
+            <button key={companion.id} type="button" aria-label={`Elegir a ${companion.name[0]}${companion.name.slice(1).toLowerCase()}`} aria-pressed={companion.id === selected.id} onClick={() => setSelectedId(companion.id)}>
+              <Image src={companion.spriteUrl} alt="" width={42} height={42} unoptimized />
             </button>
-          );
-        })}
+          ))}
+        </div>
       </div>
     </div>
   );

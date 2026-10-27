@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Coins } from 'lucide-react';
+import { ArrowLeft, Coins, MapPin, Truck } from 'lucide-react';
 import { toast } from '@/components/feedback';
 import { useCartStore } from '@/features/cart/infrastructure/store';
 import { cartTotal, storeCartTotal } from '@/features/cart/domain/cart';
@@ -50,9 +50,10 @@ function ratesForProvince(zones: ShippingZoneOption[], province: string) {
 export function CheckoutFlow() {
   const fx = useStorefrontFx();
   const formatMoney = (money?: Money | ProviderMoney) => {
-    if (!money) return '—';
+    if (!money) return '-';
     if (money.currency === 'ARS') return formatRawMoney(money);
-    return fx.formatMoney(money);
+    const converted = fx.formatMoney(money);
+    return converted === '—' ? `${formatRawMoney(money)} USD` : converted;
   };
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -259,28 +260,35 @@ export function CheckoutFlow() {
     finally { setBusy(false); }
   };
 
-  if (me.isLoading || options.isLoading) return <div className="page-loading">Cargando opciones de compra…</div>;
+  if (me.isLoading || options.isLoading) return (
+    <div className={styles.checkoutLoading} role="status" aria-label="Cargando opciones de compra">
+      <div><div className={styles.loadingHeading} /><div className={styles.loadingSection} /><div className={styles.loadingSection} /></div>
+      <div className={styles.loadingSummary} />
+    </div>
+  );
   if (!me.data) return <div className="empty-state"><h2>Iniciá sesión para continuar</h2><p>Necesitamos una cuenta verificada para reservar tu compra.</p><Link href="/auth/login?returnTo=/checkout" className="button button-primary">Ingresar</Link></div>;
   if (!me.data.emailVerified) return <div className="empty-state"><h2>Verificá tu email</h2><p>Revisá tu correo y luego volvé a intentar el checkout.</p><Link href="/auth/verify-email" className="button button-secondary">Verificar email</Link></div>;
   if (!items.length) return <div className="empty-state"><h2>Tu carrito está vacío</h2><Link href="/catalog" className="button button-primary">Explorar catálogo</Link></div>;
+  if (options.isError) return (
+    <div className="empty-state" role="alert">
+      <h2>No pudimos cargar las opciones de compra</h2>
+      <p>Tu selección sigue en el carrito. Intentá cargar la entrega y los medios de pago nuevamente.</p>
+      <Button onClick={() => void options.refetch()} disabled={options.isFetching}>Reintentar</Button>
+    </div>
+  );
 
   return (
     <div className={`${styles.checkoutLayout} checkout-layout`}>
       <div className={`${styles.checkoutMain} checkout-main`}>
         <div className={`${styles.checkoutHeading} section-heading checkout-heading`}>
-          <p className="eyebrow">Paso final · Compra segura</p>
+          <Link href="/cart" className={styles.backLink}><ArrowLeft size={16} aria-hidden="true" /> Volver al carrito</Link>
           <h1>Confirmá tu compra</h1>
-          <p>Revisá la entrega, elegí cómo pagar y confirmá. El total, el stock y tus puntos se validan nuevamente en el servidor.</p>
-          <div className={`${styles.checkoutProgress} checkout-progress`} aria-label="Progreso del checkout">
-            <span className={`${styles.isActive} is-active`}>1 Entrega</span>
-            <span className={`${styles.isActive} is-active`}>2 Pago</span>
-            <span>3 Confirmación</span>
-          </div>
+          <p>Elegí la entrega y el medio de pago. Podés revisar el total antes de crear tu orden.</p>
         </div>
 
         {sellerOptions.length > 1 && (
           <section className={`${styles.checkoutSection} ${styles.sellerDeliveryGroups} checkout-section checkout-delivery-section seller-delivery-groups`}>
-            <h2>1. Entrega por vendedor</h2>
+            <h2>Entrega por vendedor</h2>
             <p className="form-hint">Elegí una opción independiente para cada vendedor. La dirección se comparte entre los envíos.</p>
             {sellerOptions.map((seller) => {
               const selection = sellerSelections[seller.sellerKey] ?? { delivery: seller.pickupPoints.length ? 'PICKUP' : 'SHIPMENT' };
@@ -291,24 +299,26 @@ export function CheckoutFlow() {
                     <button
                       type="button"
                       className={selection.delivery === 'PICKUP' ? 'active' : ''}
+                      aria-pressed={selection.delivery === 'PICKUP'}
                       disabled={!seller.pickupPoints.length}
                       onClick={() => {
                         setSellerSelections((current) => ({ ...current, [seller.sellerKey]: { ...selection, delivery: 'PICKUP', pickupPointId: selection.pickupPointId ?? seller.pickupPoints[0]?.id } }));
                         resetQuote();
                       }}
                     >
-                      Retiro
+                      <MapPin size={17} aria-hidden="true" /> Retiro
                     </button>
                     <button
                       type="button"
                       className={selection.delivery === 'SHIPMENT' ? 'active' : ''}
+                      aria-pressed={selection.delivery === 'SHIPMENT'}
                       disabled={!seller.shippingZones.some((zone) => zone.rates.length)}
                       onClick={() => {
                         setSellerSelections((current) => ({ ...current, [seller.sellerKey]: { ...selection, delivery: 'SHIPMENT', shippingRateId: selection.shippingRateId ?? seller.shippingZones[0]?.rates[0]?.id } }));
                         resetQuote();
                       }}
                     >
-                      Envío
+                      <Truck size={17} aria-hidden="true" /> Envío
                     </button>
                   </div>
                   {selection.delivery === 'PICKUP' ? (
@@ -392,27 +402,29 @@ export function CheckoutFlow() {
         )}
 
         <section className={`${styles.checkoutSection} checkout-section checkout-delivery-section`} style={sellerOptions.length > 1 ? { display: 'none' } : undefined}>
-          <h2>1. Entrega</h2>
+          <h2>Entrega</h2>
           <div className={`${styles.segmented} segmented`}>
             <button
               type="button"
               className={delivery === 'PICKUP' ? 'active' : ''}
+              aria-pressed={delivery === 'PICKUP'}
               onClick={() => {
                 setDelivery('PICKUP');
                 resetQuote();
               }}
             >
-              Retiro
+              <MapPin size={17} aria-hidden="true" /> Retiro
             </button>
             <button
               type="button"
               className={delivery === 'SHIPMENT' ? 'active' : ''}
+              aria-pressed={delivery === 'SHIPMENT'}
               onClick={() => {
                 setDelivery('SHIPMENT');
                 resetQuote();
               }}
             >
-              Envío
+              <Truck size={17} aria-hidden="true" /> Envío
             </button>
           </div>
           {delivery === 'PICKUP' ? (
@@ -492,16 +504,17 @@ export function CheckoutFlow() {
         </section>
 
         <section className={`${styles.checkoutSection} checkout-section checkout-payment-section`}>
-          <h2>2. Medio de pago</h2>
+          <h2>Medio de pago</h2>
           <p className={`${styles.checkoutSectionIntro} checkout-section-intro`}>
             Elegí una opción. Si seleccionás Mercado Pago, te llevaremos a su checkout seguro para completar el pago.
           </p>
           <div className={`${styles.paymentOptions} payment-options`}>
             {options.data?.paymentMethods.BANK_TRANSFER && (
-              <label className={`${styles.paymentOption} ${paymentMethod === 'BANK_TRANSFER' ? `${styles.selected} selected` : ''} payment-option`}>
+              <label className={`${styles.paymentOption} ${effectivePaymentMethod === 'BANK_TRANSFER' ? `${styles.selected} selected` : ''} payment-option`}>
                 <input
                   type="radio"
-                  checked={paymentMethod === 'BANK_TRANSFER'}
+                  name="payment-method"
+                  checked={effectivePaymentMethod === 'BANK_TRANSFER'}
                   onChange={() => {
                     setPaymentMethod('BANK_TRANSFER');
                     resetQuote();
@@ -514,10 +527,11 @@ export function CheckoutFlow() {
               </label>
             )}
             {options.data?.paymentMethods.MERCADO_PAGO && (
-              <label className={`${styles.paymentOption} ${paymentMethod === 'MERCADO_PAGO' ? `${styles.selected} selected` : ''} payment-option`}>
+              <label className={`${styles.paymentOption} ${effectivePaymentMethod === 'MERCADO_PAGO' ? `${styles.selected} selected` : ''} payment-option`}>
                 <input
                   type="radio"
-                  checked={paymentMethod === 'MERCADO_PAGO'}
+                  name="payment-method"
+                  checked={effectivePaymentMethod === 'MERCADO_PAGO'}
                   onChange={() => {
                     setPaymentMethod('MERCADO_PAGO');
                     resetQuote();
@@ -546,7 +560,7 @@ export function CheckoutFlow() {
               <Coins size={21} />
             </div>
             <div>
-              <h2>3. Usar puntos</h2>
+              <h2>Usar puntos</h2>
               <p>{account ? `${account.available} puntos disponibles` : 'Consultando saldo…'}</p>
             </div>
           </div>
@@ -607,7 +621,6 @@ export function CheckoutFlow() {
       <aside className={`${styles.checkoutSummary} checkout-summary`}>
         <div className={`${styles.checkoutSummaryHeader} checkout-summary-header`}>
           <div>
-            <p className="eyebrow">Revisión final</p>
             <h2>Resumen</h2>
           </div>
           <span className={`${styles.checkoutSummaryCount} checkout-summary-count`}>
@@ -620,29 +633,29 @@ export function CheckoutFlow() {
               <span>
                 {item.name} × {item.quantity}
               </span>
-              <strong>{formatMoney({ amountMinor: (BigInt(item.price.amountMinor) * BigInt(item.quantity)).toString(), currency: BASE_CURRENCY })}</strong>
+              <strong className="product-data">{formatMoney({ amountMinor: (BigInt(item.price.amountMinor) * BigInt(item.quantity)).toString(), currency: BASE_CURRENCY })}</strong>
             </div>
           ))}
           <div className="summary-line">
             <span>Subtotal</span>
-            <strong>{quote ? formatMoney(quote.subtotal) : formatMoney({ amountMinor: cartTotal(items).toString(), currency: BASE_CURRENCY })}</strong>
+            <strong className="product-data">{quote ? formatMoney(quote.subtotal) : formatMoney({ amountMinor: cartTotal(items).toString(), currency: BASE_CURRENCY })}</strong>
           </div>
           {quote && BigInt(quote.discount.amountMinor) > 0n && (
             <div className={`summary-line ${styles.loyaltyDiscount} loyalty-discount`}>
               <span>Descuento por puntos</span>
-              <strong>−{formatMoney(quote.discount)}</strong>
+              <strong className="product-data">−{formatMoney(quote.discount)}</strong>
             </div>
           )}
           {quote && (
             <div className="summary-line">
               <span>Envío</span>
-              <strong>{formatMoney(quote.shipping)}</strong>
+              <strong className="product-data">{formatMoney(quote.shipping)}</strong>
             </div>
           )}
         </div>
         <div className="summary-total">
           <span>Total</span>
-          <strong className={!quote ? `${styles.summaryPending} summary-pending` : undefined}>
+          <strong className={!quote ? `${styles.summaryPending} summary-pending` : 'product-data'}>
             {quote ? formatMoney(quote.total) : 'Validá para calcular'}
           </strong>
         </div>
@@ -650,7 +663,7 @@ export function CheckoutFlow() {
           <div className={`${styles.paymentQuote} payment-quote`}>
             <div className="summary-line">
               <span>Total a pagar en ARS</span>
-              <strong>{formatMoney(quote.mercadoPago.total)}</strong>
+              <strong className="product-data">{formatMoney(quote.mercadoPago.total)}</strong>
             </div>
             <p className="form-hint">
               Dólar {quote.mercadoPago.casa ?? 'configurado'} venta: {quote.mercadoPago.rate} · obtenido {new Date(quote.mercadoPago.fetchedAt).toLocaleTimeString()} · vigente hasta{' '}
@@ -679,8 +692,8 @@ export function CheckoutFlow() {
         >
           {syncingCart ? 'Actualizando precios…' : busy ? 'Validando…' : quote ? 'Crear orden' : 'Validar total'}
         </Button>
-        {!input && shipmentValidationMessage && (
-          <p className={`${styles.checkoutSummaryHint} form-hint checkout-summary-hint`}>{shipmentValidationMessage}</p>
+        {!input && (
+          <p className={`${styles.checkoutSummaryHint} form-hint checkout-summary-hint`}>{shipmentValidationMessage ?? 'Completá las opciones de entrega para continuar.'}</p>
         )}
         <p className={`${styles.checkoutSummaryHint} form-hint checkout-summary-hint`}>
           El precio y el saldo mostrado son informativos hasta la validación final.

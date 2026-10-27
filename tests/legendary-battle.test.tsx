@@ -18,7 +18,7 @@ describe('LegendaryBattle', () => {
     expect(stage).toContainElement(container.querySelector('[data-pokemon-sprite]'));
     expect(stage).toContainElement(container.querySelector('[data-pokemon-platform]'));
 
-    await user.click(screen.getByRole('button', { name: 'FUEGO' }));
+    await user.click(screen.getByRole('button', { name: 'Elegir a Moltres, tipo fuego' }));
 
     expect(screen.getByRole('img', { name: 'Moltres pixelado' })).toBeInTheDocument();
     expect(container.querySelector<HTMLElement>('[data-pokemon-sprite]')).toHaveStyle({

@@ -46,7 +46,6 @@ export function OAuthResult({ result }: { result?: string }) {
     <main className={`${styles.authPage} auth-page`}>
       <div className={`${styles.authPanel} ${styles.full} auth-panel full`}>
         <div className={`${styles.authCard} auth-card`}>
-          <p className="eyebrow">Google</p>
           <h1>{ok ? 'Acceso confirmado' : linkRequired ? 'Cuenta ya registrada' : 'No pudimos conectar Google'}</h1>
           <p>
             {ok

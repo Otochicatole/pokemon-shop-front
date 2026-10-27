@@ -1,6 +1,7 @@
 'use client';
 
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 import type { News } from '../domain/contracts';
 
@@ -8,7 +9,7 @@ import styles from './news-carousel.module.css';
 
 type NewsCarouselProps = {
   items: News[];
-  variant?: 'section' | 'hero';
+  variant?: 'section' | 'hero' | 'banner';
   /** Intervalo de rotación automática en milisegundos. */
   intervalMs?: number;
   onActiveChange?: (item: News) => void;
@@ -21,7 +22,7 @@ export function NewsCarousel({ items, variant = 'section', intervalMs = DEFAULT_
   const [paused, setPaused] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
   const onActiveChangeRef = useRef(onActiveChange);
-  onActiveChangeRef.current = onActiveChange;
+  useEffect(() => { onActiveChangeRef.current = onActiveChange; }, [onActiveChange]);
   const activeIndex = items.length ? Math.min(index, items.length - 1) : 0;
   const item = items[activeIndex];
   const rotationMs = Number.isFinite(intervalMs) && intervalMs >= 2000 ? intervalMs : DEFAULT_INTERVAL_MS;
@@ -48,11 +49,12 @@ export function NewsCarousel({ items, variant = 'section', intervalMs = DEFAULT_
 
   const move = (direction: -1 | 1) => setIndex((current) => (current + direction + items.length) % items.length);
   const Heading = variant === 'hero' ? 'h1' : 'h2';
-  const variantClass = variant === 'hero' ? styles.newsCarouselHero : '';
+  const hasBannerImage = variant === 'banner' && Boolean(item.coverUrl);
+  const variantClass = variant === 'hero' ? styles.newsCarouselHero : variant === 'banner' ? styles.newsCarouselBanner : '';
 
   return (
     <section
-      className={`${styles.newsCarousel} ${variantClass} news-carousel news-carousel-${variant}`}
+      className={`${styles.newsCarousel} ${variantClass} ${hasBannerImage ? styles.newsCarouselBannerHasImage : ''} news-carousel news-carousel-${variant}`}
       aria-label="Noticias de la tienda"
       aria-roledescription="carrusel"
       onMouseEnter={() => setPaused(true)}
@@ -60,6 +62,18 @@ export function NewsCarousel({ items, variant = 'section', intervalMs = DEFAULT_
       onFocus={() => setPaused(true)}
       onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setPaused(false); }}
     >
+      {hasBannerImage && item.coverUrl && (
+        <Image
+          className={styles.newsBannerImage}
+          src={item.coverUrl}
+          alt=""
+          fill
+          sizes="(max-width: 760px) 100vw, min(1400px, 100vw)"
+          preload
+          unoptimized={!item.coverUrl.startsWith('/')}
+        />
+      )}
+      {hasBannerImage && <span className={styles.newsBannerScrim} aria-hidden="true" />}
       <div className={`${styles.newsCarouselHeading} news-carousel-heading`}>
         <p className="eyebrow">{variant === 'hero' ? 'Ruta 10 // novedades de la tienda' : 'Novedades // Card Shop'}</p>
         <span>{activeIndex + 1} / {items.length}</span>
@@ -70,6 +84,7 @@ export function NewsCarousel({ items, variant = 'section', intervalMs = DEFAULT_
           <Heading>{item.title}</Heading>
           <p>{item.summary}</p>
         </div>
+        {variant !== 'banner' && item.coverUrl && <Image className={styles.newsImage} src={item.coverUrl} alt="" width={480} height={280} sizes="(max-width: 760px) 80vw, 440px" unoptimized={!item.coverUrl.startsWith('/')} />}
       </div>
       {items.length > 1 && (
         <div className={`${styles.newsCarouselNavigation} news-carousel-navigation`}>

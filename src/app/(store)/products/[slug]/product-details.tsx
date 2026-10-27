@@ -9,10 +9,11 @@ import { ProductPurchasePrice } from './product-purchase-price';
 import styles from './page.module.css';
 
 type Detail = { label: string; value: string | null | undefined };
+const dataLabels = new Set(['Código de set', 'Número de carta', 'Número de certificación', 'SKU', 'Grado']);
 
 function DetailList({ items }: { items: Detail[] }) {
   return <dl className={styles.specs}>{items.map(({ label, value }) => (
-    <div key={label}><dt>{label}</dt><dd className={!value?.trim() ? styles.missing : undefined}>{value?.trim() || 'No informado'}</dd></div>
+    <div key={label}><dt>{label}</dt><dd className={`${!value?.trim() ? styles.missing : ''} ${dataLabels.has(label) ? 'product-data' : ''}`.trim()}>{value?.trim() || 'No informado'}</dd></div>
   ))}</dl>;
 }
 
@@ -39,7 +40,7 @@ export function ProductDetails({ product }: { product: Product }) {
           <header className={styles.identity}>
             <h1>{product.name}</h1>
             <p className={styles.productKind}>{kindLabel}{card?.pokemonType && <> <span aria-hidden="true">·</span> {pokemonTypeLabels[card.pokemonType]}</>}</p>
-            {card && <p className={styles.collection}>{collectionName || 'Colección no informada'}{card.cardNumber.trim() && <> <span aria-hidden="true">/</span> N.º {card.cardNumber.trim()}</>}</p>}
+            {card && <p className={styles.collection}>{collectionName || 'Colección no informada'}{card.cardNumber.trim() && <> <span aria-hidden="true">/</span> <span className="product-data">N.º {card.cardNumber.trim()}</span></>}</p>}
           </header>
           {card && <dl className={styles.highlights}>
             <div><dt>Rareza</dt><dd>{card.rarity.trim() || 'No informada'}</dd></div>
@@ -49,7 +50,7 @@ export function ProductDetails({ product }: { product: Product }) {
           <div className={styles.purchase}>
             <ProductPurchasePrice price={product.price} />
             <p className={`${styles.availability} ${!inStock ? styles.unavailable : ''}`}>
-              {inStock ? <Check size={17} aria-hidden="true" /> : <Package size={17} aria-hidden="true" />}<strong>{availability}</strong>
+              {inStock ? <Check size={17} aria-hidden="true" /> : <Package size={17} aria-hidden="true" />}<strong className="product-data">{availability}</strong>
             </p>
             <div className={styles.purchaseAction}><AddToCartButton product={product} /></div>
             <p className={styles.stockNote}>{inStock ? 'La disponibilidad se verifica al confirmar la compra.' : 'Podés explorar otras cartas disponibles en el catálogo.'}</p>
@@ -61,7 +62,7 @@ export function ProductDetails({ product }: { product: Product }) {
         </div>
       </div>
       <section id="product-information" className={styles.information} aria-labelledby="product-information-title">
-        <div className={styles.sectionHeading}><h2 id="product-information-title">Información del producto</h2><span>SKU {product.sku}</span></div>
+        <div className={styles.sectionHeading}><h2 id="product-information-title">Información del producto</h2><span>SKU <span className="product-data">{product.sku}</span></span></div>
         <div className={styles.informationGrid}>
           <div className={styles.technical}>
             {card ? <>

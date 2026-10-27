@@ -1,4 +1,6 @@
 .addCompact {
-  align-self: stretch;
-  padding: 6px 8px;
+  align-self: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 10px;
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ChevronDown, Search, SlidersHorizontal, X } from 'lucide-react';
+import { ChevronDown, Search, SearchX, SlidersHorizontal, X } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/button';
@@ -27,6 +27,7 @@ function CatalogSearch({ value, onCommit }: { value: string; onCommit: (value: s
 
   return (
     <label className={`${styles.searchBox} search-box`}>
+      <span className="sr-only">Buscar productos</span>
       <Search size={18} aria-hidden="true" />
       <input
         type="search"
@@ -151,7 +152,7 @@ function CatalogBrowserController({ initialFilters }: { initialFilters: CatalogF
             </div>
           ) : items.length === 0 ? (
             <div className={styles.catalogStatePanel}>
-              <EmptyState title="No encontramos productos" description="Probá con otra búsqueda o quitá algún filtro." icon="◈">
+                <EmptyState title="No encontramos productos" description="Probá con otra búsqueda o quitá algún filtro." icon={<SearchX size={32} aria-hidden="true" />}>
                 {hasCatalogFilters(filters) && <Button type="button" variant="secondary" onClick={clearFilters}>Limpiar filtros</Button>}
               </EmptyState>
             </div>

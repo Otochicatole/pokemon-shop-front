@@ -1,51 +1,8 @@
-.productImage {
-  display: block;
-  position: relative;
-  aspect-ratio: 3 / 4;
-  overflow: hidden;
-  border-bottom: 2px solid var(--line);
-  background: #18252c;
-}
-
-.productImage img {
-  object-fit: cover;
-  transition: transform .35s;
-}
-
-:global(.product-card):hover .productImage img,
-:global(.product-tile):hover .productImage img {
-  transform: scale(1.03);
-}
-
-.productBadges {
-  position: absolute;
-  top: 6px;
-  left: 6px;
-  right: 6px;
-  z-index: 2;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 4px;
-  pointer-events: none;
-}
-
-.productKind {
-  padding: 4px 5px;
-  border: 2px solid #05070a;
-  background: var(--accent);
-  color: #05070a;
-  font: 6px var(--pixel-font);
-  text-transform: uppercase;
-  box-shadow: 2px 2px 0 #05070a;
-}
-
-.imagePlaceholder {
-  width: 100%;
-  height: 100%;
-  display: grid;
-  place-items: center;
-  background: linear-gradient(135deg, #173340, #25556a);
-  color: var(--cyan);
-  font: 32px var(--pixel-font);
-}
+.productImage { display: block; position: relative; aspect-ratio: 4 / 5; overflow: hidden; background: var(--surface-2); }
+.productImage img { padding: 20px; object-fit: contain; transition: transform .3s cubic-bezier(.16, 1, .3, 1); }
+:global(.product-card):hover .productImage img, :global(.product-tile):hover .productImage img { transform: scale(1.035); }
+.productBadges { position: absolute; bottom: 12px; left: 12px; right: 12px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; pointer-events: none; }
+.productKind { padding: 4px 9px; border-radius: 6px; background: var(--surface); color: var(--ink); font: 700 12px/1.4 'Nunito', sans-serif; }
+.imagePlaceholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 12px; padding: 18px; color: var(--muted); font-size: 12px; text-align: center; }
+@media (max-width: 640px) { .productImage img { padding: 12px; } }
+@media (prefers-reduced-motion: reduce) { .productImage img { transition: none; } :global(.product-card):hover .productImage img, :global(.product-tile):hover .productImage img { transform: none; } }

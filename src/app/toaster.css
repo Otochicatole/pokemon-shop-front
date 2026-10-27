@@ -1,7 +1,7 @@
 [data-sonner-toaster] {
   --width: 360px;
   --border-radius: 0;
-  font-family: 'Nunito', var(--font-geist), Arial, sans-serif;
+  font-family: var(--pixel-font, 'Nunito', var(--font-geist), Arial, sans-serif);
 }
 
 /* Slot transparente: el contenido visual vive en AppToast / RealtimeNotificationToast */

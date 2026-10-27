@@ -80,6 +80,12 @@ export function AuthForm({ mode }: { mode: 'login' | 'register' }) {
         </>
       )}
       {mode === 'register' && <p className={`${styles.formHint} form-hint`}>Te enviaremos un token para verificar tu email antes de comprar.</p>}
+      <p className={styles.switchMode}>
+        {mode === 'login' ? '¿Todavía no tenés cuenta? ' : '¿Ya tenés cuenta? '}
+        <Link href={mode === 'login' ? '/auth/register' : '/auth/login'}>
+          {mode === 'login' ? 'Crear cuenta' : 'Ingresar'}
+        </Link>
+      </p>
     </form>
   );
 }

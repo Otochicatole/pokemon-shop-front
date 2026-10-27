@@ -9,14 +9,14 @@
 
 .heading {
   padding-bottom: 26px;
-  border-bottom: 2px solid var(--line);
+  border-bottom: 1px solid var(--line);
 }
 
 .heading h1 {
   margin: 12px 0 10px;
-  font: clamp(28px, 4vw, 48px)/1.2 var(--pixel-font);
-  text-transform: uppercase;
-  text-shadow: 4px 4px 0 #26323e;
+  font: 800 clamp(28px, 4vw, 48px)/1.2 var(--pixel-font);
+  text-transform: none;
+  text-shadow: none;
 }
 
 .heading > div > p:last-child {

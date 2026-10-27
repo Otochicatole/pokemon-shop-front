@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { ArrowUpRight, ShieldCheck, Sparkles, Truck, Package, Layers3, Gem } from 'lucide-react';
+import { ArrowUpRight, Package, Layers3, Gem } from 'lucide-react';
 import { CatalogProductCard, listProducts } from '@/features/catalog';
-import { SectionHeading, TexturePanel } from '@/components';
+import { SectionHeading } from '@/components';
 import { HomeHero } from '@/features/home';
 import { LoyaltyPromo } from '@/features/loyalty';
-import { listPublicNews } from '@/features/news';
+import { listPublicNews, NewsCarousel } from '@/features/news';
 import { absoluteUrl, config, siteDescription } from '@/shared/config/env';
 
 import styles from './page.module.css';
@@ -27,21 +27,18 @@ const collections = [
   {
     href: '/catalog?kind=SINGLE_CARD',
     label: 'Cartas sueltas',
-    eyebrow: 'Completá tu pokédex',
     icon: Layers3,
     toneClass: styles.collectionLinkYellow,
   },
   {
     href: '/catalog?kind=SEALED_PRODUCT',
     label: 'Sobres y cajas',
-    eyebrow: 'Tentá a la suerte',
     icon: Package,
     toneClass: styles.collectionLinkRed,
   },
   {
     href: '/catalog?kind=ACCESSORY',
     label: 'Accesorios',
-    eyebrow: 'Protegé tu equipo',
     icon: Gem,
     toneClass: styles.collectionLinkCyan,
   },
@@ -49,7 +46,7 @@ const collections = [
 
 export default async function Home() {
   const [products, news] = await Promise.all([
-    listProducts(new URLSearchParams({ limit: '5' })).catch(() => ({ data: [], nextCursor: null })),
+    listProducts(new URLSearchParams({ limit: '4' })).catch(() => ({ data: [], nextCursor: null })),
     listPublicNews().catch(() => ({ data: [], meta: { rotationIntervalSeconds: 5 } })),
   ]);
 
@@ -89,31 +86,33 @@ export default async function Home() {
           }),
         }}
       />
-      <HomeHero
-        news={news.data}
-        rotationIntervalSeconds={news.meta?.rotationIntervalSeconds ?? 5}
-      />
+      {news.data.length > 0 && (
+        <div className={styles.newsSection}>
+          <NewsCarousel variant="banner" items={news.data} intervalMs={(news.meta?.rotationIntervalSeconds ?? 5) * 1000} />
+        </div>
+      )}
 
-      <section className={styles.trustStrip} aria-label="Beneficios de la tienda">
+      <HomeHero />
+
+      <section className={styles.trustStrip} aria-label="Tipos de productos">
         <span>
-          <ShieldCheck size={16} aria-hidden="true" /> Compra protegida
+          <Layers3 size={16} aria-hidden="true" /> Cartas sueltas
         </span>
         <span>
-          <Sparkles size={16} aria-hidden="true" /> Piezas verificadas
+          <Package size={16} aria-hidden="true" /> Productos sellados
         </span>
         <span>
-          <Truck size={16} aria-hidden="true" /> Envíos a todo el país
+          <Gem size={16} aria-hidden="true" /> Accesorios
         </span>
       </section>
 
       <section className={styles.collectionLinks} aria-label="Explorar colecciones">
-        {collections.map(({ href, label, eyebrow, icon: Icon, toneClass }) => (
+        {collections.map(({ href, label, icon: Icon, toneClass }) => (
           <Link className={`${styles.collectionLink} ${toneClass}`} href={href} key={label}>
             <span className={styles.collectionIcon} aria-hidden="true">
               <Icon size={22} />
             </span>
             <span className={styles.collectionCopy}>
-              <small>{eyebrow}</small>
               <strong>{label}</strong>
             </span>
             <ArrowUpRight size={17} aria-hidden="true" className={styles.collectionArrow} />
@@ -124,12 +123,11 @@ export default async function Home() {
       <section className={styles.homeSection}>
         <SectionHeading
           level="h2"
-          eyebrow="Inventario en vivo"
           title="Cartas destacadas"
           description="Stock real, precios claros y piezas listas para tu próxima colección."
           action={
             <Link className={styles.textButton} href="/catalog">
-              Catálogo completo <ArrowUpRight size={15} aria-hidden="true" />
+              Explorar catálogo <ArrowUpRight size={15} aria-hidden="true" />
             </Link>
           }
           className={styles.sectionHeading}
@@ -143,27 +141,14 @@ export default async function Home() {
         ) : (
           <div className={styles.emptyHome}>
             <span className={styles.emptyIcon} aria-hidden="true">
-              ◈
+              <Layers3 size={32} />
             </span>
             <p>El catálogo se está preparando.</p>
             <Link href="/catalog" className={styles.textButton}>
-              Explorar la tienda <ArrowUpRight size={16} aria-hidden="true" />
+              Explorar catálogo <ArrowUpRight size={16} aria-hidden="true" />
             </Link>
           </div>
         )}
-      </section>
-
-      <section className={styles.exploreSection}>
-        <TexturePanel className={styles.explorePanel}>
-          <div>
-            <p className="eyebrow">Mapa de la aventura // {config.storeName}</p>
-            <h2>Explorá por categoría</h2>
-            <p>Cada zona esconde una colección diferente.</p>
-          </div>
-          <Link className="button button-secondary" href="/catalog">
-            Ver todas las piezas <ArrowUpRight size={15} aria-hidden="true" />
-          </Link>
-        </TexturePanel>
       </section>
 
       <LoyaltyPromo />

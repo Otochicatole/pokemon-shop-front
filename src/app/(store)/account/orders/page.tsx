@@ -12,7 +12,6 @@ export default function OrdersPage() {
       </Link>
       <header className={styles.heading}>
         <div>
-          <p className="eyebrow">Tu actividad</p>
           <h1>Mis órdenes</h1>
           <p>Seguimiento de compras y pagos.</p>
         </div>

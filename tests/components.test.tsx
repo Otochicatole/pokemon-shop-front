@@ -5,7 +5,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { Button, DangerButton, Header, PixelBadge, SectionHeading, EmptyState } from '@/components';
 
 vi.mock('next/link', () => ({ default: ({ children, ...props }: AnchorHTMLAttributes<HTMLAnchorElement>) => <a {...props}>{children}</a> }));
-vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn() }) }));
+vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn() }), usePathname: () => '/' }));
 vi.mock('next/image', () => ({ default: ({ alt = '' }: { alt?: string }) => <span role="img" aria-label={alt} /> }));
 vi.mock('@/features/auth/infrastructure/api', () => ({ getMe: vi.fn().mockResolvedValue({ name: 'Coleccionista', email: 'collector@example.test' }) }));
 vi.mock('@/features/loyalty/infrastructure/api', () => ({ getLoyaltyAccount: vi.fn().mockResolvedValue({ account: { available: 17 } }) }));

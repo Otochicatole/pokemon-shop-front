@@ -132,3 +132,17 @@
 .info .badge {
   background: transparent;
 }
+
+/* Toasts are portaled beside the route layout; scope by the active storefront. */
+:global(body:has(.storefront)) .toast { border: 1px solid var(--line-strong); border-radius: 14px; padding: 16px 18px; background: var(--surface); box-shadow: var(--shadow); font-family: var(--body-font); }
+:global(body:has(.storefront)) .title,
+:global(body:has(.storefront)) .description,
+:global(body:has(.storefront)) .badge { font-family: var(--body-font) !important; }
+:global(body:has(.storefront)) .icon { border: 1px solid currentColor; border-radius: 10px; }
+:global(body:has(.storefront)) .badge { border: 0; padding-left: 0; font-size: 11px; letter-spacing: .02em; text-transform: uppercase; }
+:global(body:has(.storefront)) .close { width: 36px; height: 36px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+:global(body:has(.storefront)) .close:hover { color: var(--ink); background: var(--surface-2); }
+:global(body:has(.storefront)) .success :is(.icon,.badge) { color: var(--success); background: transparent; }
+:global(body:has(.storefront)) .error :is(.icon,.badge) { color: var(--danger); background: transparent; }
+:global(body:has(.storefront)) .warning :is(.icon,.badge) { color: var(--accent-ink); background: transparent; }
+:global(body:has(.storefront)) .info :is(.icon,.badge) { color: var(--cyan); background: transparent; }

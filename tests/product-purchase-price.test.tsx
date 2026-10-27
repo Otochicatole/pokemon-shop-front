@@ -1,6 +1,8 @@
 import { cleanup, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ProductPurchasePrice } from '@/app/(store)/products/[slug]/product-purchase-price';
+import { ProductPrice } from '@/components/product/ProductPrice';
+import { StorefrontMoney } from '@/shared/fx/StorefrontMoney';
 import type { Money } from '@/shared/api/contracts';
 
 const fx = vi.hoisted(() => ({ formatMoney: vi.fn(), isLoading: false }));
@@ -11,6 +13,24 @@ const price: Money = { amountMinor: '1196', currency: 'USD' };
 beforeEach(() => {
   fx.formatMoney.mockReset();
   fx.isLoading = false;
+});
+
+describe('catalog and cart currency fallbacks', () => {
+  it('keeps the source currency visible when a conversion is unavailable', () => {
+    fx.formatMoney.mockReturnValue('—');
+    render(<><ProductPrice price={price} /><StorefrontMoney money={price} /></>);
+    expect(screen.getAllByText(/11,96.*USD/)).toHaveLength(2);
+    expect(screen.queryByText(/ARS/)).not.toBeInTheDocument();
+    expect(screen.queryByText('Consultar precio')).not.toBeInTheDocument();
+  });
+
+  it('uses the converted amount once FX is available and never converts provider ARS twice', () => {
+    fx.formatMoney.mockReturnValue('$ 15.428,40');
+    render(<><ProductPrice price={price} /><StorefrontMoney money={{ amountMinor: '250000', currency: 'ARS' }} raw /></>);
+    expect(screen.getByText('$ 15.428,40 ARS')).toBeInTheDocument();
+    expect(screen.getByText(/2.500,00/)).toBeInTheDocument();
+    expect(fx.formatMoney).toHaveBeenCalledTimes(1);
+  });
 });
 afterEach(cleanup);
 

@@ -72,7 +72,6 @@ export function ProfilePage() {
           Volver a mi cuenta
         </Link>
         <div>
-          <p className="eyebrow">Cuenta personal</p>
           <h1>Mi perfil</h1>
           <p>Actualizá tus datos y mantené segura tu cuenta.</p>
         </div>
@@ -84,7 +83,6 @@ export function ProfilePage() {
             <div className={styles.profilePanelTitle}>
               <span className={styles.profilePanelIcon} aria-hidden="true"><UserRound size={16} /></span>
               <div>
-                <p className={styles.profilePanelKicker}>Identidad</p>
                 <h2>Datos personales</h2>
               </div>
             </div>
@@ -104,7 +102,6 @@ export function ProfilePage() {
             <div className={styles.profilePanelTitle}>
               <span className={`${styles.profilePanelIcon} ${styles.profilePanelIconSecurity}`} aria-hidden="true"><Shield size={16} /></span>
               <div>
-                <p className={styles.profilePanelKicker}>Seguridad</p>
                 <h2>Contraseña</h2>
               </div>
             </div>

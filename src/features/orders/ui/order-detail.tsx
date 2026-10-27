@@ -62,7 +62,7 @@ const mercadoPagoReturnParams = [
 export function OrderDetail({ number }: { number: string }) {
   const fx = useStorefrontFx();
   const formatMoney = (money?: Money | ProviderMoney) => {
-    if (!money) return '—';
+    if (!money) return '-';
     if (money.currency === 'ARS') return formatRawMoney(money);
     return fx.formatMoney(money);
   };
@@ -103,7 +103,12 @@ export function OrderDetail({ number }: { number: string }) {
     void reconcilePaymentStatus()
       .catch((error) => toast.error(error instanceof Error ? error.message : 'No pudimos actualizar el estado del pago'));
   }, [number, reconcilePaymentStatus]);
-  if (query.isLoading) return <div className="page-loading">Cargando orden…</div>;
+  if (query.isLoading) return (
+    <div className={styles.orderLoading} role="status" aria-label="Cargando orden">
+      <div className={styles.loadingHeading} />
+      <div className={styles.orderColumns}><div className={styles.loadingCard} /><div className={styles.loadingCard} /></div>
+    </div>
+  );
   if (query.isError || !query.data) {
     return (
       <EmptyState title="Orden no encontrada" description="Puede que el número sea incorrecto o que no tengas acceso.">
@@ -177,15 +182,13 @@ export function OrderDetail({ number }: { number: string }) {
       <Link href="/account/orders" className={`back-link ${styles.backLink}`}><ArrowLeft size={15} aria-hidden="true" />Volver a mis órdenes</Link>
       <header className={styles.heading}>
         <div>
-          <p className="eyebrow">Orden {order.number}</p>
-          <h1>{statusLabel(displayStatus)}</h1>
+          <h1>Orden {order.number}</h1>
           <p>Creada el {formatDate(order.createdAt)}</p>
         </div>
         <StatusBadge status={statusLabel(displayStatus)} tone={statusTone(displayStatus)} />
       </header>
       <div className={styles.orderColumns}>
         <section className={styles.orderCard}>
-          <div className={styles.cardLabel}>Resumen</div>
           <h2>Productos</h2>
           {order.items.map((item) => (
             <div className={styles.summaryLine} key={item.productId}>
@@ -227,7 +230,6 @@ export function OrderDetail({ number }: { number: string }) {
           )}
         </section>
         <section className={styles.orderCard}>
-          <div className={styles.cardLabel}>Logística</div>
           <h2>{order.fulfillmentType === 'PICKUP' ? 'Retiro' : 'Envío'}</h2>
           <p>{order.fulfillmentType === 'PICKUP' ? 'Retiro en el punto seleccionado.' : `${String(order.fulfillment?.addressLine1 ?? '')}, ${String(order.fulfillment?.city ?? '')}, ${String(order.fulfillment?.province ?? '')}`}</p>
           <h2 className={styles.mt}>Pago</h2>
@@ -244,7 +246,7 @@ export function OrderDetail({ number }: { number: string }) {
               {payment.paymentSessionStatus === 'READY' ? 'Pagar con Mercado Pago' : 'Retomar pago con Mercado Pago'}
             </Button>
           )}
-          {payment?.method === 'MERCADO_PAGO' && !pollingStopped && <p className={styles.formHint}>Confirmando el estado del pago…</p>}
+          {payment?.method === 'MERCADO_PAGO' && paymentPending && !pollingStopped && <p className={styles.formHint}>Confirmando el estado del pago…</p>}
           {payment?.method === 'MERCADO_PAGO' && pollingStopped && paymentPending && (
             <div className={styles.formHint}>
               <p>La confirmación está tardando más de lo esperado.</p>
@@ -288,7 +290,6 @@ export function OrderDetail({ number }: { number: string }) {
           )}
         </section>
         <section className={`${styles.orderCard} ${styles.orderTimelineCard}`}>
-          <div className={styles.cardLabel}>Timeline</div>
           <h2>Seguimiento de la orden</h2>
           {timeline.length > 0 ? (
             <ol className={styles.orderTimeline}>
@@ -310,7 +311,6 @@ export function OrderDetail({ number }: { number: string }) {
       {order.sellerOrders.length > 0 && (
         <section className={`${styles.orderCard} ${styles.orderSellerOrders}`}>
           <div className={styles.sellerIntro}>
-            <p className="eyebrow">Marketplace</p>
             <h2>Entregas por vendedor</h2>
             <p>La orden se actualiza automáticamente a partir de cada suborden.</p>
           </div>
@@ -319,9 +319,8 @@ export function OrderDetail({ number }: { number: string }) {
               <article className={styles.sellerOrderCard} key={sellerOrder.id}>
                 <div className={styles.sellerOrderCardHeader}>
                   <div>
-                    <span className="eyebrow">{sellerOrder.sellerType === 'AFFILIATE' ? 'Afiliado' : 'Tienda'}</span>
                     <h3>{sellerOrder.sellerName}</h3>
-                    <p>{sellerOrder.number}</p>
+                    <p>{sellerOrder.sellerType === 'AFFILIATE' ? 'Afiliado' : 'Tienda'} · {sellerOrder.number}</p>
                   </div>
                   <StatusBadge status={statusLabel(sellerOrder.status)} tone={statusTone(sellerOrder.status)} />
                 </div>
@@ -382,7 +381,7 @@ export function OrderDetail({ number }: { number: string }) {
           </div>
         </section>
       )}
-      <Dialog open={cancelDialogOpen} title="Cancelar orden" description="Esta acción cancelará la orden y liberará las reservas asociadas. ¿Querés continuar?" onClose={() => !busy && setCancelDialogOpen(false)} className={styles.orderCancelDialog}>
+      <Dialog open={cancelDialogOpen} title="Cancelar orden" description="Esta acción cancelará la orden y liberará las reservas asociadas. ¿Querés continuar?" onClose={() => !busy && setCancelDialogOpen(false)}>
         <div className={styles.orderDialogActions}>
           <Button type="button" variant="secondary" onClick={() => setCancelDialogOpen(false)} disabled={busy}>Volver</Button>
           <Button type="button" variant="danger" onClick={() => void confirmCancel()} disabled={busy}>{busy ? 'Cancelando…' : 'Confirmar cancelación'}</Button>

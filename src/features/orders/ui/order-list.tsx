@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { Package } from 'lucide-react';
+import { ArrowRight, Package } from 'lucide-react';
 import { StatusBadge } from '@/components/badge';
 import type { BadgeTone } from '@/components/badge';
 import { EmptyState } from '@/components/feedback';
@@ -29,7 +29,16 @@ export function OrderList() {
 
   const orders = query.data?.pages.flatMap((p) => p.data) ?? [];
 
-  if (query.isLoading) return <div className="page-loading">Cargando historial…</div>;
+  if (query.isLoading) return (
+    <div className={styles.loadingList} role="status" aria-label="Cargando historial de órdenes">
+      {[0, 1, 2].map((item) => <div key={item} className={styles.loadingRow} />)}
+    </div>
+  );
+  if (query.isError && !orders.length) return (
+    <EmptyState title="No pudimos cargar tus órdenes" description="Intentá nuevamente para ver el historial de tus compras." className={styles.empty}>
+      <button type="button" className="button button-secondary" onClick={() => void query.refetch()} disabled={query.isFetching}>Reintentar</button>
+    </EmptyState>
+  );
   if (!orders.length) {
     return (
       <EmptyState
@@ -58,6 +67,7 @@ export function OrderList() {
           className={styles.orderRow}
           key={order.id}
         >
+          <span className={styles.orderIcon}><Package size={21} aria-hidden="true" /></span>
           <div className={styles.orderCopy}>
             <strong>{order.number}</strong>
             <span>
@@ -69,8 +79,10 @@ export function OrderList() {
             <StatusBadge status={statusLabel(order.status)} tone={statusTone(order.status)} />
             <strong><StorefrontMoney money={order.totals.total} /></strong>
           </div>
+          <ArrowRight className={styles.orderArrow} size={18} aria-hidden="true" />
         </Link>
       ))}
+      {query.isFetchNextPageError && <p className={styles.loadError} role="alert">No pudimos cargar más órdenes. Podés volver a intentarlo.</p>}
       {query.hasNextPage && (
         <button
           type="button"

@@ -60,7 +60,7 @@ export default function PokemonTcgPriceHistoryChart({ points, source, currency, 
       <ResponsiveContainer width="100%" height="100%" minWidth={0}>
         <LineChart data={data} accessibilityLayer aria-label={label} aria-describedby={`${chartId}-help`} margin={{ top: 12, right: 20, left: 0, bottom: 12 }}>
           <CartesianGrid vertical={false} stroke="var(--line)" />
-          <XAxis dataKey="timestamp" type="number" scale="time" domain={xDomain} ticks={ticks} tickFormatter={tickDate} tick={{ fill: 'var(--muted)', fontSize: 12 }} tickLine={false} axisLine={{ stroke: 'var(--line-strong)' }} tickMargin={12} minTickGap={28} interval="preserveStartEnd" padding={{ left: 12, right: 12 }} />
+          <XAxis dataKey="timestamp" type="number" scale="time" domain={xDomain} ticks={ticks} tickFormatter={tickDate} tick={{ fill: 'var(--muted)', fontSize: 12 }} tickLine={false} axisLine={{ stroke: 'var(--line-strong)' }} tickMargin={12} minTickGap={28} interval="preserveStartEnd" padding={{ left: 12, right: 56 }} />
           <YAxis domain={yDomain} tickFormatter={tickPrice} tick={{ fill: 'var(--muted)', fontSize: 12 }} tickLine={false} axisLine={false} tickMargin={10} width={64} tickCount={5} />
           <Tooltip trigger={tooltipTrigger} content={PriceTooltip} cursor={{ stroke: 'var(--line-strong)', strokeDasharray: '4 4' }} isAnimationActive={false} />
           <Line type="linear" dataKey="value" name="Precio" stroke="var(--cyan)" strokeWidth={2} dot={{ r: 4, fill: 'var(--cyan)', stroke: 'var(--surface)', strokeWidth: 1.5 }} activeDot={{ r: 6, fill: 'var(--cyan)', stroke: 'var(--accent)', strokeWidth: 2 }} isAnimationActive={false} />

@@ -109,7 +109,7 @@ export function SupportConversationView({ id }: { id: string }) {
     <header className={styles.conversationHeading}>
       <Link href="/account/support" className="back-link"><ArrowLeft size={15} aria-hidden="true" />Mis consultas</Link>
       <div className={styles.titleRow}>
-        <div><p className="eyebrow">Conversación de soporte</p><h1>{summary.subject}</h1></div>
+        <div><h1>{summary.subject}</h1></div>
         <span className={`${styles.status} ${styles[`status${summary.status}`]}`}>{supportStatusLabels[summary.status]}</span>
       </div>
       <p className={styles.caseMeta}><Clock3 size={14} aria-hidden="true" />Iniciada el {formatMessageDate(summary.createdAt)}</p>

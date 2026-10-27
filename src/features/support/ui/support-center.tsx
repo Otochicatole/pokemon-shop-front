@@ -111,7 +111,6 @@ export function SupportCenter() {
     <Link href="/account" className={`${styles.supportBack} back-link`}><ArrowLeft size={15} aria-hidden="true" />Volver a mi cuenta</Link>
     <header className={styles.heading}>
       <div>
-        <p className="eyebrow">Ayuda personalizada</p>
         <h1>Centro de soporte</h1>
         <p>Escribinos por cualquier problema. El equipo responde en esta misma conversación.</p>
       </div>
